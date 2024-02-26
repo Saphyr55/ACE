@@ -15,4 +15,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "AniCardEchantnment"
 include(":app")
- 
+include(":domain")

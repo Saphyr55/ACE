@@ -36,16 +36,17 @@ dependencies {
 
     implementation( project(":domain") )
 
-
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 
     implementation("com.google.android.material:material:1.11.0")
 
     // Firebase
-    implementation(platform("com.google.firebase:firebase-bom:32.7.2"))
-    implementation("com.google.firebase:firebase-analytics-ktx:21.5.1")
-    
+    implementation( platform("com.google.firebase:firebase-bom:32.7.2") )
+    implementation("com.google.firebase:firebase-analytics:21.5.1")
+    implementation("com.google.firebase:firebase-auth:22.3.1")
+    implementation("com.google.firebase:firebase-firestore:24.10.2")
+
 //    val roomVersion = "2.6.1"
 //
 //    implementation("androidx.room:room-runtime:$roomVersion")

@@ -8,7 +8,7 @@ import java.util.Optional;
 @Port
 public interface AccountInventory {
 
-    Optional<Account> getByUsername(String username);
+    Optional<Account> getByEmail(String email);
 
     void addAccount(Account account);
 

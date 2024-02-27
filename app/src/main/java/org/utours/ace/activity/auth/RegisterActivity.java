@@ -1,0 +1,90 @@
+package org.utours.ace.activity.auth;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.firebase.auth.FirebaseAuth;
+
+import org.utours.ace.R;
+import org.utours.ace.auth.AuthenticationManager;
+import org.utours.ace.auth.firebase.FirebaseAccountRegistration;
+import org.utours.ace.model.Account;
+import org.utours.ace.port.AccountRegistration;
+
+public class RegisterActivity extends AppCompatActivity {
+
+    private EditText emailEditText;
+    private EditText passwordEditText;
+    private Button registerButton;
+    private TextView connectHereTextView;
+    private ProgressBar progressBar;
+    private AccountRegistration accountRegistration;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_register);
+
+        emailEditText = findViewById(R.id.edittext_email);
+        passwordEditText = findViewById(R.id.edittext_password);
+        registerButton = findViewById(R.id.btn_register);
+        connectHereTextView = findViewById(R.id.textview_connectHere);
+        progressBar = findViewById(R.id.progressBar);
+
+        accountRegistration = AuthenticationManager.INSTANCE
+                        .getAuthenticationProvider()
+                        .accountRegistration();
+
+        connectHereTextView.setOnClickListener(v -> redirectToConnectionActivity());
+        registerButton.setOnClickListener(v -> onPressedRegisterButton());
+    }
+
+    private void onPressedRegisterButton() {
+
+        var email = String.valueOf(emailEditText.getText());
+        var password = String.valueOf(passwordEditText.getText());
+        var account = new Account(email, password);
+
+        if (account.email().isBlank()) {
+            Toast.makeText(RegisterActivity.this, "Unvalidated email.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        if (account.password().isBlank() || account.password().length() < 6) {
+            Toast.makeText(RegisterActivity.this, "Unvalidated password.", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        progressBar.setVisibility(View.VISIBLE);
+
+        accountRegistration.register(account, this::onSuccessRegistration, this::onFailedRegistration);
+
+        progressBar.setVisibility(View.GONE);
+    }
+
+    private void onFailedRegistration(Exception e) {
+        Log.w(RegisterActivity.class.getName(), "createUserWithEmail:failure", e);
+        Toast.makeText(RegisterActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+    }
+
+    private void onSuccessRegistration(Account account) {
+        Toast.makeText(RegisterActivity.this, "Authentication was a success.", Toast.LENGTH_SHORT).show();
+        redirectToConnectionActivity();
+    }
+
+    private void redirectToConnectionActivity() {
+        Intent intent = new Intent(this, ConnectionActivity.class);
+        startActivity(intent);
+        finish();
+    }
+
+}

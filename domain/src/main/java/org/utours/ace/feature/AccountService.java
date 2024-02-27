@@ -1,9 +1,9 @@
-package org.utours.ace.api;
+package org.utours.ace.feature;
 
 import org.utours.ace.common.annotation.DomainService;
 import org.utours.ace.model.Account;
-import org.utours.ace.spi.AccountConnection;
-import org.utours.ace.spi.AccountInventory;
+import org.utours.ace.port.AccountConnection;
+import org.utours.ace.port.AccountInventory;
 
 @DomainService
 public class AccountService {

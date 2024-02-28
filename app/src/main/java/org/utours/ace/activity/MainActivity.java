@@ -6,9 +6,11 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import org.utours.ace.activity.auth.ConnectionActivity;
+import org.utours.ace.activity.auth.RegisterActivity;
 
 
 public class MainActivity extends AppCompatActivity {
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

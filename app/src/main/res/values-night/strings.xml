@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">AniCardEnchantment</string>
+    <string name="title_activity_connection">ConnectionActivity</string>
     <string name="connect">Connect</string>
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="register">Register</string>
     <string name="already_have_an_account">Already have an account ?</string>
     <string name="register_here">Register here</string>
+    <string name="start_ace">Start ACE</string>
 </resources>

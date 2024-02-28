@@ -6,10 +6,10 @@ import org.utours.ace.port.AccountConnection;
 import org.utours.ace.port.AccountRegistration;
 import org.utours.ace.port.AuthenticationProvider;
 
-public class FirebaseAuthenticationProvider implements AuthenticationProvider {
+public final class FirebaseAuthenticationProvider implements AuthenticationProvider {
 
-    private AccountConnection accountConnection;
-    private AccountRegistration accountRegistration;
+    private final AccountConnection accountConnection;
+    private final AccountRegistration accountRegistration;
 
     public FirebaseAuthenticationProvider(FirebaseAuth auth) {
         this.accountConnection = new FirebaseAccountConnection(auth);

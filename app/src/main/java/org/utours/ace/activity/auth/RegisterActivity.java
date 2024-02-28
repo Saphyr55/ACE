@@ -12,11 +12,8 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import org.utours.ace.R;
 import org.utours.ace.auth.AuthenticationManager;
-import org.utours.ace.auth.firebase.FirebaseAccountRegistration;
 import org.utours.ace.model.Account;
 import org.utours.ace.port.AccountRegistration;
 
@@ -45,10 +42,10 @@ public class RegisterActivity extends AppCompatActivity {
                         .accountRegistration();
 
         connectHereTextView.setOnClickListener(v -> redirectToConnectionActivity());
-        registerButton.setOnClickListener(v -> onPressedRegisterButton());
+        registerButton.setOnClickListener(v -> registerAccount());
     }
 
-    private void onPressedRegisterButton() {
+    private void registerAccount() {
 
         var email = String.valueOf(emailEditText.getText());
         var password = String.valueOf(passwordEditText.getText());

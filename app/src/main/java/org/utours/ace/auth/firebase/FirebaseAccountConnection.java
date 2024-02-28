@@ -7,7 +7,7 @@ import org.utours.ace.port.AccountConnection;
 
 import java.util.function.Consumer;
 
-public class FirebaseAccountConnection implements AccountConnection {
+public final class FirebaseAccountConnection implements AccountConnection {
 
     private final FirebaseAuth auth;
 

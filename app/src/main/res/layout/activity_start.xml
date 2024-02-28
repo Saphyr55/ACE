@@ -7,17 +7,21 @@
     tools:context=".activity.StartActivity">
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="287dp"
-        android:layout_height="99dp"
+        android:id="@+id/textview_startAce"
+        android:layout_width="234dp"
+        android:layout_height="43dp"
         android:text="@string/start_ace"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/button"
+        android:id="@+id/btn_parameter"
         android:layout_width="40dp"
         android:layout_height="45dp"
         android:text=""

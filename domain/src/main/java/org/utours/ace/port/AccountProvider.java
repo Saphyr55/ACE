@@ -6,10 +6,8 @@ import org.utours.ace.model.Account;
 import java.util.Optional;
 
 @Port
-public interface AccountInventory {
+public interface AccountProvider {
 
     Optional<Account> getByEmail(String email);
-
-    void addAccount(Account account);
 
 }

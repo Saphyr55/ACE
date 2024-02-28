@@ -7,7 +7,7 @@ import org.utours.ace.port.AccountRegistration;
 
 import java.util.function.Consumer;
 
-public class FirebaseAccountRegistration implements AccountRegistration {
+public final class FirebaseAccountRegistration implements AccountRegistration {
 
     private final FirebaseAuth auth;
 

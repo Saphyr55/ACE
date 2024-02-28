@@ -13,4 +13,5 @@
     <string name="password_must_have_more_than_6_character">Password must have more than 6 character.</string>
     <string name="authentication_failed">Authentication failed.</string>
     <string name="authentication_was_a_success">Authentication was a success.</string>
+    <string name="is_not_a_valid_email">Is not a valid email.</string>
 </resources>

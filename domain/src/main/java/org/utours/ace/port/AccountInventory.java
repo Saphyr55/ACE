@@ -6,7 +6,7 @@ import org.utours.ace.model.Account;
 import java.util.Optional;
 
 @Port
-public interface AccountProvider {
+public interface AccountInventory {
 
     Optional<Account> getByEmail(String email);
 

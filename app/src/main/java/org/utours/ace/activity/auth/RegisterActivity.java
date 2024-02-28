@@ -14,8 +14,11 @@ import android.widget.Toast;
 
 import org.utours.ace.R;
 import org.utours.ace.auth.AuthenticationManager;
+import org.utours.ace.common.AccountValidatorProvider;
 import org.utours.ace.model.Account;
 import org.utours.ace.port.AccountRegistration;
+
+import java.util.Stack;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -24,7 +27,10 @@ public class RegisterActivity extends AppCompatActivity {
     private Button registerButton;
     private TextView connectHereTextView;
     private ProgressBar progressBar;
+
     private AccountRegistration accountRegistration;
+    private AccountValidatorProvider accountValidatorProvider;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,9 +43,11 @@ public class RegisterActivity extends AppCompatActivity {
         connectHereTextView = findViewById(R.id.textview_connectHere);
         progressBar = findViewById(R.id.progressBar);
 
+        accountValidatorProvider = () -> this;
+
         accountRegistration = AuthenticationManager.INSTANCE
-                        .getAuthenticationProvider()
-                        .accountRegistration();
+                .getAuthenticationProvider()
+                .accountRegistration();
 
         connectHereTextView.setOnClickListener(v -> redirectToConnectionActivity());
         registerButton.setOnClickListener(v -> registerAccount());
@@ -51,19 +59,18 @@ public class RegisterActivity extends AppCompatActivity {
         var password = String.valueOf(passwordEditText.getText());
         var account = new Account(email, password);
 
-        if (account.email().isBlank()) {
-            Toast.makeText(RegisterActivity.this, "Unvalidated email.", Toast.LENGTH_LONG).show();
-            return;
-        }
+        boolean isInvalid = accountValidatorProvider
+                .validatorOf(account)
+                .trace(this::sendErrorMessage)
+                .isInvalid();
 
-        if (account.password().isBlank() || account.password().length() < 6) {
-            Toast.makeText(RegisterActivity.this, "Unvalidated password.", Toast.LENGTH_LONG).show();
-            return;
-        }
+        if (isInvalid) return;
 
         progressBar.setVisibility(View.VISIBLE);
 
-        accountRegistration.register(account, this::onSuccessRegistration, this::onFailedRegistration);
+        accountRegistration.register(account,
+                this::onSuccessRegistration,
+                this::onFailedRegistration);
 
         progressBar.setVisibility(View.GONE);
     }
@@ -84,4 +91,13 @@ public class RegisterActivity extends AppCompatActivity {
         finish();
     }
 
+    private void sendErrorMessage(Account a, Stack<Throwable> throwableStack) {
+        throwableStack.stream()
+                .findFirst()
+                .ifPresent(this::messagingUserWithToast);
+    }
+
+    private void messagingUserWithToast(Throwable throwable) {
+        Toast.makeText(RegisterActivity.this, throwable.getMessage(), Toast.LENGTH_LONG).show();
+    }
 }

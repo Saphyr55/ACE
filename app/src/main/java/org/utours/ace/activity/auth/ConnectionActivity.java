@@ -2,6 +2,7 @@ package org.utours.ace.activity.auth;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,25 +13,27 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
-
 import org.utours.ace.R;
 import org.utours.ace.activity.StartActivity;
 import org.utours.ace.auth.AuthenticationManager;
-import org.utours.ace.auth.firebase.FirebaseAccountConnection;
+import org.utours.ace.common.AccountValidatorProvider;
 import org.utours.ace.model.Account;
 import org.utours.ace.port.AccountConnection;
+
+import java.util.Stack;
+import java.util.function.Consumer;
 
 public class ConnectionActivity extends AppCompatActivity {
 
     private static final String TAG = ConnectionActivity.class.getName();
 
-    EditText emailEditText;
-    EditText passwordEditText;
-    Button connectButton;
-    TextView registerHereTextView;
-    ProgressBar progressBar;
-    AccountConnection accountConnection;
+    private EditText emailEditText;
+    private EditText passwordEditText;
+    private Button connectButton;
+    private TextView registerHereTextView;
+    private ProgressBar progressBar;
+    private AccountConnection accountConnection;
+    private AccountValidatorProvider accountValidatorProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,60 +46,61 @@ public class ConnectionActivity extends AppCompatActivity {
         registerHereTextView = findViewById(R.id.textview_registerHere);
         progressBar = findViewById(R.id.progressBar);
 
+        accountValidatorProvider = () -> this;
+
         accountConnection = AuthenticationManager.INSTANCE
                 .getAuthenticationProvider()
                 .accountConnection();
 
-        registerHereTextView.setOnClickListener(v -> redirectToRegisterActivity());
-        connectButton.setOnClickListener(v -> onPressedConnectButton());
+        registerHereTextView.setOnClickListener(v -> redirectTo(RegisterActivity.class));
+        connectButton.setOnClickListener(v -> tryToConnect());
     }
 
-    private void onPressedConnectButton() {
+    private void tryToConnect() {
         var email = String.valueOf(emailEditText.getText());
         var password = String.valueOf(passwordEditText.getText());
         var account = new Account(email, password);
 
+        accountValidatorProvider.validatorOf(account)
+                .trace(this::sendErrorMessageOnInvalidation)
+                .ifValid(this::connectAccount);
+    }
 
-        if (account.email().isBlank()) {
-            Toast.makeText(ConnectionActivity.this, "Unvalidated email.", Toast.LENGTH_LONG).show();
-            return;
-        }
-
-        if (account.password().isBlank() || account.password().length() < 6) {
-            Toast.makeText(ConnectionActivity.this, "Unvalidated password.", Toast.LENGTH_LONG).show();
-            return;
-        }
-
+    private void connectAccount(Account account) {
         progressBar.setVisibility(View.VISIBLE);
-
-        accountConnection.connect(
-                account,
-                this::connectionSuccess,
-                this::connectionFailed
-        );
-
+        accountConnection.connect(account,
+                this::redirectToStartActivity,
+                this::sendErrorMessageOnAuthentication);
         progressBar.setVisibility(View.GONE);
     }
 
-    private void connectionFailed(Exception e) {
-        Log.w(TAG, "accountConnection:failure", e);
-        Toast.makeText(ConnectionActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
-    }
-
-    private void connectionSuccess(Account account) {
-        redirectToStartActivity(account);
+    private void sendErrorMessageOnInvalidation(Account a,
+                                                Stack<Throwable> throwableStack) {
+        throwableStack.stream().findFirst().ifPresent(throwable -> {
+            String msg = throwable.getMessage();
+            Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+        });
     }
 
     private void redirectToStartActivity(Account account) {
-        Intent intent = new Intent(this, StartActivity.class);
+        redirectTo(StartActivity.class, intent -> { });
+    }
+
+    private void sendErrorMessageOnAuthentication(Exception e) {
+        Log.w(TAG, "AccountConnection:Failure", e);
+        var msg = "Authentication failed.";
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private void redirectTo(Class<? extends Activity> cls, Consumer<Intent> before) {
+        Intent intent = new Intent(this, cls);
+        before.accept(intent);
         startActivity(intent);
         finish();
     }
 
-    private void redirectToRegisterActivity() {
-        Intent intent = new Intent(this, RegisterActivity.class);
-        startActivity(intent);
-        finish();
+    private void redirectTo(Class<? extends Activity> cls) {
+        redirectTo(cls, intent -> {});
     }
 
 }

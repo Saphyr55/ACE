@@ -12,8 +12,7 @@ public interface AccountValidatorProvider {
     String EMAIL_PATTERN = "^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$";
 
     Context context();
-
-
+    
     default Validator<Account> validatorOf(Account account) {
 
         var msgEmailIsBlank     = context().getString(R.string.fill_the_email_field);

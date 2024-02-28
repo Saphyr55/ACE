@@ -69,7 +69,7 @@ public class ConnectionActivity extends AppCompatActivity {
     private void connectAccount(Account account) {
         progressBar.setVisibility(View.VISIBLE);
         accountConnection.connect(account,
-                this::redirectToStartActivity,
+                a -> redirectTo(StartActivity.class),
                 this::sendErrorMessageOnAuthentication);
         progressBar.setVisibility(View.GONE);
     }
@@ -82,14 +82,9 @@ public class ConnectionActivity extends AppCompatActivity {
         });
     }
 
-    private void redirectToStartActivity(Account account) {
-        redirectTo(StartActivity.class, intent -> { });
-    }
-
     private void sendErrorMessageOnAuthentication(Exception e) {
         Log.w(TAG, "AccountConnection:Failure", e);
-        var msg = "Authentication failed.";
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.authentication_failed, Toast.LENGTH_SHORT).show();
     }
 
     private void redirectTo(Class<? extends Activity> cls, Consumer<Intent> before) {

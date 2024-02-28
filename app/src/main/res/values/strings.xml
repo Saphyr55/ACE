@@ -11,4 +11,6 @@
     <string name="fill_the_email_field">Fill the email field.</string>
     <string name="fill_the_password_field">Fill the password field.</string>
     <string name="password_must_have_more_than_6_character">Password must have more than 6 character.</string>
+    <string name="authentication_failed">Authentication failed.</string>
+    <string name="authentication_was_a_success">Authentication was a success.</string>
 </resources>

@@ -76,12 +76,14 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void onFailedRegistration(Exception e) {
-        Log.w(RegisterActivity.class.getName(), "createUserWithEmail:failure", e);
-        Toast.makeText(RegisterActivity.this, "Authentication failed.", Toast.LENGTH_SHORT).show();
+        Log.w(RegisterActivity.class.getName(), "CreateUserWithEmail:Failure", e);
+        Toast.makeText(RegisterActivity.this, R.string.authentication_failed, Toast.LENGTH_SHORT)
+                .show();
     }
 
     private void onSuccessRegistration(Account account) {
-        Toast.makeText(RegisterActivity.this, "Authentication was a success.", Toast.LENGTH_SHORT).show();
+        Toast.makeText(RegisterActivity.this, R.string.authentication_was_a_success, Toast.LENGTH_SHORT)
+                .show();
         redirectToConnectionActivity();
     }
 

@@ -18,7 +18,7 @@ public class AuthAccountValidatorProviderTest {
     @Test
     public void throw_when_empty_email() {
 
-        var account = new AuthAccount(" ", "valid_password");
+        var account = new AuthAccount("", " ", "valid_password");
         var validator = validatorProvider.validatorOf(account);
 
         assertTrue(validator.isInvalid());
@@ -28,7 +28,7 @@ public class AuthAccountValidatorProviderTest {
     @Test
     public void throw_when_not_an_email() {
 
-        var account = new AuthAccount("not_an_email", "valid_password");
+        var account = new AuthAccount("","not_an_email", "valid_password");
         var validator = validatorProvider.validatorOf(account);
 
         assertTrue(validator.isInvalid());
@@ -38,7 +38,7 @@ public class AuthAccountValidatorProviderTest {
     @Test
     public void throw_when_empty_password() {
 
-        var account = new AuthAccount("valid@email.com", "   ");
+        var account = new AuthAccount("","valid@email.com", "   ");
         var validator = validatorProvider.validatorOf(account);
 
         assertTrue(validator.isInvalid());
@@ -48,7 +48,7 @@ public class AuthAccountValidatorProviderTest {
     @Test
     public void when_illegal_password_length() {
 
-        var account = new AuthAccount("valid@email.com", "12345");
+        var account = new AuthAccount("","valid@email.com", "12345");
         var validator = validatorProvider.validatorOf(account);
 
         assertTrue(validator.isInvalid());

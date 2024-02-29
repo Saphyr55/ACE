@@ -2,8 +2,6 @@ package org.utours.ace.profile.firebase;
 
 import org.utours.ace.common.annotation.Bean;
 
-import java.util.UUID;
-
 @Bean
 class FirebasePlayerAccount {
 
@@ -54,4 +52,5 @@ class FirebasePlayerAccount {
     public void setLevel(Integer level) {
         this.level = level;
     }
+
 }

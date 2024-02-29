@@ -3,11 +3,13 @@ package org.utours.ace.auth.firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import org.utours.ace.common.annotation.Adapter;
 import org.utours.ace.auth.model.AuthAccount;
 import org.utours.ace.auth.port.AuthAccountRegistration;
 
 import java.util.function.Consumer;
 
+@Adapter
 public final class FirebaseAuthAccountRegistration implements AuthAccountRegistration {
 
     private final FirebaseAuth auth;

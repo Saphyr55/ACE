@@ -5,13 +5,14 @@ import org.utours.ace.profile.model.PlayerAccount;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 @Port
-public interface PlayerAccountInventory {
+public interface PlayerAccountRepository {
 
-    Optional<PlayerAccount> getByUID(String uid);
+    CompletableFuture<Optional<PlayerAccount>> getByUID(String uid);
 
-    List<PlayerAccount> getByUsername(String username);
+    CompletableFuture<List<PlayerAccount>> getByUsername(String username);
 
     void store(PlayerAccount playerAccount);
 

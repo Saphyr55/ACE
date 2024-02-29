@@ -6,7 +6,7 @@ import org.utours.ace.auth.model.AuthAccount;
 import java.util.Optional;
 
 @Port
-public interface AuthAccountInventory {
+public interface AuthAccountRepository {
 
     Optional<AuthAccount> getByEmail(String email);
 

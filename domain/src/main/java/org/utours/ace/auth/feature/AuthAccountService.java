@@ -2,18 +2,18 @@ package org.utours.ace.auth.feature;
 
 import org.utours.ace.common.annotation.DomainService;
 import org.utours.ace.auth.port.AuthAccountConnection;
-import org.utours.ace.auth.port.AuthAccountInventory;
+import org.utours.ace.auth.port.AuthAccountRepository;
 
 @DomainService
 public class AuthAccountService {
 
-    private final AuthAccountInventory authAccountInventory;
+    private final AuthAccountRepository authAccountRepository;
     private final AuthAccountConnection authAccountConnection;
 
 
-    public AuthAccountService(AuthAccountInventory authAccountInventory,
+    public AuthAccountService(AuthAccountRepository authAccountRepository,
                               AuthAccountConnection authAccountConnection) {
-        this.authAccountInventory = authAccountInventory;
+        this.authAccountRepository = authAccountRepository;
         this.authAccountConnection = authAccountConnection;
     }
 

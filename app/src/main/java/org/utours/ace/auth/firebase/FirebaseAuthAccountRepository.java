@@ -1,11 +1,13 @@
 package org.utours.ace.auth.firebase;
 
 import org.utours.ace.auth.model.AuthAccount;
-import org.utours.ace.auth.port.AuthAccountInventory;
+import org.utours.ace.auth.port.AuthAccountRepository;
+import org.utours.ace.common.annotation.Adapter;
 
 import java.util.Optional;
 
-public class FirebaseAuthAccountInventory implements AuthAccountInventory {
+@Adapter
+public class FirebaseAuthAccountRepository implements AuthAccountRepository {
 
 
     @Override

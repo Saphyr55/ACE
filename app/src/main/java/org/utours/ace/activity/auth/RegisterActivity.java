@@ -13,14 +13,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.utours.ace.R;
-import org.utours.ace.auth.AuthenticationManager;
+import org.utours.ace.auth.AuthenticationContainer;
 import org.utours.ace.auth.AuthAccountValidatorProvider;
 import org.utours.ace.auth.model.AuthAccount;
 import org.utours.ace.auth.port.AuthAccountRegistration;
-import org.utours.ace.profile.PlayerAccountManager;
+import org.utours.ace.profile.PlayerAccountContainer;
 import org.utours.ace.profile.feature.PlayerAccountProvider;
 import org.utours.ace.profile.model.PlayerAccount;
-import org.utours.ace.profile.port.PlayerAccountInventory;
+import org.utours.ace.profile.port.PlayerAccountRepository;
 
 import java.util.Stack;
 import java.util.UUID;
@@ -35,7 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private AuthAccountRegistration authAccountRegistration;
     private AuthAccountValidatorProvider authAccountValidatorProvider;
-    private PlayerAccountInventory playerAccountInventory;
+    private PlayerAccountRepository playerAccountRepository;
 
 
     @Override
@@ -50,18 +50,20 @@ public class RegisterActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         authAccountValidatorProvider = () -> this;
-        authAccountRegistration = AuthenticationManager.INSTANCE
+        authAccountRegistration = AuthenticationContainer.INSTANCE
                 .getAuthenticationProvider()
                 .accountRegistration();
 
-        playerAccountInventory = PlayerAccountManager.INSTANCE
-                .getPlayerAccountInventory();
+        playerAccountRepository = PlayerAccountContainer.INSTANCE
+                .getPlayerAccountRepository();
 
         connectHereTextView.setOnClickListener(v -> redirectToConnectionActivity());
         registerButton.setOnClickListener(v -> registerAccount());
     }
 
     private void registerAccount() {
+        progressBar.setVisibility(View.VISIBLE);
+
         var email = String.valueOf(emailEditText.getText());
         var password = String.valueOf(passwordEditText.getText());
         var authAccount = new AuthAccount(String.valueOf(UUID.randomUUID()), email, password);
@@ -73,19 +75,20 @@ public class RegisterActivity extends AppCompatActivity {
 
         if (isInvalid) return;
 
-        progressBar.setVisibility(View.VISIBLE);
-        authAccountRegistration.register(authAccount, this::onSuccessRegistration, this::onFailedRegistration);
-        progressBar.setVisibility(View.GONE);
+        authAccountRegistration.register(authAccount,
+                this::onSuccessRegistration,
+                this::onFailedRegistration);
     }
 
     private void onFailedRegistration(Exception e) {
         Log.w(RegisterActivity.class.getName(), "CreateUserWithEmail:Failure", e);
         Toast.makeText(RegisterActivity.this, R.string.authentication_failed, Toast.LENGTH_SHORT).show();
+        progressBar.setVisibility(View.GONE);
     }
 
     private void onSuccessRegistration(AuthAccount authAccount) {
         PlayerAccount playerAccount = PlayerAccountProvider.DEFAULT.provide(authAccount.uid(), authAccount.email());
-        playerAccountInventory.store(playerAccount);
+        playerAccountRepository.store(playerAccount);
         redirectToConnectionActivity();
     }
 

@@ -15,7 +15,7 @@ import android.widget.Toast;
 
 import org.utours.ace.R;
 import org.utours.ace.activity.StartActivity;
-import org.utours.ace.auth.AuthenticationManager;
+import org.utours.ace.auth.AuthenticationContainer;
 import org.utours.ace.auth.AuthAccountValidatorProvider;
 import org.utours.ace.auth.model.AuthAccount;
 import org.utours.ace.auth.port.AuthAccountConnection;
@@ -23,6 +23,7 @@ import org.utours.ace.auth.port.AuthAccountConnection;
 import java.util.Stack;
 import java.util.UUID;
 import java.util.function.Consumer;
+
 
 public class ConnectionActivity extends AppCompatActivity {
 
@@ -49,7 +50,7 @@ public class ConnectionActivity extends AppCompatActivity {
 
         authAccountValidatorProvider = () -> this;
 
-        authAccountConnection = AuthenticationManager.INSTANCE
+        authAccountConnection = AuthenticationContainer.INSTANCE
                 .getAuthenticationProvider()
                 .accountConnection();
 
@@ -58,26 +59,29 @@ public class ConnectionActivity extends AppCompatActivity {
     }
 
     private void tryToConnect() {
+        progressBar.setVisibility(View.VISIBLE);
+
         var email = String.valueOf(emailEditText.getText());
         var password = String.valueOf(passwordEditText.getText());
         var account = new AuthAccount(UUID.randomUUID().toString(), email, password);
 
-        authAccountValidatorProvider.validatorOf(account)
+        authAccountValidatorProvider
+                .validatorOf(account)
                 .trace(this::sendErrorMessageOnInvalidation)
                 .ifValid(this::connectAccount);
     }
 
     private void connectAccount(AuthAccount authAccount) {
-        progressBar.setVisibility(View.VISIBLE);
         authAccountConnection.connect(authAccount,
                 a -> redirectTo(StartActivity.class),
                 this::sendErrorMessageOnAuthentication);
-        progressBar.setVisibility(View.GONE);
     }
 
     private void sendErrorMessageOnInvalidation(AuthAccount a,
                                                 Stack<Throwable> throwableStack) {
-        throwableStack.stream().findFirst().ifPresent(throwable -> {
+
+        var first = throwableStack.stream().findFirst();
+        first.ifPresent(throwable -> {
             String msg = throwable.getMessage();
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
         });
@@ -86,6 +90,7 @@ public class ConnectionActivity extends AppCompatActivity {
     private void sendErrorMessageOnAuthentication(Exception e) {
         Log.w(TAG, "AccountConnection:Failure", e);
         Toast.makeText(this, R.string.authentication_failed, Toast.LENGTH_SHORT).show();
+        progressBar.setVisibility(View.GONE);
     }
 
     private void redirectTo(Class<? extends Activity> cls, Consumer<Intent> before) {

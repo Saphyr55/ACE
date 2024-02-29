@@ -2,28 +2,30 @@ package org.utours.ace.auth.firebase;
 
 import com.google.firebase.auth.FirebaseAuth;
 
-import org.utours.ace.port.AccountConnection;
-import org.utours.ace.port.AccountRegistration;
-import org.utours.ace.port.AuthenticationProvider;
+import org.utours.ace.auth.port.AuthAccountConnection;
+import org.utours.ace.auth.port.AuthAccountRegistration;
+import org.utours.ace.auth.port.AuthenticationProvider;
 
 public final class FirebaseAuthenticationProvider implements AuthenticationProvider {
 
-    private final AccountConnection accountConnection;
-    private final AccountRegistration accountRegistration;
+    private final AuthAccountConnection authAccountConnection;
+    private final AuthAccountRegistration authAccountRegistration;
+    private final FirebaseAuthAccountMapper mapper;
 
     public FirebaseAuthenticationProvider(FirebaseAuth auth) {
-        this.accountConnection = new FirebaseAccountConnection(auth);
-        this.accountRegistration = new FirebaseAccountRegistration(auth);
+        this.mapper = new FirebaseAuthAccountMapper();
+        this.authAccountConnection = new FirebaseAuthAccountConnection(auth, mapper);
+        this.authAccountRegistration = new FirebaseAuthAccountRegistration(auth, mapper);
     }
 
     @Override
-    public AccountConnection accountConnection() {
-        return accountConnection;
+    public AuthAccountConnection accountConnection() {
+        return authAccountConnection;
     }
 
     @Override
-    public AccountRegistration accountRegistration() {
-        return accountRegistration;
+    public AuthAccountRegistration accountRegistration() {
+        return authAccountRegistration;
     }
 
 }

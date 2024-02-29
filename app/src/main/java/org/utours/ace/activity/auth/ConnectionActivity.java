@@ -16,11 +16,12 @@ import android.widget.Toast;
 import org.utours.ace.R;
 import org.utours.ace.activity.StartActivity;
 import org.utours.ace.auth.AuthenticationManager;
-import org.utours.ace.common.AccountValidatorProvider;
-import org.utours.ace.model.Account;
-import org.utours.ace.port.AccountConnection;
+import org.utours.ace.auth.AuthAccountValidatorProvider;
+import org.utours.ace.auth.model.AuthAccount;
+import org.utours.ace.auth.port.AuthAccountConnection;
 
 import java.util.Stack;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class ConnectionActivity extends AppCompatActivity {
@@ -32,8 +33,8 @@ public class ConnectionActivity extends AppCompatActivity {
     private Button connectButton;
     private TextView registerHereTextView;
     private ProgressBar progressBar;
-    private AccountConnection accountConnection;
-    private AccountValidatorProvider accountValidatorProvider;
+    private AuthAccountConnection authAccountConnection;
+    private AuthAccountValidatorProvider authAccountValidatorProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,9 +47,9 @@ public class ConnectionActivity extends AppCompatActivity {
         registerHereTextView = findViewById(R.id.textview_registerHere);
         progressBar = findViewById(R.id.progressBar);
 
-        accountValidatorProvider = () -> this;
+        authAccountValidatorProvider = () -> this;
 
-        accountConnection = AuthenticationManager.INSTANCE
+        authAccountConnection = AuthenticationManager.INSTANCE
                 .getAuthenticationProvider()
                 .accountConnection();
 
@@ -59,22 +60,22 @@ public class ConnectionActivity extends AppCompatActivity {
     private void tryToConnect() {
         var email = String.valueOf(emailEditText.getText());
         var password = String.valueOf(passwordEditText.getText());
-        var account = new Account(email, password);
+        var account = new AuthAccount(UUID.randomUUID().toString(), email, password);
 
-        accountValidatorProvider.validatorOf(account)
+        authAccountValidatorProvider.validatorOf(account)
                 .trace(this::sendErrorMessageOnInvalidation)
                 .ifValid(this::connectAccount);
     }
 
-    private void connectAccount(Account account) {
+    private void connectAccount(AuthAccount authAccount) {
         progressBar.setVisibility(View.VISIBLE);
-        accountConnection.connect(account,
+        authAccountConnection.connect(authAccount,
                 a -> redirectTo(StartActivity.class),
                 this::sendErrorMessageOnAuthentication);
         progressBar.setVisibility(View.GONE);
     }
 
-    private void sendErrorMessageOnInvalidation(Account a,
+    private void sendErrorMessageOnInvalidation(AuthAccount a,
                                                 Stack<Throwable> throwableStack) {
         throwableStack.stream().findFirst().ifPresent(throwable -> {
             String msg = throwable.getMessage();

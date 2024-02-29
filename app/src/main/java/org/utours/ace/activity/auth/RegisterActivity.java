@@ -14,11 +14,16 @@ import android.widget.Toast;
 
 import org.utours.ace.R;
 import org.utours.ace.auth.AuthenticationManager;
-import org.utours.ace.common.AccountValidatorProvider;
-import org.utours.ace.model.Account;
-import org.utours.ace.port.AccountRegistration;
+import org.utours.ace.auth.AuthAccountValidatorProvider;
+import org.utours.ace.auth.model.AuthAccount;
+import org.utours.ace.auth.port.AuthAccountRegistration;
+import org.utours.ace.profile.PlayerAccountManager;
+import org.utours.ace.profile.feature.PlayerAccountProvider;
+import org.utours.ace.profile.model.PlayerAccount;
+import org.utours.ace.profile.port.PlayerAccountInventory;
 
 import java.util.Stack;
+import java.util.UUID;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -28,8 +33,9 @@ public class RegisterActivity extends AppCompatActivity {
     private TextView connectHereTextView;
     private ProgressBar progressBar;
 
-    private AccountRegistration accountRegistration;
-    private AccountValidatorProvider accountValidatorProvider;
+    private AuthAccountRegistration authAccountRegistration;
+    private AuthAccountValidatorProvider authAccountValidatorProvider;
+    private PlayerAccountInventory playerAccountInventory;
 
 
     @Override
@@ -43,47 +49,43 @@ public class RegisterActivity extends AppCompatActivity {
         connectHereTextView = findViewById(R.id.textview_connectHere);
         progressBar = findViewById(R.id.progressBar);
 
-        accountValidatorProvider = () -> this;
-
-        accountRegistration = AuthenticationManager.INSTANCE
+        authAccountValidatorProvider = () -> this;
+        authAccountRegistration = AuthenticationManager.INSTANCE
                 .getAuthenticationProvider()
                 .accountRegistration();
+
+        playerAccountInventory = PlayerAccountManager.INSTANCE
+                .getPlayerAccountInventory();
 
         connectHereTextView.setOnClickListener(v -> redirectToConnectionActivity());
         registerButton.setOnClickListener(v -> registerAccount());
     }
 
     private void registerAccount() {
-
         var email = String.valueOf(emailEditText.getText());
         var password = String.valueOf(passwordEditText.getText());
-        var account = new Account(email, password);
+        var authAccount = new AuthAccount(String.valueOf(UUID.randomUUID()), email, password);
 
-        boolean isInvalid = accountValidatorProvider
-                .validatorOf(account)
+        boolean isInvalid = authAccountValidatorProvider
+                .validatorOf(authAccount)
                 .trace(this::sendErrorMessage)
                 .isInvalid();
 
         if (isInvalid) return;
 
         progressBar.setVisibility(View.VISIBLE);
-
-        accountRegistration.register(account,
-                this::onSuccessRegistration,
-                this::onFailedRegistration);
-
+        authAccountRegistration.register(authAccount, this::onSuccessRegistration, this::onFailedRegistration);
         progressBar.setVisibility(View.GONE);
     }
 
     private void onFailedRegistration(Exception e) {
         Log.w(RegisterActivity.class.getName(), "CreateUserWithEmail:Failure", e);
-        Toast.makeText(RegisterActivity.this, R.string.authentication_failed, Toast.LENGTH_SHORT)
-                .show();
+        Toast.makeText(RegisterActivity.this, R.string.authentication_failed, Toast.LENGTH_SHORT).show();
     }
 
-    private void onSuccessRegistration(Account account) {
-        Toast.makeText(RegisterActivity.this, R.string.authentication_was_a_success, Toast.LENGTH_SHORT)
-                .show();
+    private void onSuccessRegistration(AuthAccount authAccount) {
+        PlayerAccount playerAccount = PlayerAccountProvider.DEFAULT.provide(authAccount.uid(), authAccount.email());
+        playerAccountInventory.store(playerAccount);
         redirectToConnectionActivity();
     }
 
@@ -93,7 +95,7 @@ public class RegisterActivity extends AppCompatActivity {
         finish();
     }
 
-    private void sendErrorMessage(Account a, Stack<Throwable> throwableStack) {
+    private void sendErrorMessage(AuthAccount a, Stack<Throwable> throwableStack) {
         throwableStack.stream()
                 .findFirst()
                 .ifPresent(this::messagingUserWithToast);
@@ -102,4 +104,5 @@ public class RegisterActivity extends AppCompatActivity {
     private void messagingUserWithToast(Throwable throwable) {
         Toast.makeText(RegisterActivity.this, throwable.getMessage(), Toast.LENGTH_LONG).show();
     }
+
 }

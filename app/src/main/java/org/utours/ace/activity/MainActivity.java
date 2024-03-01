@@ -17,8 +17,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         var cls = determineActivityClass();
-        var intent = new Intent(this, cls);
 
+        var intent = new Intent(this, cls);
         startActivity(intent);
         finish();
     }

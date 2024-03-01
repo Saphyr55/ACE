@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -43,6 +44,7 @@ public class StartActivity extends AppCompatActivity {
 
     private void initPlayerAccount(PlayerAccount playerAccount) {
         PlayerAccountContainer.INSTANCE.setCurrentPlayerAccount(playerAccount);
+
         parameterStartButton.setOnClickListener(v -> openParameter());
         startACETextView.setOnClickListener(v -> redirectToGame());
     }

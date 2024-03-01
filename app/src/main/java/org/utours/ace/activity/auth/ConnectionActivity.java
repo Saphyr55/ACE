@@ -20,6 +20,7 @@ import org.utours.ace.auth.AuthAccountValidatorProvider;
 import org.utours.ace.auth.model.AuthAccount;
 import org.utours.ace.auth.port.AuthAccountConnection;
 
+import java.util.Optional;
 import java.util.Stack;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -67,8 +68,8 @@ public class ConnectionActivity extends AppCompatActivity {
 
         authAccountValidatorProvider
                 .validatorOf(account)
-                .trace(this::sendErrorMessageOnInvalidation)
-                .ifValid(this::connectAccount);
+                .ifValid(this::connectAccount)
+                .trace(this::sendErrorMessageOnInvalidation);
     }
 
     private void connectAccount(AuthAccount authAccount) {
@@ -80,11 +81,12 @@ public class ConnectionActivity extends AppCompatActivity {
     private void sendErrorMessageOnInvalidation(AuthAccount a,
                                                 Stack<Throwable> throwableStack) {
 
-        var first = throwableStack.stream().findFirst();
+        Optional<Throwable> first = throwableStack.stream().findFirst();
         first.ifPresent(throwable -> {
             String msg = throwable.getMessage();
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
         });
+        progressBar.setVisibility(View.GONE);
     }
 
     private void sendErrorMessageOnAuthentication(Exception e) {
@@ -94,6 +96,7 @@ public class ConnectionActivity extends AppCompatActivity {
     }
 
     private void redirectTo(Class<? extends Activity> cls, Consumer<Intent> before) {
+
         Intent intent = new Intent(this, cls);
         before.accept(intent);
         startActivity(intent);

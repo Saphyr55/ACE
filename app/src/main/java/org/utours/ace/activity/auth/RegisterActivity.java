@@ -50,6 +50,7 @@ public class RegisterActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
 
         authAccountValidatorProvider = () -> this;
+
         authAccountRegistration = AuthenticationContainer.INSTANCE
                 .getAuthenticationProvider()
                 .accountRegistration();
@@ -68,16 +69,16 @@ public class RegisterActivity extends AppCompatActivity {
         var password = String.valueOf(passwordEditText.getText());
         var authAccount = new AuthAccount(String.valueOf(UUID.randomUUID()), email, password);
 
-        boolean isInvalid = authAccountValidatorProvider
+        boolean isValid = authAccountValidatorProvider
                 .validatorOf(authAccount)
                 .trace(this::sendErrorMessage)
-                .isInvalid();
+                .isValid();
 
-        if (isInvalid) return;
-
-        authAccountRegistration.register(authAccount,
-                this::onSuccessRegistration,
-                this::onFailedRegistration);
+        if (isValid) {
+            authAccountRegistration.register(authAccount,
+                    this::onSuccessRegistration,
+                    this::onFailedRegistration);
+        }
     }
 
     private void onFailedRegistration(Exception e) {
@@ -87,7 +88,10 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void onSuccessRegistration(AuthAccount authAccount) {
-        PlayerAccount playerAccount = PlayerAccountProvider.DEFAULT.provide(authAccount.uid(), authAccount.email());
+        PlayerAccount playerAccount =
+            PlayerAccountProvider.DEFAULT
+                    .provide(authAccount.uid(), authAccount.email());
+
         playerAccountRepository.store(playerAccount);
         redirectToConnectionActivity();
     }

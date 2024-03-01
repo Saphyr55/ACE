@@ -9,11 +9,9 @@ import java.util.function.Consumer;
 @Port
 public interface AuthAccountConnection {
 
-
     void connect(AuthAccount authAccount,
                  Consumer<AuthAccount> onSuccess,
                  Consumer<Exception> onFailure);
 
 
 }
-

@@ -1,6 +1,7 @@
 package org.utours.ace.auth.firebase;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.utours.ace.auth.model.AuthAccount;
 import org.utours.ace.auth.port.AuthAccountConnection;
@@ -29,7 +30,9 @@ public final class FirebaseAuthAccountConnection implements AuthAccountConnectio
                 .addOnFailureListener(onFailure::accept)
                 .addOnSuccessListener(result -> {
                     assert result.getUser() != null;
-                    onSuccess.accept(mapper.map(result.getUser(), authAccount.password()));
+                    FirebaseUser user = result.getUser();
+                    AuthAccount account = mapper.map(user, authAccount.password());
+                    onSuccess.accept(account);
                 });
     }
 

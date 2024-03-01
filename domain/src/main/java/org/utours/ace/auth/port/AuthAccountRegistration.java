@@ -5,6 +5,7 @@ import org.utours.ace.auth.model.AuthAccount;
 
 import java.util.function.Consumer;
 
+
 @Port
 public interface AuthAccountRegistration {
 

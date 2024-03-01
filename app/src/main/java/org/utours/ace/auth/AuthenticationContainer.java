@@ -12,7 +12,6 @@ public enum AuthenticationContainer {
     INSTANCE;
 
     private final AuthenticationProvider authenticationProvider;
-
     private final CurrentAuthAccountProvider currentAuthAccountProvider;
 
     AuthenticationContainer() {

@@ -1,5 +1,7 @@
 package org.utours.ace.profile.firebase;
 
+import android.util.Log;
+
 import com.google.firebase.database.DatabaseReference;
 
 import org.utours.ace.common.annotation.Adapter;

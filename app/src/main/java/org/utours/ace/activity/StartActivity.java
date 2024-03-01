@@ -14,8 +14,6 @@ import org.utours.ace.auth.model.AuthAccount;
 import org.utours.ace.profile.PlayerAccountContainer;
 import org.utours.ace.profile.model.PlayerAccount;
 
-import java.util.Optional;
-
 public class StartActivity extends AppCompatActivity {
 
     private TextView startACETextView;
@@ -38,16 +36,13 @@ public class StartActivity extends AppCompatActivity {
                 .getPlayerAccountRepository()
                 .getByUID(authAccount.uid())
                 .thenAccept(opt ->{
-                    var playerAccount = opt.orElseThrow(RuntimeException::new);
+                    PlayerAccount playerAccount = opt.orElseThrow(RuntimeException::new);
                     initPlayerAccount(playerAccount);
                 });
     }
 
-
     private void initPlayerAccount(PlayerAccount playerAccount) {
-
         PlayerAccountContainer.INSTANCE.setCurrentPlayerAccount(playerAccount);
-
         parameterStartButton.setOnClickListener(v -> openParameter());
         startACETextView.setOnClickListener(v -> redirectToGame());
     }
@@ -58,8 +53,8 @@ public class StartActivity extends AppCompatActivity {
         finish();
     }
 
-
     private void openParameter() {
+
     }
 
 

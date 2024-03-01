@@ -3,16 +3,18 @@ package org.utours.ace.activity.profile;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import org.utours.ace.R;
-import org.utours.ace.auth.AuthenticationContainer;
-import org.utours.ace.auth.model.AuthAccount;
+import org.utours.ace.activity.auth.ConnectionActivity;
 import org.utours.ace.profile.PlayerAccountContainer;
 import org.utours.ace.profile.model.PlayerAccount;
 
 public class ProfileActivity extends AppCompatActivity {
+
+    private static final String TAG = ConnectionActivity.class.getName();
 
     TextView usernameTextView;
     TextView levelTextView;
@@ -30,13 +32,20 @@ public class ProfileActivity extends AppCompatActivity {
 
         playerAccount = PlayerAccountContainer.INSTANCE
                 .getCurrentPlayerAccount()
-                .orElseThrow(RuntimeException::new);
+                .orElseThrow(ProfileActivity::errorMissingCurrentPlayer);
 
         usernameTextView.setText(playerAccount.username());
         descriptionEditText.setText(playerAccount.description());
 
-        var level = String.format("Level %s", playerAccount.level());
-        levelTextView.setText(level);
+        levelTextView.setText(String.format("Level %s", playerAccount.level()));
+    }
+
+
+    private static RuntimeException errorMissingCurrentPlayer() {
+        var msg = "Current player account doesn't exist, and entire in ProfileActivity.";
+        var e = new RuntimeException(msg);
+        Log.e(TAG, e.getMessage(), e);
+        return e;
     }
 
 

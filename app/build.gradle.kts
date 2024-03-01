@@ -15,6 +15,9 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary = true
+        }
     }
 
     buildTypes {
@@ -30,6 +33,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    packaging {
+        resources {
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
+    }
 }
 
 dependencies {
@@ -43,22 +51,13 @@ dependencies {
 
     // Firebase
     implementation( platform("com.google.firebase:firebase-bom:32.7.2") )
-    implementation("com.google.firebase:firebase-analytics:21.5.1")
     implementation("com.google.firebase:firebase-auth:22.3.1")
-    implementation("com.google.firebase:firebase-firestore:24.10.2")
-
-//    val roomVersion = "2.6.1"
-//
-//    implementation("androidx.room:room-runtime:$roomVersion")
-//    implementation("androidx.room:room-ktx:$roomVersion")
-//    annotationProcessor("androidx.room:room-compiler:$roomVersion")
-//
-//    // To use Kotlin annotation processing tool (kapt)
-//    kapt("androidx.room:room-compiler:$roomVersion")
-//    // To use Kotlin Symbol Processing (KSP)
-//    ksp("androidx.room:room-compiler:$roomVersion")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
+    implementation("com.google.firebase:firebase-database:20.3.0")
+    implementation("androidx.preference:preference:1.2.0")
 
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+
 }

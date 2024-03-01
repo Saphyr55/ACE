@@ -5,7 +5,7 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="register">Register</string>
-    <string name="already_have_an_account">Already have an account ?</string>
+    <string name="already_have_an_account">Already have an authAccount ?</string>
     <string name="register_here">Register here</string>
     <string name="start_ace">Start ACE</string>
     <string name="fill_the_email_field">Fill the email field.</string>
@@ -14,4 +14,21 @@
     <string name="authentication_failed">Authentication failed.</string>
     <string name="authentication_was_a_success">Authentication was a success.</string>
     <string name="is_not_a_valid_email">Is not a valid email.</string>
+    <string name="title_activity_profile">ProfileActivity</string>
+
+    <!-- Preference Titles -->
+    <string name="messages_header">Messages</string>
+    <string name="sync_header">Sync</string>
+
+    <!-- Messages Preferences -->
+    <string name="signature_title">Your signature</string>
+    <string name="reply_title">Default reply action</string>
+
+    <!-- Sync Preferences -->
+    <string name="sync_title">Sync email periodically</string>
+    <string name="attachment_title">Download incoming attachments</string>
+    <string name="attachment_summary_on">Automatically download attachments for incoming emails
+    </string>
+    <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="description">Description</string>
 </resources>

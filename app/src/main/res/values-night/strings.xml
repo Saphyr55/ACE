@@ -6,10 +6,11 @@
     <string name="email">Email</string>
     <string name="password">Password</string>
     <string name="register">Register</string>
-    <string name="already_have_an_account">Already have an account ?</string>
+    <string name="already_have_an_account">Already have an authAccount ?</string>
     <string name="register_here">Register here</string>
     <string name="start_ace">Start ACE</string>
     <string name="fill_the_email_field">Fill the email field.</string>
     <string name="fill_the_password_field">Fill the password field.</string>
     <string name="password_must_have_more_than_6_character">Password must have more than 6 character.</string>
+    <string name="description">Description</string>
 </resources>

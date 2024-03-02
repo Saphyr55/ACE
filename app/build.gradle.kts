@@ -29,10 +29,16 @@ android {
             )
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
+
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -44,9 +50,10 @@ dependencies {
 
     implementation( project(":domain") )
 
+    // Android
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-
+    implementation("androidx.preference:preference:1.2.1")
     implementation("com.google.android.material:material:1.11.0")
 
     // Firebase
@@ -54,9 +61,12 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:22.3.1")
     implementation("com.google.firebase:firebase-storage:20.3.0")
     implementation("com.google.firebase:firebase-database:20.3.1")
-    implementation("androidx.preference:preference:1.2.1")
+    implementation("androidx.activity:activity:1.8.0")
 
+    // Test
     testImplementation("junit:junit:4.13.2")
+
+    // Android Test
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 

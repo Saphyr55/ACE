@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/item_profile"
+        android:title="@string/profile"
+        android:icon="@drawable/ic_profile" />
+
+    <item
+        android:id="@+id/item_deck"
+        android:title="@string/deck"
+        android:icon="@drawable/ic_deck" />
+
+    <item
+        android:id="@+id/item_main"
+        android:title="@string/main"
+        android:icon="@drawable/ic_main" />
+
+    <item
+        android:id="@+id/item_gacha"
+        android:title="@string/gacha"
+        android:icon="@drawable/ic_gacha" />
+
+    <item
+        android:id="@+id/item_shop"
+        android:title="@string/shop"
+        android:icon="@drawable/ic_shop" />
+
+</menu>

@@ -31,4 +31,10 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="description">Description</string>
+    <string name="profile">Profile</string>
+    <string name="deck">Deck</string>
+    <string name="main">Main</string>
+    <string name="gacha">Gacha</string>
+    <string name="shop">Shop</string>
+
 </resources>

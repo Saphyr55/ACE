@@ -13,4 +13,7 @@
     <string name="fill_the_password_field">Fill the password field.</string>
     <string name="password_must_have_more_than_6_character">Password must have more than 6 character.</string>
     <string name="description">Description</string>
+    <string name="profile">Profile</string>
+    <string name="main">Main</string>
+    <string name="shop">Shop</string>
 </resources>

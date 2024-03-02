@@ -4,12 +4,10 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.TextView;
 
 import org.utours.ace.R;
-import org.utours.ace.activity.profile.ProfileActivity;
 import org.utours.ace.auth.AuthenticationContainer;
 import org.utours.ace.auth.model.AuthAccount;
 import org.utours.ace.profile.PlayerAccountContainer;
@@ -46,11 +44,11 @@ public class StartActivity extends AppCompatActivity {
         PlayerAccountContainer.INSTANCE.setCurrentPlayerAccount(playerAccount);
 
         parameterStartButton.setOnClickListener(v -> openParameter());
-        startACETextView.setOnClickListener(v -> redirectToGame());
+        startACETextView.setOnClickListener(v -> redirectToNavigationActivity());
     }
 
-    private void redirectToGame() {
-        Intent intent = new Intent(this, ProfileActivity.class);
+    private void redirectToNavigationActivity() {
+        Intent intent = new Intent(this, NavigationActivity.class);
         startActivity(intent);
         finish();
     }

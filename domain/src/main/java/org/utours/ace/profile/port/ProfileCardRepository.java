@@ -12,6 +12,4 @@ public interface ProfileCardRepository {
 
     CompletableFuture<ProfileCard> getByUID(String uid);
 
-    CompletableFuture<List<ProfileCard>> getByProfile(PlayerAccount playerAccount);
-
 }

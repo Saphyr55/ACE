@@ -11,7 +11,7 @@ import android.view.ViewGroup;
 import org.utours.ace.R;
 
 
-public class ShopFragment extends Fragment {
+public final class ShopFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater,
@@ -20,4 +20,5 @@ public class ShopFragment extends Fragment {
 
         return inflater.inflate(R.layout.fragment_shop, container, false);
     }
+
 }

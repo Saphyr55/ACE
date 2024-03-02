@@ -5,7 +5,8 @@ public record ProfileCard(
         String pictureAddress,
         Integer lifePoint,
         Integer attackPoint,
-        Integer manaPoint
+        Integer manaPoint,
+        ProfileCardRarity rarity
 ) {
 
 }

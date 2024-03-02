@@ -27,22 +27,18 @@ public class StartActivity extends AppCompatActivity {
         parameterStartButton = findViewById(R.id.btn_parameter);
 
         AuthAccount authAccount = AuthenticationContainer.INSTANCE
-                .getCurrentAuthAccountProvider()
+                .getService()
                 .currentAuthAccount()
                 .orElseThrow(RuntimeException::new);
 
         PlayerAccountContainer.INSTANCE
                 .getPlayerAccountRepository()
                 .getByUID(authAccount.uid())
-                .thenAccept(opt ->{
-                    PlayerAccount playerAccount = opt.orElseThrow(RuntimeException::new);
-                    initPlayerAccount(playerAccount);
-                });
+                .thenAccept(opt -> initPlayerAccount(opt.orElseThrow(RuntimeException::new)));
     }
 
     private void initPlayerAccount(PlayerAccount playerAccount) {
         PlayerAccountContainer.INSTANCE.setCurrentPlayerAccount(playerAccount);
-
         parameterStartButton.setOnClickListener(v -> openParameter());
         startACETextView.setOnClickListener(v -> redirectToNavigationActivity());
     }

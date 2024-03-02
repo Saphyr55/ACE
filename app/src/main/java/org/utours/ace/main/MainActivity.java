@@ -17,12 +17,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        var currentAuthAccount = AuthenticationContainer.INSTANCE
-                .getCurrentAuthAccountProvider()
-                .currentAuthAccount();
-
-        // currentAuthAccount.ifPresent(authAccount -> redirectToStartActivity());
-
         var cls = determineActivityClass();
         var intent = new Intent(this, cls);
         startActivity(intent);
@@ -30,10 +24,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private Class<?> determineActivityClass() {
+
         var preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (preferences.contains("auth_account_uid")) {
             return StartActivity.class;
         }
+
         return ConnectionActivity.class;
     }
 

@@ -39,5 +39,6 @@
     <string name="image_card">Image Card</string>
     <string name="card">Card</string>
     <string name="unknown">Unknown</string>
+    <string name="rarity">Rarity</string>
 
 </resources>

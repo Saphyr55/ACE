@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.utours.ace.R;
+import org.utours.ace.auth.feature.AuthAccountService;
 import org.utours.ace.infra.auth.AuthenticationContainer;
 import org.utours.ace.infra.auth.AuthAccountValidatorProvider;
 import org.utours.ace.auth.model.AuthAccount;
@@ -32,8 +33,7 @@ public class RegisterActivity extends AppCompatActivity {
     private Button registerButton;
     private TextView connectHereTextView;
     private ProgressBar progressBar;
-    private AuthAccountRegistration authAccountRegistration;
-    private AuthAccountValidatorProvider authAccountValidatorProvider;
+    private AuthAccountService authAccountService;
     private PlayerAccountRepository playerAccountRepository;
 
 
@@ -42,20 +42,14 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+        authAccountService = AuthenticationContainer.INSTANCE.getService();
+        playerAccountRepository = PlayerAccountContainer.INSTANCE.getPlayerAccountRepository();
+
         emailEditText = findViewById(R.id.edittext_email);
         passwordEditText = findViewById(R.id.edittext_password);
         registerButton = findViewById(R.id.btn_register);
         connectHereTextView = findViewById(R.id.textview_connectHere);
         progressBar = findViewById(R.id.progressBar);
-
-        authAccountValidatorProvider = () -> this;
-
-        authAccountRegistration = AuthenticationContainer.INSTANCE
-                .getAuthenticationProvider()
-                .accountRegistration();
-
-        playerAccountRepository = PlayerAccountContainer.INSTANCE
-                .getPlayerAccountRepository();
 
         connectHereTextView.setOnClickListener(v -> redirectToConnectionActivity());
         registerButton.setOnClickListener(v -> registerAccount());
@@ -68,13 +62,13 @@ public class RegisterActivity extends AppCompatActivity {
         var password = String.valueOf(passwordEditText.getText());
         var authAccount = new AuthAccount(String.valueOf(UUID.randomUUID()), email, password);
 
-        boolean isValid = authAccountValidatorProvider
-                .validatorOf(authAccount)
+        boolean isValid = AuthAccountValidatorProvider
+                .validatorOf(this, authAccount)
                 .trace(this::sendErrorMessage)
                 .isValid();
 
         if (isValid) {
-            authAccountRegistration.register(authAccount,
+            authAccountService.register(authAccount,
                     this::onSuccessRegistration,
                     this::onFailedRegistration);
         }
@@ -92,6 +86,7 @@ public class RegisterActivity extends AppCompatActivity {
                     .create(authAccount.uid(), authAccount.email());
 
         playerAccountRepository.store(playerAccount);
+
         redirectToConnectionActivity();
     }
 

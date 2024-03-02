@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.utours.ace.R;
+import org.utours.ace.auth.feature.AuthAccountService;
 import org.utours.ace.main.StartActivity;
 import org.utours.ace.infra.auth.AuthenticationContainer;
 import org.utours.ace.infra.auth.AuthAccountValidatorProvider;
@@ -38,25 +39,20 @@ public class ConnectionActivity extends AppCompatActivity {
     private Button connectButton;
     private TextView registerHereTextView;
     private ProgressBar progressBar;
-    private AuthAccountConnection authAccountConnection;
-    private AuthAccountValidatorProvider authAccountValidatorProvider;
+    private AuthAccountService authAccountService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
 
+        authAccountService = AuthenticationContainer.INSTANCE.getService();
+
         emailEditText = findViewById(R.id.edittext_email);
         passwordEditText = findViewById(R.id.edittext_password);
         connectButton = findViewById(R.id.btn_connect);
         registerHereTextView = findViewById(R.id.textview_registerHere);
         progressBar = findViewById(R.id.progressBar);
-
-        authAccountValidatorProvider = () -> this;
-
-        authAccountConnection = AuthenticationContainer.INSTANCE
-                .getAuthenticationProvider()
-                .accountConnection();
 
         registerHereTextView.setOnClickListener(v -> redirectTo(RegisterActivity.class));
         connectButton.setOnClickListener(v -> tryToConnect());
@@ -69,14 +65,14 @@ public class ConnectionActivity extends AppCompatActivity {
         var password = String.valueOf(passwordEditText.getText());
         var account = new AuthAccount(UUID.randomUUID().toString(), email, password);
 
-        authAccountValidatorProvider
-                .validatorOf(account)
+        AuthAccountValidatorProvider
+                .validatorOf(this, account)
                 .ifValid(this::connectAccount)
                 .trace(this::sendErrorMessageOnInvalidation);
     }
 
     private void connectAccount(AuthAccount authAccount) {
-        authAccountConnection.connect(authAccount,
+        authAccountService.connect(authAccount,
                 this::onConnectionSuccess,
                 this::sendErrorMessageOnAuthentication);
     }

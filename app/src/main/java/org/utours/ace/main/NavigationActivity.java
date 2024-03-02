@@ -36,9 +36,11 @@ public class NavigationActivity extends AppCompatActivity {
         gachaFragment = new GachaFragment();
         shopFragment = new ShopFragment();
 
-        replaceFragment(mainFragment);
         binding.navBarView.setBackground(null);
         binding.navBarView.setOnItemSelectedListener(this::switchBetweenFragment);
+
+        replaceFragment(mainFragment);
+        binding.navBarView.setSelectedItemId(R.id.item_main);
     }
 
     private boolean switchBetweenFragment(MenuItem menuItem) {

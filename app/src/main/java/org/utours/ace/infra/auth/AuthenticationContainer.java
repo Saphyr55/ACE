@@ -2,6 +2,7 @@ package org.utours.ace.infra.auth;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import org.utours.ace.auth.feature.AuthAccountService;
 import org.utours.ace.infra.auth.firebase.FirebaseAuthAccountMapper;
 import org.utours.ace.infra.auth.firebase.FirebaseAuthenticationProvider;
 import org.utours.ace.infra.auth.firebase.FirebaseCurrentAuthAccountProvider;
@@ -11,17 +12,14 @@ import org.utours.ace.infra.sqlite.SQLiteACEDatabase;
 
 import java.io.Closeable;
 
-public enum AuthenticationContainer implements Closeable {
+public enum AuthenticationContainer {
     INSTANCE;
 
     private final AuthenticationProvider authenticationProvider;
     private final CurrentAuthAccountProvider currentAuthAccountProvider;
-    private final SQLiteACEDatabase sqLiteACEDatabase;
-
+    private final AuthAccountService authAccountService;
 
     AuthenticationContainer() {
-        this.sqLiteACEDatabase = new SQLiteACEDatabase(null);
-
         var mapper = new FirebaseAuthAccountMapper();
         var auth = FirebaseAuth.getInstance();
 
@@ -30,6 +28,11 @@ public enum AuthenticationContainer implements Closeable {
 
         this.authenticationProvider = firebaseAuthenticationProvider;
         this.currentAuthAccountProvider = firebaseCurrentAuthAccountProvider;
+        this.authAccountService = new AuthAccountService(
+             null,
+                authenticationProvider,
+                currentAuthAccountProvider
+        );
     }
 
     public AuthenticationProvider getAuthenticationProvider() {
@@ -40,9 +43,8 @@ public enum AuthenticationContainer implements Closeable {
         return currentAuthAccountProvider;
     }
 
-    @Override
-    public synchronized void close() {
-        sqLiteACEDatabase.close();
+    public AuthAccountService getService() {
+        return authAccountService;
     }
 
 }

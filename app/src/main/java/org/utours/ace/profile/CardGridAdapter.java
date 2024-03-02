@@ -19,14 +19,14 @@ import java.util.List;
 public class CardGridAdapter extends BaseAdapter {
 
     private final List<ProfileCard> profileCards;
-    private final Context context;
     private final LayoutInflater layoutInflater;
 
 
-    public CardGridAdapter(Context context, List<ProfileCard> profileCards) {
-        this.context = context;
+    public CardGridAdapter(Context context,
+                           List<ProfileCard> profileCards) {
+
         this.profileCards = profileCards;
-        this.layoutInflater = (LayoutInflater.from(context));
+        this.layoutInflater = LayoutInflater.from(context);
     }
 
     @Override
@@ -58,13 +58,16 @@ public class CardGridAdapter extends BaseAdapter {
         TextView attackPointTextView = convertView.findViewById(R.id.text_attackPointCard);
         TextView lifePointTextView = convertView.findViewById(R.id.text_lifePointCard);
         TextView manaPointTextView = convertView.findViewById(R.id.text_manaPointCard);
+        TextView rarityTextView = convertView.findViewById(R.id.text_rarity);
 
         iconImageView.setImageResource(R.drawable.picture_ubel);
         nameTextView.setText(card.name());
         attackPointTextView.setText(String.valueOf(card.attackPoint()));
         lifePointTextView.setText(String.valueOf(card.lifePoint()));
         manaPointTextView.setText(String.valueOf(card.manaPoint()));
+        rarityTextView.setText(card.rarity().name());
 
         return convertView;
     }
+
 }

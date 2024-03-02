@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import org.junit.Test;
-import org.utours.ace.auth.AuthAccountValidatorProvider;
+import org.utours.ace.infra.auth.AuthAccountValidatorProvider;
 import org.utours.ace.auth.model.AuthAccount;
 
 public class AuthAccountValidatorProviderTest {

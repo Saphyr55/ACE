@@ -36,5 +36,8 @@
     <string name="main">Main</string>
     <string name="gacha">Gacha</string>
     <string name="shop">Shop</string>
+    <string name="image_card">Image Card</string>
+    <string name="card">Card</string>
+    <string name="unknown">Unknown</string>
 
 </resources>

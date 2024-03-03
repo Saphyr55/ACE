@@ -14,7 +14,7 @@ public record Card(
     public final static Supplier<Card> ubel = () ->
             new Card(
                     "Übel",
-                    "206725",
+                    "https://cdn.myanimelist.net/images/characters/2/535522.jpg",
                     20,
                     10,
                     5,

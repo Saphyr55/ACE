@@ -40,6 +40,9 @@ public class NavigationActivity extends AppCompatActivity {
         binding = ActivityNavigationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        waitFragment = new WaitFragment();
+        replaceFragment(waitFragment);
+
         playerAccountService = PlayerAccountContainer.INSTANCE
                 .getService(this);
 
@@ -47,18 +50,15 @@ public class NavigationActivity extends AppCompatActivity {
                 .getCurrentPlayerAccount()
                 .orElseThrow(this::errorMissingCurrentPlayer);
 
-        waitFragment = new WaitFragment();
         mainFragment = new MainFragment();
         profileFragment = new ProfileFragment();
         deckFragment = new DeckFragment(playerAccountService, playerAccount);
         gachaFragment = new GachaFragment();
         shopFragment = new ShopFragment();
 
-        binding.navBarView.setVisibility(View.GONE);
+        binding.navBar.setVisibility(View.GONE);
         binding.navBarView.setBackground(null);
         binding.navBarView.setSelectedItemId(R.id.item_main);
-
-        replaceFragment(waitFragment);
 
         deckFragment.setup()
                 .thenRun(this::startNavigationMain)
@@ -66,9 +66,11 @@ public class NavigationActivity extends AppCompatActivity {
     }
 
     private void startNavigationMain() {
-        replaceFragment(mainFragment);
-        binding.navBarView.setVisibility(View.VISIBLE);
-        binding.navBarView.setOnItemSelectedListener(this::switchBetweenFragment);
+        runOnUiThread(() -> {
+            binding.navBar.setVisibility(View.VISIBLE);
+            binding.navBarView.setOnItemSelectedListener(this::switchBetweenFragment);
+            replaceFragment(mainFragment);
+        });
     }
 
     private boolean switchBetweenFragment(MenuItem menuItem) {
@@ -88,7 +90,6 @@ public class NavigationActivity extends AppCompatActivity {
         return true;
     }
 
-
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -104,7 +105,10 @@ public class NavigationActivity extends AppCompatActivity {
     }
 
     private Void messagingErrorFragment(Throwable throwable) {
-        replaceFragment(new ErrorFragment("Loading account failed."));
+        runOnUiThread(() -> {
+            replaceFragment(new ErrorFragment("Loading account failed."));
+            Log.e(TAG, throwable.getMessage(), throwable);
+        });
         throw new RuntimeException(throwable);
     }
 

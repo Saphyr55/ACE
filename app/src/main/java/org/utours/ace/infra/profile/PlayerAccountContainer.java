@@ -8,7 +8,7 @@ import org.utours.ace.infra.common.http.HttpImageDownloader;
 import org.utours.ace.infra.profile.firebase.FirebaseDatabaseReferences;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountMapper;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountRepository;
-import org.utours.ace.infra.profile.jikan.JikanImageCardDownloader;
+import org.utours.ace.infra.profile.mal.MalImageCardDownloader;
 import org.utours.ace.infra.profile.sqlite.SQLiteImageInstaller;
 import org.utours.ace.infra.profile.sqlite.SQLiteImageProvider;
 import org.utours.ace.infra.common.sqlite.SQLiteACEDatabaseWrapper;
@@ -50,15 +50,18 @@ public enum PlayerAccountContainer {
     }
 
     public PlayerAccountService getService(Context context) {
+
         if (!databaseMap.containsKey(context)) {
             databaseMap.put(context, new SQLiteACEDatabaseWrapper(context));
         }
+
         SQLiteACEDatabaseWrapper ace = databaseMap.get(context);
         assert ace != null;
+
         return new PlayerAccountService(
                 new SQLiteImageInstaller(ace.getWritableDatabase()),
                 new SQLiteImageProvider(ace.getWritableDatabase()),
-                new JikanImageCardDownloader(new HttpImageDownloader())
+                new MalImageCardDownloader(new HttpImageDownloader())
         );
     }
 

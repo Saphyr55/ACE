@@ -87,13 +87,11 @@ public class ConnectionActivity extends AppCompatActivity {
 
     private void sendErrorMessageOnInvalidation(AuthAccount a,
                                                 Stack<Throwable> throwableStack) {
-
-        Optional<Throwable> first = throwableStack.stream().findFirst();
-        first.ifPresent(throwable -> {
+        throwableStack.stream().findFirst().ifPresent(throwable -> {
             String msg = throwable.getMessage();
             Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+            progressBar.setVisibility(View.GONE);
         });
-        progressBar.setVisibility(View.GONE);
     }
 
     private void sendErrorMessageOnAuthentication(Exception e) {

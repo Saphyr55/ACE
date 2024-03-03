@@ -9,6 +9,7 @@ import android.os.Bundle;
 import org.utours.ace.auth.ConnectionActivity;
 import org.utours.ace.infra.auth.AuthenticationContainer;
 import org.utours.ace.auth.port.CurrentAuthAccountProvider;
+import org.utours.ace.infra.profile.PlayerAccountContainer;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -16,6 +17,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        PlayerAccountContainer.INSTANCE.getService(this);
 
         var cls = determineActivityClass();
         var intent = new Intent(this, cls);

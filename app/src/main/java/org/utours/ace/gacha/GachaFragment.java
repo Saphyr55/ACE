@@ -19,4 +19,5 @@ public class GachaFragment extends Fragment {
 
         return inflater.inflate(R.layout.fragment_gacha, container, false);
     }
+
 }

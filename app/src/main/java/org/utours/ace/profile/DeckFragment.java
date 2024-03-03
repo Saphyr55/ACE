@@ -21,6 +21,7 @@ import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -42,7 +43,7 @@ public final class DeckFragment extends Fragment {
     public CompletableFuture<Void> setup() {
         return playerAccountService
                 .provideAllCardImage(playerAccount)
-                .thenAccept(cardImages::putAll);
+                .thenAccept(this::fillCardImages);
     }
 
     @Override
@@ -77,9 +78,6 @@ public final class DeckFragment extends Fragment {
 
         ImageView iconImageView = view.findViewById(R.id.image_card);
         TextView nameTextView = view.findViewById(R.id.text_nameCard);
-        // TextView attackPointTextView = view.findViewById(R.id.text_attackPointCard);
-        // TextView lifePointTextView = view.findViewById(R.id.text_lifePointCard);
-        // TextView manaPointTextView = view.findViewById(R.id.text_manaPointCard);
         TextView rarityTextView = view.findViewById(R.id.text_rarity);
 
         ImageCard imageCard = cardImages.get(card.pictureAddress());
@@ -89,10 +87,16 @@ public final class DeckFragment extends Fragment {
 
         iconImageView.setImageBitmap(bitmap);
         nameTextView.setText(card.name());
-        // attackPointTextView.setText(String.valueOf(card.attackPoint()));
-        // lifePointTextView.setText(String.valueOf(card.lifePoint()));
-        // manaPointTextView.setText(String.valueOf(card.manaPoint()));
         rarityTextView.setText(card.rarity().name());
+    }
+
+    private void fillCardImages(List<ImageCard> imageCards) {
+        var result = new HashMap<String, ImageCard>();
+        for (int i = 0; i < imageCards.size(); i++) {
+            String id = playerAccount.cards().get(i).pictureAddress();
+            result.put(id, imageCards.get(i));
+        }
+        this.cardImages.putAll(result);
     }
 
 }

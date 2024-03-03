@@ -27,24 +27,28 @@ public class JikanImageCardDownloader implements ImageCardDownloader {
     }
 
     @Override
-    public CompletableFuture<ImageCard> download(String id) {
+    public CompletableFuture<ImageCard> download(String source) {
         return CompletableFuture
-                .supplyAsync(() -> connectURL(String.format(URL, id)))
+                .supplyAsync(() -> connectURL(String.format(URL, source)))
                 .thenCompose(imageDownloader::download)
-                .thenApply(bytes -> new ImageCard(id, bytes));
+                .thenApply(bytes -> new ImageCard(source, bytes));
     }
 
     private URL connectURL(String completeUrlStr) {
         try {
-
             var url = new URL(completeUrlStr);
             var connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
 
+            Log.i("", "Connection to '" + completeUrlStr + "'.");
+
             if (connection.getResponseCode() != 200)
-                throw new RuntimeException("Http Error.");
+                 throw new Exception("Http Error : " + connection.getResponseCode());
 
             var json = readData(connection);
+
+            Thread.sleep(300);
+
             var pictureURL = jikanJsonParser.pictureURL(json);
 
             return new URL(pictureURL);
@@ -58,10 +62,13 @@ public class JikanImageCardDownloader implements ImageCardDownloader {
         } catch (JSONException e) {
             Log.e("", e.getMessage(), e);
             throw new RuntimeException(e);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
     private String readData(HttpURLConnection connection) throws IOException {
+        Log.i("", "Read data from '" + connection.getURL().getPath() + "'.");
         try (var input = connection.getInputStream()) {
             var json = new StringBuilder();
             int c;

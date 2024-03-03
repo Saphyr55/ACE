@@ -22,29 +22,30 @@ public class SQLiteImageProvider implements ImageCardProvider {
     }
 
     @Override
-    public CompletableFuture<Optional<ImageCard>> provide(String uid) {
+    public CompletableFuture<Optional<ImageCard>> provide(String source) {
 
-        if (cache.containsKey(uid)) {
+        if (cache.containsKey(source)) {
             return CompletableFuture.completedFuture(
-                    Optional.ofNullable(cache.get(uid)));
+                    Optional.ofNullable(cache.get(source)));
         }
 
         return CompletableFuture.supplyAsync(() -> {
             try {
                 Cursor cursor = database.rawQuery(
                         "SELECT * FROM " + SQLiteDetails.TABLE_CARD_IMAGE_NAME +
-                                " WHERE uid = ?", new String[]{ uid });
+                                " WHERE uid = ?", new String[]{source});
                 cursor.moveToFirst();
                 int cIndex = cursor.getColumnIndex("image");
                 byte[] bitmap = cursor.getBlob(cIndex);
                 cursor.close();
-                var image = new ImageCard(uid, bitmap);
-                cache.put(uid, image);
+                var image = new ImageCard(source, bitmap);
+                cache.put(source, image);
                 return Optional.of(image);
             } catch (Exception e) {
                 return Optional.empty();
             }
         });
+
     }
 
 }

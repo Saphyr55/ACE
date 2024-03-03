@@ -1,5 +1,7 @@
 package org.utours.ace.infra.auth;
 
+import android.content.Context;
+
 import com.google.firebase.auth.FirebaseAuth;
 
 import org.utours.ace.auth.feature.AuthAccountService;
@@ -17,7 +19,7 @@ public enum AuthenticationContainer {
 
     private final AuthenticationProvider authenticationProvider;
     private final CurrentAuthAccountProvider currentAuthAccountProvider;
-    private final AuthAccountService authAccountService;
+
 
     AuthenticationContainer() {
         var mapper = new FirebaseAuthAccountMapper();
@@ -28,23 +30,22 @@ public enum AuthenticationContainer {
 
         this.authenticationProvider = firebaseAuthenticationProvider;
         this.currentAuthAccountProvider = firebaseCurrentAuthAccountProvider;
-        this.authAccountService = new AuthAccountService(
-             null,
-                authenticationProvider,
-                currentAuthAccountProvider
-        );
     }
 
     public AuthenticationProvider getAuthenticationProvider() {
         return authenticationProvider;
     }
 
-    public CurrentAuthAccountProvider getCurrentAuthAccountProvider() {
-        return currentAuthAccountProvider;
+    public CurrentAuthAccountProvider getCurrentAuthAccountProvider(Context context) {
+        return new CurrentAuthAccountProviderProxy(currentAuthAccountProvider, context);
     }
 
-    public AuthAccountService getService() {
-        return authAccountService;
+    public AuthAccountService getService(Context context) {
+        return new AuthAccountService(
+                null,
+                authenticationProvider,
+                new CurrentAuthAccountProviderProxy(currentAuthAccountProvider, context)
+        );
     }
 
 }

@@ -46,7 +46,7 @@ public class ConnectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
 
-        authAccountService = AuthenticationContainer.INSTANCE.getService();
+        authAccountService = AuthenticationContainer.INSTANCE.getService(this);
 
         emailEditText = findViewById(R.id.edittext_email);
         passwordEditText = findViewById(R.id.edittext_password);

@@ -40,5 +40,6 @@
     <string name="card">Card</string>
     <string name="unknown">Unknown</string>
     <string name="rarity">Rarity</string>
+    <string name="error">Error</string>
 
 </resources>

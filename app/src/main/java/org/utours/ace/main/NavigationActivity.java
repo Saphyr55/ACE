@@ -1,7 +1,9 @@
 package org.utours.ace.main;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -10,19 +12,27 @@ import androidx.fragment.app.FragmentTransaction;
 
 import org.utours.ace.R;
 import org.utours.ace.databinding.ActivityNavigationBinding;
+import org.utours.ace.infra.profile.PlayerAccountContainer;
 import org.utours.ace.profile.DeckFragment;
 import org.utours.ace.gacha.GachaFragment;
 import org.utours.ace.profile.ProfileFragment;
+import org.utours.ace.profile.feature.PlayerAccountService;
+import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.shop.ShopFragment;
 
 public class NavigationActivity extends AppCompatActivity {
 
-    ActivityNavigationBinding binding;
-    MainFragment mainFragment;
-    ProfileFragment profileFragment;
-    DeckFragment deckFragment;
-    GachaFragment gachaFragment;
-    ShopFragment shopFragment;
+    private static final String TAG = NavigationActivity.class.getName();
+
+    private ActivityNavigationBinding binding;
+    private WaitFragment waitFragment;
+    private MainFragment mainFragment;
+    private ProfileFragment profileFragment;
+    private DeckFragment deckFragment;
+    private GachaFragment gachaFragment;
+    private ShopFragment shopFragment;
+    private PlayerAccount playerAccount;
+    private PlayerAccountService playerAccountService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,17 +40,35 @@ public class NavigationActivity extends AppCompatActivity {
         binding = ActivityNavigationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        playerAccountService = PlayerAccountContainer.INSTANCE
+                .getService(this);
+
+        playerAccount = PlayerAccountContainer.INSTANCE
+                .getCurrentPlayerAccount()
+                .orElseThrow(this::errorMissingCurrentPlayer);
+
+        waitFragment = new WaitFragment();
         mainFragment = new MainFragment();
         profileFragment = new ProfileFragment();
-        deckFragment = new DeckFragment();
+        deckFragment = new DeckFragment(playerAccountService, playerAccount);
         gachaFragment = new GachaFragment();
         shopFragment = new ShopFragment();
 
+        binding.navBarView.setVisibility(View.GONE);
         binding.navBarView.setBackground(null);
-        binding.navBarView.setOnItemSelectedListener(this::switchBetweenFragment);
-
-        replaceFragment(mainFragment);
         binding.navBarView.setSelectedItemId(R.id.item_main);
+
+        replaceFragment(waitFragment);
+
+        deckFragment.setup()
+                .thenRun(this::startNavigationMain)
+                .exceptionally(this::messagingErrorFragment);
+    }
+
+    private void startNavigationMain() {
+        replaceFragment(mainFragment);
+        binding.navBarView.setVisibility(View.VISIBLE);
+        binding.navBarView.setOnItemSelectedListener(this::switchBetweenFragment);
     }
 
     private boolean switchBetweenFragment(MenuItem menuItem) {
@@ -66,6 +94,18 @@ public class NavigationActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
+    }
+
+    private RuntimeException errorMissingCurrentPlayer() {
+        var msg = "Current player account doesn't exist, and entire in ProfileActivity.";
+        var e = new RuntimeException(msg);
+        Log.e(TAG, e.getMessage(), e);
+        return e;
+    }
+
+    private Void messagingErrorFragment(Throwable throwable) {
+        replaceFragment(new ErrorFragment("Loading account failed."));
+        return null;
     }
 
 }

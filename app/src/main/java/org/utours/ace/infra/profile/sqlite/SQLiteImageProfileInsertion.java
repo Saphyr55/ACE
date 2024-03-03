@@ -5,7 +5,7 @@ import static org.utours.ace.infra.sqlite.SQLiteDetails.TABLE_CARD_IMAGE_NAME;
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
-import org.utours.ace.profile.model.ProfileCardImage;
+import org.utours.ace.profile.model.ImageProfileCard;
 import org.utours.ace.profile.port.ImageProfileCardInsertion;
 
 import java.util.concurrent.CompletableFuture;
@@ -19,16 +19,16 @@ public final class SQLiteImageProfileInsertion implements ImageProfileCardInsert
     }
 
     @Override
-    public CompletableFuture<ProfileCardImage> insert(ProfileCardImage profileCardImage) {
+    public CompletableFuture<ImageProfileCard> insert(ImageProfileCard imageProfileCard) {
         return CompletableFuture.supplyAsync(() -> {
 
             var contentValues = new ContentValues();
-            contentValues.put("uid", profileCardImage.uid());
-            contentValues.put("image", profileCardImage.content());
+            contentValues.put("uid", imageProfileCard.uid());
+            contentValues.put("image", imageProfileCard.content());
             if (database.insert(TABLE_CARD_IMAGE_NAME, null, contentValues) == -1)
                 throw new RuntimeException();
 
-            return profileCardImage;
+            return imageProfileCard;
         });
     }
 

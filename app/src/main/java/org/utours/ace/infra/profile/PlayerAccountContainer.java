@@ -7,6 +7,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import org.utours.ace.infra.profile.firebase.FirebaseDatabaseReferences;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountMapper;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountRepository;
+import org.utours.ace.infra.profile.jikan.JikanImageDownloader;
 import org.utours.ace.infra.profile.sqlite.SQLiteImageProfileInsertion;
 import org.utours.ace.infra.profile.sqlite.SQLiteImageProfileProvider;
 import org.utours.ace.infra.sqlite.SQLiteACEDatabase;
@@ -14,6 +15,8 @@ import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.port.PlayerAccountRepository;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 public enum PlayerAccountContainer {
@@ -21,6 +24,7 @@ public enum PlayerAccountContainer {
 
     private final PlayerAccountRepository playerAccountRepository;
     private PlayerAccount currentPlayerAccount;
+    private Map<Context, SQLiteACEDatabase> databaseMap;
 
     PlayerAccountContainer() {
         var database = FirebaseDatabase.getInstance();
@@ -29,6 +33,7 @@ public enum PlayerAccountContainer {
                 new FirebasePlayerAccountRepository(
                         refs.playerAccountsReference(),
                         new FirebasePlayerAccountMapper());
+        this.databaseMap = new HashMap<>();
     }
 
     public PlayerAccountRepository getPlayerAccountRepository() {
@@ -43,14 +48,17 @@ public enum PlayerAccountContainer {
         this.currentPlayerAccount = currentPlayerAccount;
     }
 
-    public PlayerAccountService getPlayerAccountService(Context context) {
-        try (var aceDB = new SQLiteACEDatabase(context)) {
-            return new PlayerAccountService(
-                    new SQLiteImageProfileInsertion(aceDB.getWritableDatabase()),
-                    new SQLiteImageProfileProvider(aceDB.getWritableDatabase()),
-                    playerAccountRepository
-            );
+    public PlayerAccountService getService(Context context) {
+        if (!databaseMap.containsKey(context)) {
+            databaseMap.put(context, new SQLiteACEDatabase(context));
         }
+        SQLiteACEDatabase ace = databaseMap.get(context);
+        assert ace != null;
+        return new PlayerAccountService(
+                new SQLiteImageProfileInsertion(ace.getWritableDatabase()),
+                new SQLiteImageProfileProvider(ace.getWritableDatabase()),
+                new JikanImageDownloader()
+        );
     }
 
 }

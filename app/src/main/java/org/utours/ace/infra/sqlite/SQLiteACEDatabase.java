@@ -22,6 +22,7 @@ public class SQLiteACEDatabase extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CARD_IMAGE_NAME);
+        onCreate(db);
     }
 
 }

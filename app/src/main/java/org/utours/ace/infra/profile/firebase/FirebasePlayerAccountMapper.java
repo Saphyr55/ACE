@@ -1,8 +1,12 @@
 package org.utours.ace.infra.profile.firebase;
 
 import org.utours.ace.profile.model.PlayerAccount;
+import org.utours.ace.profile.model.ProfileCard;
+import org.utours.ace.profile.model.ProfileDeck;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class FirebasePlayerAccountMapper {
 
@@ -20,7 +24,19 @@ public class FirebasePlayerAccountMapper {
                 playerAccount.getEmail(),
                 playerAccount.getLevel(),
                 playerAccount.getDescription(),
-                List.of());
+
+                // TODO: Remove this debug thing.
+                IntStream.range(0, 30)
+                        .mapToObj(value -> ProfileCard.ubel.get())
+                        .collect(Collectors.toList()),
+
+                // TODO: Remove this debug thing.
+                new ProfileDeck(
+                        ProfileCard.ubel.get(),
+                        ProfileCard.ubel.get(),
+                        ProfileCard.ubel.get(),
+                        ProfileCard.ubel.get(),
+                        ProfileCard.ubel.get()));
     }
 
     FirebasePlayerAccount map(PlayerAccount playerAccount) {

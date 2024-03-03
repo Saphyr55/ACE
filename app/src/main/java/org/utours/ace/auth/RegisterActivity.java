@@ -42,7 +42,7 @@ public class RegisterActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        authAccountService = AuthenticationContainer.INSTANCE.getService();
+        authAccountService = AuthenticationContainer.INSTANCE.getService(this);
         playerAccountRepository = PlayerAccountContainer.INSTANCE.getPlayerAccountRepository();
 
         emailEditText = findViewById(R.id.edittext_email);

@@ -16,7 +16,6 @@ import org.utours.ace.infra.profile.PlayerAccountContainer;
 
 public class ProfileFragment extends Fragment {
 
-    private static final String TAG = ProfileFragment.class.getName();
 
 
     @Override
@@ -24,18 +23,8 @@ public class ProfileFragment extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
 
-        var playerAccount = PlayerAccountContainer.INSTANCE
-                .getCurrentPlayerAccount()
-                .orElseThrow(this::errorMissingCurrentPlayer);
-
         return inflater.inflate(R.layout.fragment_profile, container, false);
     }
 
-    private RuntimeException errorMissingCurrentPlayer() {
-        var msg = "Current player account doesn't exist, and entire in ProfileActivity.";
-        var e = new RuntimeException(msg);
-        Log.e(TAG, e.getMessage(), e);
-        return e;
-    }
 
 }

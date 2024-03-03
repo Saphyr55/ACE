@@ -5,14 +5,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import org.utours.ace.R;
 import org.utours.ace.common.annotation.Adapter;
+import org.utours.ace.profile.model.ImageProfileCard;
 import org.utours.ace.profile.model.ProfileCard;
 
 import java.util.List;
+import java.util.Map;
 
 
 @Adapter
@@ -20,13 +20,16 @@ public class CardGridAdapter extends BaseAdapter {
 
     private final List<ProfileCard> profileCards;
     private final LayoutInflater layoutInflater;
+    private final Map<String, ImageProfileCard> cardImages;
 
 
     public CardGridAdapter(Context context,
-                           List<ProfileCard> profileCards) {
+                           List<ProfileCard> profileCards,
+                           Map<String, ImageProfileCard> cardImages) {
 
         this.profileCards = profileCards;
         this.layoutInflater = LayoutInflater.from(context);
+        this.cardImages = cardImages;
     }
 
     @Override
@@ -46,27 +49,11 @@ public class CardGridAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-
         var card = (ProfileCard) getItem(position);
-
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_card, parent, false);
         }
-
-        ImageView iconImageView = convertView.findViewById(R.id.image_card);
-        TextView nameTextView = convertView.findViewById(R.id.text_nameCard);
-        TextView attackPointTextView = convertView.findViewById(R.id.text_attackPointCard);
-        TextView lifePointTextView = convertView.findViewById(R.id.text_lifePointCard);
-        TextView manaPointTextView = convertView.findViewById(R.id.text_manaPointCard);
-        TextView rarityTextView = convertView.findViewById(R.id.text_rarity);
-
-        iconImageView.setImageResource(R.drawable.picture_ubel);
-        nameTextView.setText(card.name());
-        attackPointTextView.setText(String.valueOf(card.attackPoint()));
-        lifePointTextView.setText(String.valueOf(card.lifePoint()));
-        manaPointTextView.setText(String.valueOf(card.manaPoint()));
-        rarityTextView.setText(card.rarity().name());
-
+        DeckFragment.setupCardView(convertView, card, cardImages);
         return convertView;
     }
 

@@ -26,8 +26,9 @@ public class StartActivity extends AppCompatActivity {
         startACETextView = findViewById(R.id.textview_startAce);
         parameterStartButton = findViewById(R.id.btn_parameter);
 
-        AuthAccount authAccount = AuthenticationContainer.INSTANCE
-                .getService()
+        AuthAccount authAccount =
+                AuthenticationContainer.INSTANCE
+                .getService(this)
                 .currentAuthAccount()
                 .orElseThrow(RuntimeException::new);
 

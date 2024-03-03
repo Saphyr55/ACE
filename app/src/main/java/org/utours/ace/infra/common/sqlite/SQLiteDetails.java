@@ -1,4 +1,4 @@
-package org.utours.ace.infra.sqlite;
+package org.utours.ace.infra.common.sqlite;
 
 public final class SQLiteDetails {
 

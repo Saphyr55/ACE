@@ -105,7 +105,7 @@ public class NavigationActivity extends AppCompatActivity {
 
     private Void messagingErrorFragment(Throwable throwable) {
         replaceFragment(new ErrorFragment("Loading account failed."));
-        return null;
+        throw new RuntimeException(throwable);
     }
 
 }

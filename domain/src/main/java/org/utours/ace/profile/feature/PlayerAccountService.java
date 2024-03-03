@@ -2,63 +2,63 @@ package org.utours.ace.profile.feature;
 
 import org.utours.ace.common.annotation.DomainService;
 import org.utours.ace.profile.model.PlayerAccount;
-import org.utours.ace.profile.model.ProfileCard;
-import org.utours.ace.profile.model.ImageProfileCard;
-import org.utours.ace.profile.port.ImageDownloader;
-import org.utours.ace.profile.port.ImageProfileCardInsertion;
-import org.utours.ace.profile.port.ImageProfileCardProvider;
-import org.utours.ace.profile.port.PlayerAccountRepository;
+import org.utours.ace.profile.model.Card;
+import org.utours.ace.profile.model.ImageCard;
+import org.utours.ace.profile.port.ImageCardDownloader;
+import org.utours.ace.profile.port.ImageCardInstaller;
+import org.utours.ace.profile.port.ImageCardProvider;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 import java.util.stream.Collectors;
 
 @DomainService
 public final class PlayerAccountService {
 
+    private final ImageCardInstaller imageCardInstaller;
+    private final ImageCardProvider imageCardProvider;
+    private final ImageCardDownloader imageCardDownloader;
 
-    private final ImageProfileCardInsertion imageProfileCardInsertion;
-    private final ImageProfileCardProvider imageProfileCardProvider;
-    private final ImageDownloader imageDownloader;
+    public PlayerAccountService(ImageCardInstaller imageCardInstaller,
+                                ImageCardProvider imageCardProvider,
+                                ImageCardDownloader imageCardDownloader) {
 
-    public PlayerAccountService(ImageProfileCardInsertion imageProfileCardInsertion,
-                                ImageProfileCardProvider imageProfileCardProvider,
-                                ImageDownloader imageDownloader) {
-
-        this.imageProfileCardInsertion = imageProfileCardInsertion;
-        this.imageProfileCardProvider = imageProfileCardProvider;
-        this.imageDownloader = imageDownloader;
+        this.imageCardInstaller = imageCardInstaller;
+        this.imageCardProvider = imageCardProvider;
+        this.imageCardDownloader = imageCardDownloader;
     }
 
-    public CompletableFuture<ImageProfileCard> insertCardImage(ImageProfileCard imageProfileCard) {
-        return imageProfileCardInsertion.insert(imageProfileCard);
+    public CompletableFuture<ImageCard> installImageCard(ImageCard imageCard) {
+        return imageCardProvider.provide(imageCard.uid())
+                .thenCompose(image ->
+                        image.<CompletionStage<ImageCard>>map(CompletableFuture::completedFuture)
+                        .orElseGet(() -> imageCardInstaller.install(imageCard))
+                );
     }
 
-    public CompletableFuture<Optional<ImageProfileCard>> provideCardImage(String uid) {
+    public CompletableFuture<Optional<ImageCard>> provideCardImage(String uid) {
 
-        return imageProfileCardProvider.provide(uid).thenCompose(imageProfileCard -> {
-
-            if (imageProfileCard.isPresent()) {
-                return CompletableFuture.completedFuture(imageProfileCard);
+        return imageCardProvider.provide(uid).thenCompose(imageCard -> {
+            if (imageCard.isPresent()) {
+                return CompletableFuture.completedFuture(imageCard);
             }
-
-            return imageDownloader.download(uid).thenCompose(bytes -> {
-                var card = new ImageProfileCard(uid, bytes);
-                return insertCardImage(card).thenApply(Optional::of);
-            });
+            return imageCardDownloader
+                    .download(uid)
+                    .thenCompose(card -> installImageCard(card)
+                            .thenApply(Optional::of));
 
         });
     }
 
 
-    public CompletableFuture<Map<String, ImageProfileCard>> provideAllCardImage(PlayerAccount playerAccount) {
+    public CompletableFuture<Map<String, ImageCard>> provideAllCardImage(PlayerAccount playerAccount) {
 
-        var cardImageFutures = new HashMap<String, CompletableFuture<Optional<ImageProfileCard>>>();
+        var cardImageFutures = new HashMap<String, CompletableFuture<Optional<ImageCard>>>();
 
-        for (ProfileCard card : playerAccount.cards()) {
+        for (Card card : playerAccount.cards()) {
             var future = provideCardImage(card.pictureAddress());
             cardImageFutures.put(card.pictureAddress(), future);
         }

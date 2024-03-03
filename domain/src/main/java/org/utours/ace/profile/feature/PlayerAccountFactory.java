@@ -1,7 +1,7 @@
 package org.utours.ace.profile.feature;
 
 import org.utours.ace.profile.model.PlayerAccount;
-import org.utours.ace.profile.model.ProfileCard;
+import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ProfileDeck;
 
 import java.util.List;
@@ -13,11 +13,11 @@ public interface PlayerAccountFactory {
                     // TODO: Remove this debug things.
                     List.of(),
                     new ProfileDeck(
-                    ProfileCard.ubel.get(),
-                    ProfileCard.ubel.get(),
-                    ProfileCard.ubel.get(),
-                    ProfileCard.ubel.get(),
-                    ProfileCard.ubel.get()));
+                    Card.ubel.get(),
+                    Card.ubel.get(),
+                    Card.ubel.get(),
+                    Card.ubel.get(),
+                    Card.ubel.get()));
 
     PlayerAccount create(String uid, String email);
 

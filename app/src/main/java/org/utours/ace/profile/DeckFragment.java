@@ -17,12 +17,11 @@ import android.widget.TextView;
 import org.utours.ace.R;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.PlayerAccount;
-import org.utours.ace.profile.model.ProfileCard;
-import org.utours.ace.profile.model.ImageProfileCard;
+import org.utours.ace.profile.model.Card;
+import org.utours.ace.profile.model.ImageCard;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -30,7 +29,7 @@ public final class DeckFragment extends Fragment {
 
     private final PlayerAccountService playerAccountService;
     private final PlayerAccount playerAccount;
-    private final Map<String, ImageProfileCard> cardImages;
+    private final Map<String, ImageCard> cardImages;
 
     public DeckFragment(PlayerAccountService playerAccountService,
                         PlayerAccount playerAccount) {
@@ -73,8 +72,8 @@ public final class DeckFragment extends Fragment {
     }
 
     public static void setupCardView(View view,
-                                     ProfileCard card,
-                                     Map<String, ImageProfileCard> cardImages) {
+                                     Card card,
+                                     Map<String, ImageCard> cardImages) {
 
         ImageView iconImageView = view.findViewById(R.id.image_card);
         TextView nameTextView = view.findViewById(R.id.text_nameCard);
@@ -83,9 +82,9 @@ public final class DeckFragment extends Fragment {
         // TextView manaPointTextView = view.findViewById(R.id.text_manaPointCard);
         TextView rarityTextView = view.findViewById(R.id.text_rarity);
 
-        ImageProfileCard imageProfileCard = cardImages.get(card.pictureAddress());
-        assert imageProfileCard != null;
-        byte[] content = imageProfileCard.content();
+        ImageCard imageCard = cardImages.get(card.pictureAddress());
+        assert imageCard != null;
+        byte[] content = imageCard.content();
         Bitmap bitmap = BitmapFactory.decodeByteArray(content, 0, content.length);
 
         iconImageView.setImageBitmap(bitmap);

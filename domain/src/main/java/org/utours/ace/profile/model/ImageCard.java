@@ -1,6 +1,6 @@
 package org.utours.ace.profile.model;
 
-public record ImageProfileCard(
+public record ImageCard(
         String uid,
         byte[] content
 ) {

@@ -4,13 +4,14 @@ import android.content.Context;
 
 import com.google.firebase.database.FirebaseDatabase;
 
+import org.utours.ace.infra.common.http.HttpImageDownloader;
 import org.utours.ace.infra.profile.firebase.FirebaseDatabaseReferences;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountMapper;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountRepository;
-import org.utours.ace.infra.profile.jikan.JikanImageDownloader;
-import org.utours.ace.infra.profile.sqlite.SQLiteImageProfileInsertion;
-import org.utours.ace.infra.profile.sqlite.SQLiteImageProfileProvider;
-import org.utours.ace.infra.sqlite.SQLiteACEDatabase;
+import org.utours.ace.infra.profile.jikan.JikanImageCardDownloader;
+import org.utours.ace.infra.profile.sqlite.SQLiteImageInstaller;
+import org.utours.ace.infra.profile.sqlite.SQLiteImageProvider;
+import org.utours.ace.infra.common.sqlite.SQLiteACEDatabaseWrapper;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.port.PlayerAccountRepository;
@@ -24,7 +25,7 @@ public enum PlayerAccountContainer {
 
     private final PlayerAccountRepository playerAccountRepository;
     private PlayerAccount currentPlayerAccount;
-    private Map<Context, SQLiteACEDatabase> databaseMap;
+    private Map<Context, SQLiteACEDatabaseWrapper> databaseMap;
 
     PlayerAccountContainer() {
         var database = FirebaseDatabase.getInstance();
@@ -50,14 +51,14 @@ public enum PlayerAccountContainer {
 
     public PlayerAccountService getService(Context context) {
         if (!databaseMap.containsKey(context)) {
-            databaseMap.put(context, new SQLiteACEDatabase(context));
+            databaseMap.put(context, new SQLiteACEDatabaseWrapper(context));
         }
-        SQLiteACEDatabase ace = databaseMap.get(context);
+        SQLiteACEDatabaseWrapper ace = databaseMap.get(context);
         assert ace != null;
         return new PlayerAccountService(
-                new SQLiteImageProfileInsertion(ace.getWritableDatabase()),
-                new SQLiteImageProfileProvider(ace.getWritableDatabase()),
-                new JikanImageDownloader()
+                new SQLiteImageInstaller(ace.getWritableDatabase()),
+                new SQLiteImageProvider(ace.getWritableDatabase()),
+                new JikanImageCardDownloader(new HttpImageDownloader())
         );
     }
 

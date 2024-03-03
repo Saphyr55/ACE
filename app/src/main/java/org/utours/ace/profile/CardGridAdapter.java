@@ -8,8 +8,8 @@ import android.widget.BaseAdapter;
 
 import org.utours.ace.R;
 import org.utours.ace.common.annotation.Adapter;
-import org.utours.ace.profile.model.ImageProfileCard;
-import org.utours.ace.profile.model.ProfileCard;
+import org.utours.ace.profile.model.ImageCard;
+import org.utours.ace.profile.model.Card;
 
 import java.util.List;
 import java.util.Map;
@@ -18,28 +18,28 @@ import java.util.Map;
 @Adapter
 public class CardGridAdapter extends BaseAdapter {
 
-    private final List<ProfileCard> profileCards;
+    private final List<Card> cards;
     private final LayoutInflater layoutInflater;
-    private final Map<String, ImageProfileCard> cardImages;
+    private final Map<String, ImageCard> cardImages;
 
 
     public CardGridAdapter(Context context,
-                           List<ProfileCard> profileCards,
-                           Map<String, ImageProfileCard> cardImages) {
+                           List<Card> cards,
+                           Map<String, ImageCard> cardImages) {
 
-        this.profileCards = profileCards;
+        this.cards = cards;
         this.layoutInflater = LayoutInflater.from(context);
         this.cardImages = cardImages;
     }
 
     @Override
     public int getCount() {
-        return profileCards.size();
+        return cards.size();
     }
 
     @Override
     public Object getItem(int position) {
-        return profileCards.get(position);
+        return cards.get(position);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class CardGridAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        var card = (ProfileCard) getItem(position);
+        var card = (Card) getItem(position);
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_card, parent, false);
         }

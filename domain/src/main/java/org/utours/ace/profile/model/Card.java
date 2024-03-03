@@ -2,23 +2,23 @@ package org.utours.ace.profile.model;
 
 import java.util.function.Supplier;
 
-public record ProfileCard(
+public record Card(
         String name,
         String pictureAddress,
         Integer lifePoint,
         Integer attackPoint,
         Integer manaPoint,
-        ProfileCardRarity rarity
+        CardRarity rarity
 ) {
 
-    public final static Supplier<ProfileCard> ubel = () ->
-            new ProfileCard(
+    public final static Supplier<Card> ubel = () ->
+            new Card(
                     "Übel",
                     "206725",
                     20,
                     10,
                     5,
-                    ProfileCardRarity.UR);
+                    CardRarity.UR);
 
 
 }

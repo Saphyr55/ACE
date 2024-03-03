@@ -1,22 +1,21 @@
-package org.utours.ace.infra.sqlite;
+package org.utours.ace.infra.common.sqlite;
 
-import static org.utours.ace.infra.sqlite.SQLiteDetails.*;
+import static org.utours.ace.infra.common.sqlite.SQLiteDetails.*;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 
-public class SQLiteACEDatabase extends SQLiteOpenHelper {
+public class SQLiteACEDatabaseWrapper extends SQLiteOpenHelper {
 
-    public SQLiteACEDatabase(Context context) {
+    public SQLiteACEDatabaseWrapper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_CARD_IMAGE_NAME + "(uid VARCHAR(255), image BLOB)");
+        db.execSQL("CREATE TABLE " + TABLE_CARD_IMAGE_NAME + "(uid VARCHAR(255) UNIQUE, image BLOB)");
     }
 
     @Override

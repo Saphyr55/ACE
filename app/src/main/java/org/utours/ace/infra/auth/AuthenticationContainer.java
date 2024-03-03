@@ -10,9 +10,6 @@ import org.utours.ace.infra.auth.firebase.FirebaseAuthenticationProvider;
 import org.utours.ace.infra.auth.firebase.FirebaseCurrentAuthAccountProvider;
 import org.utours.ace.auth.port.AuthenticationProvider;
 import org.utours.ace.auth.port.CurrentAuthAccountProvider;
-import org.utours.ace.infra.sqlite.SQLiteACEDatabase;
-
-import java.io.Closeable;
 
 public enum AuthenticationContainer {
     INSTANCE;

@@ -16,6 +16,7 @@ import org.utours.ace.infra.profile.PlayerAccountContainer;
 import org.utours.ace.profile.DeckFragment;
 import org.utours.ace.gacha.GachaFragment;
 import org.utours.ace.profile.ProfileFragment;
+import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.shop.ShopFragment;
@@ -32,7 +33,7 @@ public class NavigationActivity extends AppCompatActivity {
     private GachaFragment gachaFragment;
     private ShopFragment shopFragment;
     private PlayerAccount playerAccount;
-    private PlayerAccountService playerAccountService;
+    private CardService playerAccountService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,7 @@ public class NavigationActivity extends AppCompatActivity {
         replaceFragment(waitFragment);
 
         playerAccountService = PlayerAccountContainer.INSTANCE
-                .getService(this);
+                .getCardService(this);
 
         playerAccount = PlayerAccountContainer.INSTANCE
                 .getCurrentPlayerAccount()

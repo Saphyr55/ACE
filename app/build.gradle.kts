@@ -50,10 +50,13 @@ dependencies {
 
     implementation( project(":domain") )
 
-    // Android
+    // AndroidX
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation("androidx.preference:preference:1.2.1")
+    implementation("androidx.activity:activity:1.8.2")
+
+    // Android Material
     implementation("com.google.android.material:material:1.11.0")
 
     // Firebase
@@ -61,7 +64,6 @@ dependencies {
     implementation("com.google.firebase:firebase-auth:22.3.1")
     implementation("com.google.firebase:firebase-storage:20.3.0")
     implementation("com.google.firebase:firebase-database:20.3.1")
-    implementation("androidx.activity:activity:1.8.0")
 
     // Test
     testImplementation("junit:junit:4.13.2")

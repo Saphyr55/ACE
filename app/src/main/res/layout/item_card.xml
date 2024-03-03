@@ -8,6 +8,7 @@
     android:orientation="vertical"
     android:background="@drawable/shape_card"
     app:cardElevation="8dp"
+    android:id="@+id/card_card"
     >
 
     <LinearLayout

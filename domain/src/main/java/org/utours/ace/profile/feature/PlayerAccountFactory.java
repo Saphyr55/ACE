@@ -1,8 +1,7 @@
 package org.utours.ace.profile.feature;
 
-import org.utours.ace.profile.model.CardRegistry;
+import org.utours.ace.profile.model.Deck;
 import org.utours.ace.profile.model.PlayerAccount;
-import org.utours.ace.profile.model.ProfileDeck;
 
 import java.util.List;
 
@@ -10,16 +9,20 @@ public interface PlayerAccountFactory {
 
     PlayerAccountFactory DEFAULT = (uid, email) ->
             new PlayerAccount(uid, "Player", email, 1, "",
-                    // TODO: Remove this debug things.
-                    List.of(),
-                    new ProfileDeck(
-                    CardRegistry.UBEL_CARD.get(),
-                    CardRegistry.UBEL_CARD.get(),
-                    CardRegistry.UBEL_CARD.get(),
-                    CardRegistry.UBEL_CARD.get(),
-                    CardRegistry.UBEL_CARD.get()));
+                    new Deck(List.of(
+                            CardRegistry.UBEL_CARD.get(),
+                            CardRegistry.HIMMEL_CARD.get(),
+                            CardRegistry.FERN_CARD.get()
+                    )),
+                    List.of(
+                            CardRegistry.UBEL_CARD.get(),
+                            CardRegistry.EISEN_CARD.get(),
+                            CardRegistry.FRIEREN_CARD.get(),
+                            CardRegistry.STARK_CARD.get(),
+                            CardRegistry.HIMMEL_CARD.get(),
+                            CardRegistry.FERN_CARD.get()
+                        ));
 
     PlayerAccount create(String uid, String email);
-
 
 }

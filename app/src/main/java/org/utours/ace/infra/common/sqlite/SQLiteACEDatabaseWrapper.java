@@ -15,7 +15,7 @@ public class SQLiteACEDatabaseWrapper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_CARD_IMAGE_NAME + "(source VARCHAR(255), image BLOB)");
+        db.execSQL("CREATE TABLE " + TABLE_CARD_IMAGE_NAME + "(source TEXT, image BLOB)");
     }
 
     @Override

@@ -31,16 +31,25 @@ public class SQLiteImageProvider implements ImageCardProvider {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
+
                 Cursor cursor = database.rawQuery(
-                        "SELECT * FROM " + SQLiteDetails.TABLE_CARD_IMAGE_NAME +
-                                " WHERE uid = ?", new String[]{source});
+                    "SELECT * FROM " + SQLiteDetails.TABLE_CARD_IMAGE_NAME +
+                        " WHERE uid = ?", new String[]{ source });
+
                 cursor.moveToFirst();
-                int cIndex = cursor.getColumnIndex("image");
-                byte[] bitmap = cursor.getBlob(cIndex);
+
+                // int cIndexID = cursor.getColumnIndex("card_id");
+                // String cardID = cursor.getString(cIndexID);
+
+                int cIndexImage = cursor.getColumnIndex("image");
+                byte[] bitmap = cursor.getBlob(cIndexImage);
+
                 cursor.close();
+
                 var image = new ImageCard(source, bitmap);
                 cache.put(source, image);
                 return Optional.of(image);
+
             } catch (Exception e) {
                 return Optional.empty();
             }

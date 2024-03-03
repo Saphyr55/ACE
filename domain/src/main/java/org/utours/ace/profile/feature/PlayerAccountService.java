@@ -2,6 +2,7 @@ package org.utours.ace.profile.feature;
 
 import org.utours.ace.common.FunctionalUtils;
 import org.utours.ace.common.annotation.DomainService;
+import org.utours.ace.profile.model.Deck;
 import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.model.ImageCard;
 import org.utours.ace.profile.port.ImageCardDownloader;
@@ -16,42 +17,19 @@ import java.util.stream.Collectors;
 @DomainService
 public final class PlayerAccountService {
 
-    private final ImageCardInstaller imageCardInstaller;
-    private final ImageCardProvider imageCardProvider;
-    private final ImageCardDownloader imageCardDownloader;
+    private PlayerAccount currentPlayerAccount;
 
-    public PlayerAccountService(ImageCardInstaller imageCardInstaller,
-                                ImageCardProvider imageCardProvider,
-                                ImageCardDownloader imageCardDownloader) {
+    public PlayerAccountService() {
 
-        this.imageCardInstaller = imageCardInstaller;
-        this.imageCardProvider = imageCardProvider;
-        this.imageCardDownloader = imageCardDownloader;
     }
 
-    public CompletableFuture<ImageCard> installImageCard(ImageCard imageCard) {
-        return imageCardProvider.provide(imageCard.source()).thenCompose(image ->
-                image.map(CompletableFuture::completedFuture)
-                .orElseGet(() -> imageCardInstaller.install(imageCard)));
+    public PlayerAccount currentPlayerAccount() {
+        return currentPlayerAccount;
     }
 
-    public CompletableFuture<ImageCard> provideCardImage(String uid) {
-        return imageCardProvider.provide(uid).thenCompose(imageCard ->
-                imageCard.map(CompletableFuture::completedFuture)
-                    .orElseGet(() -> imageCardDownloader.download(uid)
-                            .thenCompose(this::installImageCard)));
+    public void updateCurrentPlayerAccount(PlayerAccount playerAccount) {
+        currentPlayerAccount = playerAccount;
     }
-
-
-    public CompletableFuture<List<ImageCard>> provideAllCardImage(PlayerAccount playerAccount) {
-
-        var imageCards = playerAccount.cards().stream()
-                .map(card -> provideCardImage(card.pictureAddress()))
-                .collect(Collectors.toList());
-
-        return FunctionalUtils.listOfFuturesToFutureList(imageCards, Function.identity());
-    }
-
 
 
 }

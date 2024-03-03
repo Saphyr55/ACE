@@ -2,6 +2,8 @@ package org.utours.ace.infra.profile.firebase;
 
 import org.utours.ace.common.annotation.Bean;
 
+import java.util.List;
+
 @Bean
 class FirebasePlayerAccount {
 
@@ -10,6 +12,8 @@ class FirebasePlayerAccount {
     private String email;
     private String description;
     private Integer level;
+    private List<String> cards;
+    private List<String> deck;
 
     public FirebasePlayerAccount() { }
 
@@ -53,4 +57,19 @@ class FirebasePlayerAccount {
         this.level = level;
     }
 
+    public List<String> getCards() {
+        return cards;
+    }
+
+    public void setCards(List<String> cards) {
+        this.cards = cards;
+    }
+
+    public List<String> getDeck() {
+        return deck;
+    }
+
+    public void setDeck(List<String> deck) {
+        this.deck = deck;
+    }
 }

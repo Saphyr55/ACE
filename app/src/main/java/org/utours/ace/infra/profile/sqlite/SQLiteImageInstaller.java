@@ -23,6 +23,7 @@ public final class SQLiteImageInstaller implements ImageCardInstaller {
         return CompletableFuture.supplyAsync(() -> {
 
             var contentValues = new ContentValues();
+            // contentValues.put("card_id", imageCard.cardId());
             contentValues.put("source", imageCard.source());
             contentValues.put("image", imageCard.content());
             if (database.insert(TABLE_CARD_IMAGE_NAME, null, contentValues) == -1)

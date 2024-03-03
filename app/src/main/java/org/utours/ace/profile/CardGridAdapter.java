@@ -1,35 +1,45 @@
 package org.utours.ace.profile;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import androidx.cardview.widget.CardView;
+
 import org.utours.ace.R;
 import org.utours.ace.common.annotation.Adapter;
+import org.utours.ace.profile.model.Deck;
 import org.utours.ace.profile.model.ImageCard;
 import org.utours.ace.profile.model.Card;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 
 @Adapter
 public class CardGridAdapter extends BaseAdapter {
 
-    private final List<Card> cards;
+    private List<Card> cards;
+    private Deck deck;
     private final LayoutInflater layoutInflater;
     private final Map<String, ImageCard> cardImages;
-
+    private BiConsumer<CardView, Card> bitmapBiFunction;
 
     public CardGridAdapter(Context context,
                            List<Card> cards,
-                           Map<String, ImageCard> cardImages) {
+                           Deck deck,
+                           Map<String, ImageCard> cardImages,
+                           BiConsumer<CardView, Card> bitmapBiFunction) {
 
         this.cards = cards;
         this.layoutInflater = LayoutInflater.from(context);
+        this.deck = deck;
         this.cardImages = cardImages;
+        this.bitmapBiFunction = bitmapBiFunction;
     }
 
     @Override
@@ -53,8 +63,16 @@ public class CardGridAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_card, parent, false);
         }
-        DeckFragment.setupCardView(convertView, card, cardImages);
+        DeckFragment.setupCardView(convertView, card, bitmapBiFunction, cardImages);
         return convertView;
+    }
+
+    public void setBitmapBiFunction(BiConsumer<CardView, Card> bitmapBiFunction) {
+        this.bitmapBiFunction = bitmapBiFunction;
+    }
+
+    public void setCards(List<Card> cards) {
+        this.cards = cards;
     }
 
 }

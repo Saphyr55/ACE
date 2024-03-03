@@ -12,6 +12,7 @@ import org.utours.ace.infra.profile.mal.MalImageCardDownloader;
 import org.utours.ace.infra.profile.sqlite.SQLiteImageInstaller;
 import org.utours.ace.infra.profile.sqlite.SQLiteImageProvider;
 import org.utours.ace.infra.common.sqlite.SQLiteACEDatabaseWrapper;
+import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.port.PlayerAccountRepository;
@@ -23,18 +24,20 @@ import java.util.Optional;
 public enum PlayerAccountContainer {
     INSTANCE;
 
+    private final Map<Context, SQLiteACEDatabaseWrapper> databaseMap;
     private final PlayerAccountRepository playerAccountRepository;
     private PlayerAccount currentPlayerAccount;
-    private Map<Context, SQLiteACEDatabaseWrapper> databaseMap;
+
 
     PlayerAccountContainer() {
+
         var database = FirebaseDatabase.getInstance();
         var refs = new FirebaseDatabaseReferences(database);
-        this.playerAccountRepository =
-                new FirebasePlayerAccountRepository(
+
+        this.databaseMap = new HashMap<>();
+        this.playerAccountRepository = new FirebasePlayerAccountRepository(
                         refs.playerAccountsReference(),
                         new FirebasePlayerAccountMapper());
-        this.databaseMap = new HashMap<>();
     }
 
     public PlayerAccountRepository getPlayerAccountRepository() {
@@ -49,7 +52,7 @@ public enum PlayerAccountContainer {
         this.currentPlayerAccount = currentPlayerAccount;
     }
 
-    public PlayerAccountService getService(Context context) {
+    public CardService getCardService(Context context) {
 
         if (!databaseMap.containsKey(context)) {
             databaseMap.put(context, new SQLiteACEDatabaseWrapper(context));
@@ -58,7 +61,7 @@ public enum PlayerAccountContainer {
         SQLiteACEDatabaseWrapper ace = databaseMap.get(context);
         assert ace != null;
 
-        return new PlayerAccountService(
+        return new CardService(
                 new SQLiteImageInstaller(ace.getWritableDatabase()),
                 new SQLiteImageProvider(ace.getWritableDatabase()),
                 new MalImageCardDownloader(new HttpImageDownloader())

@@ -16,8 +16,6 @@ import java.util.concurrent.CompletableFuture;
 
 public class MalImageCardDownloader implements ImageCardDownloader {
 
-    private static final String URL = "https://cdn.myanimelist.net/images/characters/%s/%s.jpg";
-    private static final int MAX_SEARCH = 20;
     private final ImageDownloader imageDownloader;
     private final Map<String, ImageCard> cache;
 

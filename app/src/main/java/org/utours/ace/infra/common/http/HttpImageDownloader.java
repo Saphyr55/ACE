@@ -17,6 +17,7 @@ public class HttpImageDownloader implements ImageDownloader {
     @Override
     public CompletableFuture<byte[]> download(URL url) {
         return CompletableFuture.supplyAsync(() -> {
+
             try {
                 var httpURLConnectionImage = (HttpURLConnection) url.openConnection();
                 httpURLConnectionImage.setRequestMethod("GET");
@@ -33,6 +34,7 @@ public class HttpImageDownloader implements ImageDownloader {
                 imageInput.close();
 
                 return imageOutput.toByteArray();
+
             } catch (MalformedURLException e) {
                 Log.e("", "You've entered an invalid URL here: " + url.getPath(), e);
                 throw new RuntimeException();
@@ -40,6 +42,7 @@ public class HttpImageDownloader implements ImageDownloader {
                 Log.e("", "Error processing request.", e);
                 throw new RuntimeException(e);
             }
+
         });
     }
 

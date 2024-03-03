@@ -8,8 +8,8 @@ public record PlayerAccount(
         String email,
         Integer level,
         String description,
-        List<Card> cards,
-        ProfileDeck deck
+        Deck deck,
+        List<Card> cards
 ) {
 
 }

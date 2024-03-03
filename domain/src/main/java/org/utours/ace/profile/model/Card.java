@@ -1,6 +1,7 @@
 package org.utours.ace.profile.model;
 
 public record Card(
+        String id,
         String name,
         String pictureAddress,
         Integer lifePoint,
@@ -8,7 +9,5 @@ public record Card(
         Integer manaPoint,
         CardRarity rarity
 ) {
-
-
 
 }

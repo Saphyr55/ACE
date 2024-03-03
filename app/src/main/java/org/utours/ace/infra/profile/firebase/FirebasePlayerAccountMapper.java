@@ -1,7 +1,7 @@
 package org.utours.ace.infra.profile.firebase;
 
+import org.utours.ace.profile.model.CardRegistry;
 import org.utours.ace.profile.model.PlayerAccount;
-import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ProfileDeck;
 
 import java.util.stream.Collectors;
@@ -26,16 +26,16 @@ public class FirebasePlayerAccountMapper {
 
                 // TODO: Remove this debug thing.
                 IntStream.range(0, 30)
-                        .mapToObj(value -> Card.ubel.get())
+                        .mapToObj(value -> CardRegistry.UBEL_CARD.get())
                         .collect(Collectors.toList()),
 
                 // TODO: Remove this debug thing.
                 new ProfileDeck(
-                        Card.ubel.get(),
-                        Card.ubel.get(),
-                        Card.ubel.get(),
-                        Card.ubel.get(),
-                        Card.ubel.get()));
+                        CardRegistry.UBEL_CARD.get(),
+                        CardRegistry.UBEL_CARD.get(),
+                        CardRegistry.UBEL_CARD.get(),
+                        CardRegistry.UBEL_CARD.get(),
+                        CardRegistry.UBEL_CARD.get()));
     }
 
     FirebasePlayerAccount map(PlayerAccount playerAccount) {

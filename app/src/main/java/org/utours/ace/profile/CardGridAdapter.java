@@ -1,7 +1,6 @@
 package org.utours.ace.profile;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,22 +23,19 @@ import java.util.function.BiConsumer;
 public class CardGridAdapter extends BaseAdapter {
 
     private List<Card> cards;
-    private Deck deck;
     private final LayoutInflater layoutInflater;
     private final Map<String, ImageCard> cardImages;
-    private BiConsumer<CardView, Card> bitmapBiFunction;
+    private BiConsumer<CardView, Card> onCreateCardView;
 
     public CardGridAdapter(Context context,
                            List<Card> cards,
-                           Deck deck,
                            Map<String, ImageCard> cardImages,
-                           BiConsumer<CardView, Card> bitmapBiFunction) {
+                           BiConsumer<CardView, Card> onCreateCardView) {
 
         this.cards = cards;
         this.layoutInflater = LayoutInflater.from(context);
-        this.deck = deck;
         this.cardImages = cardImages;
-        this.bitmapBiFunction = bitmapBiFunction;
+        this.onCreateCardView = onCreateCardView;
     }
 
     @Override
@@ -63,12 +59,12 @@ public class CardGridAdapter extends BaseAdapter {
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_card, parent, false);
         }
-        DeckFragment.setupCardView(convertView, card, bitmapBiFunction, cardImages);
+        DeckFragment.setupCardView(convertView, card, onCreateCardView, cardImages);
         return convertView;
     }
 
-    public void setBitmapBiFunction(BiConsumer<CardView, Card> bitmapBiFunction) {
-        this.bitmapBiFunction = bitmapBiFunction;
+    public void setOnCreateCardView(BiConsumer<CardView, Card> onCreateCardView) {
+        this.onCreateCardView = onCreateCardView;
     }
 
     public void setCards(List<Card> cards) {

@@ -32,8 +32,8 @@ public class NavigationActivity extends AppCompatActivity {
     private DeckFragment deckFragment;
     private GachaFragment gachaFragment;
     private ShopFragment shopFragment;
-    private PlayerAccount playerAccount;
-    private CardService playerAccountService;
+    private CardService cardService;
+    private PlayerAccountService playerAccountService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,16 +44,14 @@ public class NavigationActivity extends AppCompatActivity {
         waitFragment = new WaitFragment();
         replaceFragment(waitFragment);
 
-        playerAccountService = PlayerAccountContainer.INSTANCE
+        cardService = PlayerAccountContainer.INSTANCE
                 .getCardService(this);
 
-        playerAccount = PlayerAccountContainer.INSTANCE
-                .getCurrentPlayerAccount()
-                .orElseThrow(this::errorMissingCurrentPlayer);
+        playerAccountService = PlayerAccountContainer.INSTANCE.getService();
 
         mainFragment = new MainFragment();
         profileFragment = new ProfileFragment();
-        deckFragment = new DeckFragment(playerAccountService, playerAccount);
+        deckFragment = new DeckFragment(cardService, playerAccountService);
         gachaFragment = new GachaFragment();
         shopFragment = new ShopFragment();
 

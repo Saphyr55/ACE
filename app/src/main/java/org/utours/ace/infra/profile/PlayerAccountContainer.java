@@ -14,20 +14,17 @@ import org.utours.ace.infra.profile.sqlite.SQLiteImageProvider;
 import org.utours.ace.infra.common.sqlite.SQLiteACEDatabaseWrapper;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
-import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.port.PlayerAccountRepository;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public enum PlayerAccountContainer {
     INSTANCE;
 
     private final Map<Context, SQLiteACEDatabaseWrapper> databaseMap;
     private final PlayerAccountRepository playerAccountRepository;
-    private PlayerAccount currentPlayerAccount;
-
+    private final PlayerAccountService playerAccountService;
 
     PlayerAccountContainer() {
 
@@ -38,18 +35,16 @@ public enum PlayerAccountContainer {
         this.playerAccountRepository = new FirebasePlayerAccountRepository(
                         refs.playerAccountsReference(),
                         new FirebasePlayerAccountMapper());
+
+        this.playerAccountService = new PlayerAccountService(playerAccountRepository);
     }
 
     public PlayerAccountRepository getPlayerAccountRepository() {
         return playerAccountRepository;
     }
 
-    public Optional<PlayerAccount> getCurrentPlayerAccount() {
-        return Optional.ofNullable(currentPlayerAccount);
-    }
-
-    public void setCurrentPlayerAccount(PlayerAccount currentPlayerAccount) {
-        this.currentPlayerAccount = currentPlayerAccount;
+    public PlayerAccountService getService() {
+        return playerAccountService;
     }
 
     public CardService getCardService(Context context) {

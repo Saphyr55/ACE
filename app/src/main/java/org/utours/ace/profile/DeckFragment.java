@@ -5,6 +5,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatToggleButton;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
@@ -19,6 +20,7 @@ import android.widget.TextView;
 
 import org.utours.ace.R;
 import org.utours.ace.profile.feature.CardService;
+import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
@@ -28,12 +30,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 
-public final class DeckFragment extends Fragment {
+public class DeckFragment extends Fragment {
 
     private final CardService cardService;
-    private final PlayerAccount playerAccount;
+    private final PlayerAccountService playerAccountService;
     private final Map<String, ImageCard> cardImages;
     private GridView gridView;
     private View viewFragment;
@@ -43,16 +46,16 @@ public final class DeckFragment extends Fragment {
 
 
     public DeckFragment(CardService cardService,
-                        PlayerAccount playerAccount) {
+                        PlayerAccountService playerAccountService) {
 
         this.cardService = cardService;
-        this.playerAccount = playerAccount;
+        this.playerAccountService = playerAccountService;
         this.cardImages = new HashMap<>();
     }
 
     public CompletableFuture<Void> setup() {
         return cardService
-                .provideAllCardImage(playerAccount)
+                .provideAllCardImage(playerAccountService.currentPlayerAccount())
                 .thenAccept(this::fillCardImages);
     }
 
@@ -72,9 +75,11 @@ public final class DeckFragment extends Fragment {
 
         deckToggleButton.setOnCheckedChangeListener(this::onToggleDeck);
 
+        var playerAccount = playerAccountService.currentPlayerAccount();
         cardGridAdapter = new CardGridAdapter(getContext(),
                 cardService.sortedByRarity(playerAccount.cards()),
-                playerAccount.deck(), cardImages, defaultOnCreateCardView);
+                cardImages,
+                defaultOnCreateCardView);
 
         gridView.setAdapter(cardGridAdapter);
 
@@ -82,19 +87,48 @@ public final class DeckFragment extends Fragment {
     }
 
     private void onToggleDeck(CompoundButton compoundButton, boolean isActive) {
+        var playerAccount = playerAccountService.currentPlayerAccount();
+
         if (isActive) {
-            cardGridAdapter.setBitmapBiFunction((cardView, card) -> {
-                if (playerAccount.deck().cards().contains(card)) {
-                    int color = Color.rgb(255, 187, 156);
-                    cardView.setBackgroundColor(color);
-                }
-            });
+            cardGridAdapter.setOnCreateCardView(this::onCreateCardView);
             cardGridAdapter.setCards(cardService.cardsDeckFirst(playerAccount));
         } else {
-            cardGridAdapter.setBitmapBiFunction(defaultOnCreateCardView);
+            cardGridAdapter.setOnCreateCardView(defaultOnCreateCardView);
             cardGridAdapter.setCards(cardService.sortedByRarity(playerAccount.cards()));
+            playerAccountService.updateCurrentPlayerAccount();
         }
+
         cardGridAdapter.notifyDataSetChanged();
+    }
+
+    private void onCreateCardView(CardView cardView, Card card) {
+
+        var playerAccount = playerAccountService.currentPlayerAccount();
+
+        Consumer<CardView> setBackgroundColor = cd -> {
+            int color = Color.rgb(255, 187, 156);
+            cd.setBackgroundColor(color);
+        };
+
+        if (playerAccount.deck().cards().contains(card)) {
+
+            setBackgroundColor.accept(cardView);
+
+            cardView.setOnClickListener(v -> {
+                playerAccountService.updateCurrentPlayerAccount(pa -> pa.removeCardInDeck(card));
+                cardGridAdapter.notifyDataSetChanged();
+            });
+
+        } else {
+
+            defaultOnCreateCardView.accept(cardView, card);
+
+            cardView.setOnClickListener(v -> {
+                playerAccountService.updateCurrentPlayerAccount(pa -> pa.addCardInDeck(card));
+                cardGridAdapter.notifyDataSetChanged();
+            });
+        }
+
     }
 
     public static void setupCardView(View view, Card card,
@@ -121,8 +155,8 @@ public final class DeckFragment extends Fragment {
     private void fillCardImages(List<ImageCard> imageCards) {
         var result = new HashMap<String, ImageCard>();
         for (int i = 0; i < imageCards.size(); i++) {
-            String id = playerAccount.cards().get(i).pictureAddress();
-            result.put(id, imageCards.get(i));
+            Card card = playerAccountService.currentPlayerAccount().cards().get(i);
+            result.put(card.pictureAddress(), imageCards.get(i));
         }
         this.cardImages.putAll(result);
     }

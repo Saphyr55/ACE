@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <scale
+        android:duration="@integer/material_motion_duration_short_1"
+        android:fromXScale="0.2dp"
+        android:fromYScale="0.2dp"
+        android:toXScale="1"
+        android:toYScale="1"
+        android:pivotX="60%"
+        android:pivotY="60%"
+        />
+</set>

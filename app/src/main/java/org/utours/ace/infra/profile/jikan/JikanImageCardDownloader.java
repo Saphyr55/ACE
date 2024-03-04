@@ -16,8 +16,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class JikanImageCardDownloader implements ImageCardDownloader {
 
-    static String URL = "https://api.jikan.moe/v4/characters/%s/pictures";
-
+    public final static String URL = "https://api.jikan.moe/v4/characters/%s/pictures";
     private final ImageDownloader imageDownloader;
     private final JikanJsonParser jikanJsonParser;
 

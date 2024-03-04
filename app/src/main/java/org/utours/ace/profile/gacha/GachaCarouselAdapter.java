@@ -2,6 +2,7 @@ package org.utours.ace.profile.gacha;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -70,6 +71,5 @@ public class GachaCarouselAdapter
         }
 
     }
-
 
 }

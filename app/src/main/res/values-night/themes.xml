@@ -1,8 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
+
     <!-- Base application theme. -->
     <style name="Base.Theme.AniCardEnchantment" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <item name="colorPrimary">@color/dark_gray</item>
     </style>
+
     <style name="Theme.AniCardEnchantment" parent="Base.Theme.AniCardEnchantment" />
 </resources>

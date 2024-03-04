@@ -18,51 +18,57 @@ import org.utours.ace.main.MainFragment;
 import org.utours.ace.main.WaitFragment;
 import org.utours.ace.profile.deck.DeckFragment;
 import org.utours.ace.profile.feature.CardService;
+import org.utours.ace.profile.feature.GachaService;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.gacha.GachaFragment;
 import org.utours.ace.profile.profile.ProfileFragment;
 import org.utours.ace.shop.ShopFragment;
+
+import java.util.concurrent.CompletableFuture;
 
 public class NavigationActivity extends AppCompatActivity {
 
     private static final String TAG = NavigationActivity.class.getName();
 
     private ActivityNavigationBinding binding;
-    private WaitFragment waitFragment;
     private MainFragment mainFragment;
     private ProfileFragment profileFragment;
     private DeckFragment deckFragment;
     private GachaFragment gachaFragment;
     private ShopFragment shopFragment;
-    private CardService cardService;
-    private PlayerAccountService playerAccountService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         binding = ActivityNavigationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        waitFragment = new WaitFragment();
-        replaceFragment(waitFragment);
-
-        cardService = PlayerAccountContainer.INSTANCE.getCardService(this);
-        playerAccountService = PlayerAccountContainer.INSTANCE.getService();
-
-        mainFragment = new MainFragment();
-        profileFragment = new ProfileFragment();
-        deckFragment = new DeckFragment(cardService, playerAccountService);
-        gachaFragment = new GachaFragment(cardService);
-        shopFragment = new ShopFragment();
-
+        replaceFragment(new WaitFragment());
         binding.navBar.setVisibility(View.GONE);
         binding.navBarView.setBackground(null);
         binding.navBarView.setSelectedItemId(R.id.item_main);
 
-        deckFragment.setup()
+        CardService cardService = PlayerAccountContainer.INSTANCE.getCardService(this);
+        PlayerAccountService playerAccountService = PlayerAccountContainer.INSTANCE.getService();
+        GachaService gachaService = PlayerAccountContainer.INSTANCE.getGachaService(this);
+
+        mainFragment = new MainFragment();
+        profileFragment = new ProfileFragment();
+        deckFragment = new DeckFragment(cardService, playerAccountService);
+        gachaFragment = new GachaFragment(gachaService, cardService);
+        shopFragment = new ShopFragment();
+
+        CompletableFuture
+                .runAsync(this::setup)
+                .thenCompose(unused -> deckFragment.setup())
                 .thenCompose(unused -> gachaFragment.setup())
                 .thenRun(this::startNavigationMain)
                 .exceptionally(this::messagingErrorFragment);
+    }
+
+    private void setup() {
+
     }
 
     private void startNavigationMain() {
@@ -95,13 +101,6 @@ public class NavigationActivity extends AppCompatActivity {
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
         fragmentTransaction.replace(R.id.frame_layout, fragment);
         fragmentTransaction.commit();
-    }
-
-    private RuntimeException errorMissingCurrentPlayer() {
-        var msg = "Current player account doesn't exist, and entire in ProfileActivity.";
-        var e = new RuntimeException(msg);
-        Log.e(TAG, e.getMessage(), e);
-        return e;
     }
 
     private Void messagingErrorFragment(Throwable throwable) {

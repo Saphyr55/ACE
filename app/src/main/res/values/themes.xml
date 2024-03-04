@@ -2,9 +2,14 @@
 
     <!-- Base application theme. -->
     <style name="Base.Theme.AniCardEnchantment" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/dark_gray</item>
     </style>
 
     <style name="Theme.AniCardEnchantment" parent="Base.Theme.AniCardEnchantment" />
+
+    <style name="DialogAnimations" parent="Theme.AniCardEnchantment">
+        <item name="android:windowEnterAnimation">@anim/anim_dialog_zoom_in</item>
+        <item name="android:windowExitAnimation">@anim/anim_dialog_zoom_out</item>
+    </style>
+
 </resources>

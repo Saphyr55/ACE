@@ -29,21 +29,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:layout_marginTop="50dp"
+            android:layout_marginTop="10dp"
             android:gravity="center">
 
             <Button
-                android:layout_width="wrap_content"
+                android:id="@+id/btn_single_pull"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="75dp"
-                android:text="@string/unknown"
-                style="?android:attr/buttonBarButtonStyle" />
+                android:layout_margin="15dp"
+                android:text="300.SD Pull 1X" />
 
             <Button
-                android:layout_width="wrap_content"
+                android:id="@+id/btn_multi_pull"
+                android:layout_width="120dp"
                 android:layout_height="wrap_content"
-                android:text="@string/unknown"
-                style="?android:attr/buttonBarButtonStyle" />
+                android:layout_margin="15dp"
+                android:text="3000.SD Pull 10x" />
 
         </LinearLayout>
 

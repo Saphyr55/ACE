@@ -13,7 +13,9 @@ import org.utours.ace.infra.profile.sqlite.SQLiteImageInstaller;
 import org.utours.ace.infra.profile.sqlite.SQLiteImageProvider;
 import org.utours.ace.infra.common.sqlite.SQLiteACEDatabaseWrapper;
 import org.utours.ace.profile.feature.CardService;
+import org.utours.ace.profile.feature.GachaService;
 import org.utours.ace.profile.feature.PlayerAccountService;
+import org.utours.ace.profile.port.ImageCardDownloader;
 import org.utours.ace.profile.port.PlayerAccountRepository;
 
 import java.util.HashMap;
@@ -25,6 +27,7 @@ public enum PlayerAccountContainer {
     private final Map<Context, SQLiteACEDatabaseWrapper> databaseMap;
     private final PlayerAccountRepository playerAccountRepository;
     private final PlayerAccountService playerAccountService;
+    private final ImageCardDownloader imageCardDownloader;
 
     PlayerAccountContainer() {
 
@@ -35,7 +38,7 @@ public enum PlayerAccountContainer {
         this.playerAccountRepository = new FirebasePlayerAccountRepository(
                         refs.playerAccountsReference(),
                         new FirebasePlayerAccountMapper());
-
+        this.imageCardDownloader = new MalImageCardDownloader(new HttpImageDownloader());
         this.playerAccountService = new PlayerAccountService(playerAccountRepository);
     }
 
@@ -59,8 +62,12 @@ public enum PlayerAccountContainer {
         return new CardService(
                 new SQLiteImageInstaller(ace.getWritableDatabase()),
                 new SQLiteImageProvider(ace.getWritableDatabase()),
-                new MalImageCardDownloader(new HttpImageDownloader())
+                imageCardDownloader
         );
+    }
+
+    public GachaService getGachaService(Context context) {
+        return new GachaService(getCardService(context));
     }
 
 }

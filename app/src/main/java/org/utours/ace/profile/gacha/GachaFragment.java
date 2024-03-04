@@ -3,21 +3,23 @@ package org.utours.ace.profile.gacha;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.google.android.material.carousel.CarouselLayoutManager;
 import com.google.android.material.carousel.CarouselSnapHelper;
-import com.google.android.material.carousel.CarouselStrategy;
-import com.google.android.material.carousel.HeroCarouselStrategy;
 import com.google.android.material.carousel.MultiBrowseCarouselStrategy;
 
 import org.utours.ace.R;
-import org.utours.ace.profile.feature.CardRegistry;
 import org.utours.ace.profile.feature.CardService;
+import org.utours.ace.profile.feature.GachaService;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
 
@@ -25,51 +27,79 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class GachaFragment extends Fragment {
 
     private static final int MAX_CARD_CAROUSEL = 5;
+    private final GachaService gachaService;
     private final CardService cardService;
     private final Map<String, ImageCard> imageCards;
     private final List<Card> cards;
+    private PullConfirmationDialog singlePullConfirmationDialog;
+    private PullConfirmationDialog multiPullConfirmationDialog;
 
-    public GachaFragment(CardService cardService) {
+
+    public GachaFragment(GachaService gachaService,
+                         CardService cardService) {
+        this.gachaService = gachaService;
         this.cardService = cardService;
         this.cards = new ArrayList<>();
         this.imageCards = new HashMap<>();
     }
 
     public CompletableFuture<Void> setup() {
-        var cards = cardService.getRandomCards(MAX_CARD_CAROUSEL);
-        this.cards.addAll(cards);
-        return cardService
+        return CompletableFuture
+                .runAsync(this::onSetup)
+                .thenAccept(unused -> cardService
                 .provideAllCardImage(this.cards)
-                .thenAccept(this::fillCardImages);
+                .thenAccept(this::fillCardImages));
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater,
                              ViewGroup container,
                              Bundle savedInstanceState) {
-
+        // Setup
         View fragmentView = inflater.inflate(R.layout.fragment_gacha, container, false);
 
+        // Manage carousel.
         RecyclerView carouselTopCards = fragmentView.findViewById(R.id.carousel_top_cards);
+        var gachaCarouselAdapter = new GachaCarouselAdapter(cards, imageCards);
+        var carouselLayoutManager = new CarouselLayoutManager(new MultiBrowseCarouselStrategy());
+        var carouselSnapHelper = new CarouselSnapHelper(false);
 
-        GachaCarouselAdapter gachaCarouselAdapter = new GachaCarouselAdapter(cards, imageCards);
-        CarouselLayoutManager carouselLayoutManager = new CarouselLayoutManager(new MultiBrowseCarouselStrategy());
-
-        CarouselSnapHelper carouselSnapHelper = new CarouselSnapHelper(false);
-        carouselSnapHelper.findSnapView(carouselLayoutManager);
+        // carouselSnapHelper.findSnapView(carouselLayoutManager);
         carouselSnapHelper.attachToRecyclerView(carouselTopCards);
 
         carouselTopCards.setLayoutManager(carouselLayoutManager);
         carouselTopCards.setAdapter(gachaCarouselAdapter);
 
+        // Manage pull confirmation.
+        multiPullConfirmationDialog = new PullConfirmationDialog(fragmentView.getContext());
+        singlePullConfirmationDialog = new PullConfirmationDialog(fragmentView.getContext());
+
+        multiPullConfirmationDialog.getPullButton().setOnClickListener(v -> {
+            gachaService.multiPull();
+            multiPullConfirmationDialog.dismiss();
+        });
+        singlePullConfirmationDialog.getPullButton().setOnClickListener(v -> {
+            gachaService.singlePull();
+            singlePullConfirmationDialog.dismiss();
+        });
+
+        Button singlePullButton = fragmentView.findViewById(R.id.btn_single_pull);
+        Button multiPullButton = fragmentView.findViewById(R.id.btn_multi_pull);
+
+        singlePullButton.setOnClickListener(v -> singlePullConfirmationDialog.show());
+        multiPullButton.setOnClickListener(v -> multiPullConfirmationDialog.show());
+
         return fragmentView;
+    }
+
+    private void onSetup() {
+        var cards = cardService.getRandomCards(MAX_CARD_CAROUSEL, true);
+        this.cards.addAll(cards);
     }
 
     private void fillCardImages(List<ImageCard> imageCards) {
@@ -79,6 +109,11 @@ public class GachaFragment extends Fragment {
             result.put(card.pictureAddress(), imageCards.get(i));
         }
         this.imageCards.putAll(result);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
     }
 
 }

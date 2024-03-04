@@ -45,5 +45,8 @@
     <string name="mana_cost">Mana Cost</string>
     <string name="attack_point">Attack Point</string>
     <string name="life_point">Life Point</string>
+    <string name="pull_confirmation">Pull Confirmation</string>
+    <string name="pull">Pull</string>
+    <string name="cancel">Cancel</string>
 
 </resources>

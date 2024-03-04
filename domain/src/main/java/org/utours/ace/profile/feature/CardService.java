@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -47,8 +48,7 @@ public class CardService {
     }
 
     public List<Card> cardsDeckFirst(PlayerAccount playerAccount) {
-        List<Card> cards = new ArrayList<>();
-        cards.addAll(0, sortedByRarity(playerAccount.deck().cards()));
+        var cards = new ArrayList<>(sortedByRarity(playerAccount.deck().cards()));
         for (Card card : sortedByRarity(playerAccount.cards())) {
             if (!cards.contains(card)) {
                 cards.add(card);
@@ -58,7 +58,8 @@ public class CardService {
     }
 
     public CompletableFuture<ImageCard> installImageCard(ImageCard imageCard) {
-        return imageCardProvider.provide(imageCard.source())
+        return imageCardProvider
+                .provide(imageCard.source())
                 .thenCompose(image ->
                         image.map(CompletableFuture::completedFuture)
                         .orElseGet(() -> imageCardInstaller.install(imageCard)));
@@ -78,7 +79,6 @@ public class CardService {
                         .orElseGet(downloadAndInstall));
     }
 
-
     public CompletableFuture<List<ImageCard>> provideAllCardImage(List<Card> cards) {
 
         var imageCards = cards.stream()
@@ -88,14 +88,20 @@ public class CardService {
         return FunctionalUtils.listOfFuturesToFutureList(imageCards, Function.identity());
     }
 
-    public List<Card> getRandomCards(int max) {
+    public List<Card> getRandomCards(int max, boolean unique) {
+
         var cards = new ArrayList<Card>();
-        int size = CardRegistry.INSTANCE.CARDS.size() - 1;
+        int size = CardRegistry.INSTANCE.CARDS.size();
+        if (max > size)
+            throw new IllegalStateException();
+
         var random = new Random();
         while (cards.size() != max) {
-            int j = random.nextInt(size);
+            int j = random.nextInt(size - 1);
             var card = CardRegistry.INSTANCE.CARDS.get(j).get();
-            if (!cards.contains(card)) {
+            if (!unique) {
+                cards.add(card);
+            } else if (!cards.contains(card)) {
                 cards.add(card);
             }
         }

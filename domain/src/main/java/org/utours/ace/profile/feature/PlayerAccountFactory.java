@@ -1,14 +1,21 @@
 package org.utours.ace.profile.feature;
 
+import org.utours.ace.common.Quantity;
 import org.utours.ace.profile.model.Deck;
 import org.utours.ace.profile.model.PlayerAccount;
+import org.utours.ace.profile.model.StarDust;
 
 import java.util.List;
 
 public interface PlayerAccountFactory {
 
     PlayerAccountFactory DEFAULT = (uid, email) ->
-            new PlayerAccount(uid, "Player", email, 1, "",
+            new PlayerAccount(uid,
+                    "Player",
+                    email,
+                    1,
+                    "",
+                    new Quantity<>(3000),
                     new Deck(List.of(
                             CardRegistry.UBEL_CARD.get(),
                             CardRegistry.HIMMEL_CARD.get(),

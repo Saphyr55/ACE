@@ -3,12 +3,14 @@ package org.utours.ace.profile.feature;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.CardRarity;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public enum CardRegistry {
-    INSTANCE;
+    INSTANCE();
 
     public final static Supplier<Card> FERN_CARD = INSTANCE.register(() -> new Card("7", "Fern",
             "https://cdn.myanimelist.net/images/characters/13/519083.jpg",
@@ -53,6 +55,11 @@ public enum CardRegistry {
             CardRarity.SR));
 
     public final List<Supplier<Card>> CARDS = new LinkedList<>();
+    public final Map<String, String> REFS;
+
+    CardRegistry() {
+        REFS = new HashMap<>();
+    }
 
     public Supplier<Card> register(Supplier<Card> cardSupplier) {
         CARDS.add(cardSupplier);

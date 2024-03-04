@@ -203,7 +203,7 @@ public class DeckFragment extends Fragment {
 
         cardBiConsumer.accept(cardView, card);
 
-        ImageCard imageCard = cardImages.get(card.pictureAddress());
+        ImageCard imageCard = cardImages.get(card.pictureId());
         assert imageCard != null;
         byte[] content = imageCard.content();
         Bitmap bitmap = BitmapFactory.decodeByteArray(content, 0, content.length);
@@ -217,7 +217,7 @@ public class DeckFragment extends Fragment {
         var result = new HashMap<String, ImageCard>();
         for (int i = 0; i < imageCards.size(); i++) {
             Card card = playerAccountService.currentPlayerAccount().cards().get(i);
-            result.put(card.pictureAddress(), imageCards.get(i));
+            result.put(card.pictureId(), imageCards.get(i));
         }
         this.cardImages.putAll(result);
     }

@@ -3,11 +3,8 @@ package org.utours.ace.profile.gacha;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,7 +103,7 @@ public class GachaFragment extends Fragment {
         var result = new HashMap<String, ImageCard>();
         for (int i = 0; i < imageCards.size(); i++) {
             Card card = cards.get(i);
-            result.put(card.pictureAddress(), imageCards.get(i));
+            result.put(card.pictureId(), imageCards.get(i));
         }
         this.imageCards.putAll(result);
     }

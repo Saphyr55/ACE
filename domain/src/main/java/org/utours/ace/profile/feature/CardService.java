@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -82,7 +81,7 @@ public class CardService {
     public CompletableFuture<List<ImageCard>> provideAllCardImage(List<Card> cards) {
 
         var imageCards = cards.stream()
-                .map(card -> provideCardImage(card.pictureAddress()))
+                .map(card -> provideCardImage(card.pictureId()))
                 .collect(Collectors.toList());
 
         return FunctionalUtils.listOfFuturesToFutureList(imageCards, Function.identity());

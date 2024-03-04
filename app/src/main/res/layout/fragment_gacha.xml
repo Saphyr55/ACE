@@ -15,12 +15,12 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/carousel_top_cards"
             android:layout_width="match_parent"
-            android:layout_height="550dp"
+            android:layout_height="500dp"
             android:orientation="horizontal"
             android:clipChildren="true"
             android:clipToPadding="true"
             android:rotation="-5"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="70dp"
             app:layoutManager="com.google.android.material.carousel.CarouselLayoutManager"
             app:carousel_alignment="center"
             />

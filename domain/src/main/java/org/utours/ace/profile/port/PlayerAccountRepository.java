@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-@Port
 public interface PlayerAccountRepository {
 
     CompletableFuture<Optional<PlayerAccount>> getByUID(String uid);

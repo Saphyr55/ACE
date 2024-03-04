@@ -1,22 +1,19 @@
 package org.utours.ace.infra.profile.firebase;
 
+import org.utours.ace.common.Quantity;
 import org.utours.ace.profile.feature.CardRegistry;
-import org.utours.ace.profile.feature.CardService;
-import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.Deck;
 import org.utours.ace.profile.model.PlayerAccount;
-import org.utours.ace.profile.port.PlayerAccountRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class FirebasePlayerAccountMapper {
 
 
-    PlayerAccount map(FirebasePlayerAccount playerAccount) {
+   PlayerAccount map(FirebasePlayerAccount playerAccount) {
         if (playerAccount == null) return null;
         return new PlayerAccount(
                 playerAccount.getUid(),
@@ -24,6 +21,7 @@ public class FirebasePlayerAccountMapper {
                 playerAccount.getEmail(),
                 playerAccount.getLevel(),
                 playerAccount.getDescription(),
+                new Quantity<>(playerAccount.getStarDustQuantity()),
                 new Deck(stringsToCards(playerAccount.getDeck())),
                 stringsToCards(playerAccount.getCards())
         );
@@ -39,16 +37,17 @@ public class FirebasePlayerAccountMapper {
         firebasePlayerAccount.setUsername(playerAccount.username());
         firebasePlayerAccount.setEmail(playerAccount.email());
         firebasePlayerAccount.setDescription(playerAccount.description());
+        firebasePlayerAccount.setStarDustQuantity(playerAccount.starDustQuantity().quantity());
         firebasePlayerAccount.setLevel(playerAccount.level());
 
         firebasePlayerAccount.setCards(playerAccount
                 .cards().stream()
-                .map(Card::pictureAddress)
+                .map(Card::pictureId)
                 .collect(Collectors.toList()));
 
-        firebasePlayerAccount.setDeck(playerAccount
-                .deck().cards().stream()
-                .map(Card::pictureAddress)
+        firebasePlayerAccount.setDeck(playerAccount.deck()
+                .cards().stream()
+                .map(Card::pictureId)
                 .collect(Collectors.toList()));
 
         return firebasePlayerAccount;
@@ -59,7 +58,7 @@ public class FirebasePlayerAccountMapper {
         for (int i = 0; i < ids.size(); i++) {
             for (int j = 0; j < CardRegistry.INSTANCE.CARDS.size(); j++) {
                 var card = CardRegistry.INSTANCE.CARDS.get(j).get();
-                if (card.pictureAddress().equals(ids.get(i))) {
+                if (card.pictureId().equals(ids.get(i))) {
                     cards.add(card);
                 }
             }

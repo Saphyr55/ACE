@@ -12,6 +12,7 @@ class FirebasePlayerAccount {
     private String email;
     private String description;
     private Integer level;
+    private Integer starDustQuantity;
     private List<String> cards;
     private List<String> deck;
 
@@ -71,5 +72,13 @@ class FirebasePlayerAccount {
 
     public void setDeck(List<String> deck) {
         this.deck = deck;
+    }
+
+    public Integer getStarDustQuantity() {
+        return starDustQuantity;
+    }
+
+    public void setStarDustQuantity(Integer starDustQuantity) {
+        this.starDustQuantity = starDustQuantity;
     }
 }

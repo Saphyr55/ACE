@@ -11,6 +11,7 @@ import org.utours.ace.profile.port.ImageCardProvider;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -78,14 +79,27 @@ public class CardService {
     }
 
 
-    public CompletableFuture<List<ImageCard>> provideAllCardImage(PlayerAccount playerAccount) {
+    public CompletableFuture<List<ImageCard>> provideAllCardImage(List<Card> cards) {
 
-        var imageCards = playerAccount.cards().stream()
+        var imageCards = cards.stream()
                 .map(card -> provideCardImage(card.pictureAddress()))
                 .collect(Collectors.toList());
 
         return FunctionalUtils.listOfFuturesToFutureList(imageCards, Function.identity());
     }
 
+    public List<Card> getRandomCards(int max) {
+        var cards = new ArrayList<Card>();
+        int size = CardRegistry.INSTANCE.CARDS.size() - 1;
+        var random = new Random();
+        while (cards.size() != max) {
+            int j = random.nextInt(size);
+            var card = CardRegistry.INSTANCE.CARDS.get(j).get();
+            if (!cards.contains(card)) {
+                cards.add(card);
+            }
+        }
+        return cards;
+    }
 
 }

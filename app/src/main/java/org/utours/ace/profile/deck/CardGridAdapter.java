@@ -1,4 +1,4 @@
-package org.utours.ace.profile;
+package org.utours.ace.profile.deck;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,7 +10,6 @@ import androidx.cardview.widget.CardView;
 
 import org.utours.ace.R;
 import org.utours.ace.common.annotation.Adapter;
-import org.utours.ace.profile.model.Deck;
 import org.utours.ace.profile.model.ImageCard;
 import org.utours.ace.profile.model.Card;
 

@@ -11,6 +11,7 @@ import org.utours.ace.R;
 import org.utours.ace.infra.auth.AuthenticationContainer;
 import org.utours.ace.auth.model.AuthAccount;
 import org.utours.ace.infra.profile.PlayerAccountContainer;
+import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.model.PlayerAccount;
 
 public class StartActivity extends AppCompatActivity {

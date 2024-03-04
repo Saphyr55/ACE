@@ -1,4 +1,4 @@
-package org.utours.ace.main;
+package org.utours.ace.profile;
 
 import android.os.Bundle;
 import android.util.Log;
@@ -13,12 +13,14 @@ import androidx.fragment.app.FragmentTransaction;
 import org.utours.ace.R;
 import org.utours.ace.databinding.ActivityNavigationBinding;
 import org.utours.ace.infra.profile.PlayerAccountContainer;
-import org.utours.ace.profile.DeckFragment;
-import org.utours.ace.gacha.GachaFragment;
-import org.utours.ace.profile.ProfileFragment;
+import org.utours.ace.main.ErrorFragment;
+import org.utours.ace.main.MainFragment;
+import org.utours.ace.main.WaitFragment;
+import org.utours.ace.profile.deck.DeckFragment;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
-import org.utours.ace.profile.model.PlayerAccount;
+import org.utours.ace.profile.gacha.GachaFragment;
+import org.utours.ace.profile.profile.ProfileFragment;
 import org.utours.ace.shop.ShopFragment;
 
 public class NavigationActivity extends AppCompatActivity {
@@ -44,15 +46,13 @@ public class NavigationActivity extends AppCompatActivity {
         waitFragment = new WaitFragment();
         replaceFragment(waitFragment);
 
-        cardService = PlayerAccountContainer.INSTANCE
-                .getCardService(this);
-
+        cardService = PlayerAccountContainer.INSTANCE.getCardService(this);
         playerAccountService = PlayerAccountContainer.INSTANCE.getService();
 
         mainFragment = new MainFragment();
         profileFragment = new ProfileFragment();
         deckFragment = new DeckFragment(cardService, playerAccountService);
-        gachaFragment = new GachaFragment();
+        gachaFragment = new GachaFragment(cardService);
         shopFragment = new ShopFragment();
 
         binding.navBar.setVisibility(View.GONE);
@@ -60,6 +60,7 @@ public class NavigationActivity extends AppCompatActivity {
         binding.navBarView.setSelectedItemId(R.id.item_main);
 
         deckFragment.setup()
+                .thenCompose(unused -> gachaFragment.setup())
                 .thenRun(this::startNavigationMain)
                 .exceptionally(this::messagingErrorFragment);
     }

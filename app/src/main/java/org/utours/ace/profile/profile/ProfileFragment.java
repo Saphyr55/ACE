@@ -1,4 +1,4 @@
-package org.utours.ace.profile;
+package org.utours.ace.profile.profile;
 
 import android.os.Bundle;
 

@@ -42,12 +42,13 @@
         android:id="@+id/text_rarity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="top"
+        android:layout_gravity="end"
+        android:layout_marginEnd="11dp"
         android:layout_marginTop="7dp"
         android:text="@string/rarity"
-        android:textColor="@color/light_gray"
+        android:textColor="@color/white"
         android:textSize="20sp"
         android:layout_marginStart="12dp"
-        android:fontFamily="@font/dancing_script_bold" />
+        android:fontFamily="@font/delius_unicase_bold" />
 
 </androidx.cardview.widget.CardView>

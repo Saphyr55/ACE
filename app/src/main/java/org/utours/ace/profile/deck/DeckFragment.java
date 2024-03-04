@@ -1,4 +1,4 @@
-package org.utours.ace.profile;
+package org.utours.ace.profile.deck;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,7 +9,6 @@ import androidx.appcompat.widget.AppCompatToggleButton;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -68,7 +67,7 @@ public class DeckFragment extends Fragment {
 
     public CompletableFuture<Void> setup() {
         return cardService
-                .provideAllCardImage(playerAccountService.currentPlayerAccount())
+                .provideAllCardImage(playerAccountService.currentPlayerAccount().cards())
                 .thenAccept(this::fillCardImages);
     }
 
@@ -170,6 +169,7 @@ public class DeckFragment extends Fragment {
         String lifePoint = getResources().getString(R.string.unknown);
 
         if (card == null) {
+
             ImageView iconImageView = selectedViewCard.findViewById(R.id.image_card);
             TextView nameTextView = selectedViewCard.findViewById(R.id.text_nameCard);
             TextView rarityTextView = selectedViewCard.findViewById(R.id.text_rarity);
@@ -179,6 +179,7 @@ public class DeckFragment extends Fragment {
             selectedViewCard.setBackgroundColor(getResources().getColor(R.color.light_gray, theme));
             nameTextView.setText(R.string.card_name);
             rarityTextView.setText(R.string.rarity);
+
         } else {
             setupCardView(selectedViewCard, card, (cardView, card1) -> {}, cardImages);
             attackPoint = String.valueOf(card.attackPoint());

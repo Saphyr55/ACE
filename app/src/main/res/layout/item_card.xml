@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
             android:fontFamily="sans-serif-black"
-            android:text="@string/card"
+            android:text="@string/card_name"
             android:textAlignment="center"
             android:textSize="14sp" />
 

@@ -5,11 +5,11 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatToggleButton;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,8 +21,8 @@ import android.widget.TextView;
 import org.utours.ace.R;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
-import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.model.Card;
+import org.utours.ace.profile.model.Deck;
 import org.utours.ace.profile.model.ImageCard;
 
 import java.util.HashMap;
@@ -42,8 +42,13 @@ public class DeckFragment extends Fragment {
     private View viewFragment;
     private CardGridAdapter cardGridAdapter;
     private AppCompatToggleButton deckToggleButton;
-    private BiConsumer<CardView, Card> defaultOnCreateCardView;
-
+    private Consumer<CardView> setDefaultCardViewBackground;
+    private Consumer<CardView> setSelectedBackgroundColor;
+    private Card cardSelected;
+    private CardView cardViewSelected;
+    private TextView attackPointText;
+    private TextView manaPointText;
+    private TextView lifePointText;
 
     public DeckFragment(CardService cardService,
                         PlayerAccountService playerAccountService) {
@@ -51,6 +56,14 @@ public class DeckFragment extends Fragment {
         this.cardService = cardService;
         this.playerAccountService = playerAccountService;
         this.cardImages = new HashMap<>();
+        this.setDefaultCardViewBackground = (cardView) -> {
+            var theme = viewFragment.getContext().getTheme();
+            cardView.setBackgroundColor(getResources().getColor(R.color.white, theme));
+        };
+        this.setSelectedBackgroundColor = (cardView) -> {
+            int color = Color.rgb(255, 187, 156);
+            cardView.setBackgroundColor(color);
+        };
     }
 
     public CompletableFuture<Void> setup() {
@@ -65,70 +78,117 @@ public class DeckFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         viewFragment = inflater.inflate(R.layout.fragment_deck, container, false);
-        gridView = viewFragment.findViewById(R.id.grid_cards);
-        deckToggleButton = viewFragment.findViewById(R.id.toggle_deck);
 
-        defaultOnCreateCardView = (cardView, card) -> {
-            var theme = viewFragment.getContext().getTheme();
-            cardView.setBackgroundColor(getResources().getColor(R.color.white, theme));
-        };
+        deckToggleButton = viewFragment.findViewById(R.id.toggle_deck);
+        gridView = viewFragment.findViewById(R.id.grid_cards);
+        attackPointText = viewFragment.findViewById(R.id.text_attackPoint);
+        manaPointText = viewFragment.findViewById(R.id.text_manaCost);
+        lifePointText = viewFragment.findViewById(R.id.text_lifePoint);
 
         deckToggleButton.setOnCheckedChangeListener(this::onToggleDeck);
 
         var playerAccount = playerAccountService.currentPlayerAccount();
-        cardGridAdapter = new CardGridAdapter(getContext(),
+        cardGridAdapter = new CardGridAdapter(
+                getContext(),
                 cardService.sortedByRarity(playerAccount.cards()),
                 cardImages,
-                defaultOnCreateCardView);
+                this::onCreateCardViewCardsMode);
 
         gridView.setAdapter(cardGridAdapter);
+        setupCardDetailsOnSelect(null);
 
         return viewFragment;
     }
 
     private void onToggleDeck(CompoundButton compoundButton, boolean isActive) {
         var playerAccount = playerAccountService.currentPlayerAccount();
-
         if (isActive) {
-            cardGridAdapter.setOnCreateCardView(this::onCreateCardView);
+            cardGridAdapter.setOnCreateCardView(this::onCreateCardViewDeckMode);
             cardGridAdapter.setCards(cardService.cardsDeckFirst(playerAccount));
         } else {
-            cardGridAdapter.setOnCreateCardView(defaultOnCreateCardView);
+            cardGridAdapter.setOnCreateCardView(this::onCreateCardViewCardsMode);
             cardGridAdapter.setCards(cardService.sortedByRarity(playerAccount.cards()));
+
+            // Save data on quiting deck mode.
             playerAccountService.updateCurrentPlayerAccount();
         }
-
         cardGridAdapter.notifyDataSetChanged();
     }
 
-    private void onCreateCardView(CardView cardView, Card card) {
-
+    private void onCreateCardViewDeckMode(CardView cardView, Card card) {
         var playerAccount = playerAccountService.currentPlayerAccount();
-
-        Consumer<CardView> setBackgroundColor = cd -> {
-            int color = Color.rgb(255, 187, 156);
-            cd.setBackgroundColor(color);
-        };
-
-        if (playerAccount.deck().cards().contains(card)) {
-
-            setBackgroundColor.accept(cardView);
-
+        var selectedCardIsInDeck = playerAccount.deck().cards().contains(card);
+        if (selectedCardIsInDeck) {
+            setSelectedBackgroundColor.accept(cardView);
             cardView.setOnClickListener(v -> {
                 playerAccountService.updateCurrentPlayerAccount(pa -> pa.removeCardInDeck(card));
                 cardGridAdapter.notifyDataSetChanged();
             });
-
         } else {
-
-            defaultOnCreateCardView.accept(cardView, card);
-
+            setDefaultCardViewBackground.accept(cardView);
             cardView.setOnClickListener(v -> {
+                if (playerAccount.deck().cards().size() > Deck.MAX_SLOT) return;
                 playerAccountService.updateCurrentPlayerAccount(pa -> pa.addCardInDeck(card));
                 cardGridAdapter.notifyDataSetChanged();
             });
         }
+    }
 
+    private void onCreateCardViewCardsMode(CardView cardView, Card card) {
+
+        setDefaultCardViewBackground.accept(cardView);
+        cardView.setOnClickListener(v -> {
+
+            if (cardSelected == null) {
+                cardSelected = card;
+                cardViewSelected = cardView;
+                setSelectedBackgroundColor.accept(cardViewSelected);
+                setupCardDetailsOnSelect(card);
+                return;
+            }
+
+            if (card.equals(cardSelected)) {
+                cardSelected = null;
+                cardViewSelected = null;
+                setDefaultCardViewBackground.accept(cardView);
+            } else {
+                setDefaultCardViewBackground.accept(cardViewSelected);
+                cardSelected = card;
+                cardViewSelected = cardView;
+                setSelectedBackgroundColor.accept(cardViewSelected);
+            }
+
+            setupCardDetailsOnSelect(cardSelected);
+        });
+    }
+
+    private void setupCardDetailsOnSelect(Card card) {
+
+        CardView selectedViewCard = viewFragment.findViewById(R.id.card_selectedCard);
+        String attackPoint = getResources().getString(R.string.unknown);
+        String manaPoint = getResources().getString(R.string.unknown);
+        String lifePoint = getResources().getString(R.string.unknown);
+
+        if (card == null) {
+            ImageView iconImageView = selectedViewCard.findViewById(R.id.image_card);
+            TextView nameTextView = selectedViewCard.findViewById(R.id.text_nameCard);
+            TextView rarityTextView = selectedViewCard.findViewById(R.id.text_rarity);
+
+            iconImageView.setImageDrawable(null);
+            var theme = viewFragment.getContext().getTheme();
+            selectedViewCard.setBackgroundColor(getResources().getColor(R.color.light_gray, theme));
+            nameTextView.setText(R.string.card_name);
+            rarityTextView.setText(R.string.rarity);
+        } else {
+            setupCardView(selectedViewCard, card, (cardView, card1) -> {}, cardImages);
+            attackPoint = String.valueOf(card.attackPoint());
+            manaPoint = String.valueOf(card.manaPoint());
+            lifePoint = String.valueOf(card.lifePoint());
+        }
+
+        attackPointText.setText(attackPoint);
+        manaPointText.setText(manaPoint);
+        lifePointText.setText(lifePoint);
     }
 
     public static void setupCardView(View view, Card card,

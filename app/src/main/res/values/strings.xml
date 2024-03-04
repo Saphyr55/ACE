@@ -37,10 +37,13 @@
     <string name="gacha">Gacha</string>
     <string name="shop">Shop</string>
     <string name="image_card">Image Card</string>
-    <string name="card">Card</string>
+    <string name="card_name">Name Card</string>
     <string name="unknown">Unknown</string>
     <string name="rarity">Rarity</string>
     <string name="error">Error</string>
     <string name="cards">Cards</string>
+    <string name="mana_cost">Mana Cost</string>
+    <string name="attack_point">Attack Point</string>
+    <string name="life_point">Life Point</string>
 
 </resources>

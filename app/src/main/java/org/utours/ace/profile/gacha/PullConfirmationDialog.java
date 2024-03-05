@@ -19,7 +19,7 @@ public class PullConfirmationDialog extends Dialog {
     public PullConfirmationDialog(@NonNull Context context) {
         super(context);
         setContentView(R.layout.dialog_pull_confirmation);
-        
+
         Optional.ofNullable(getWindow())
                 .ifPresent(window -> window.setWindowAnimations(R.style.DialogAnimations));
 

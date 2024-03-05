@@ -1,6 +1,9 @@
 package org.utours.ace.infra.profile.firebase;
 
 import org.utours.ace.common.annotation.Bean;
+import org.utours.ace.profile.model.PlayerAccount;
+import org.utours.ace.profile.model.StarDust;
+import org.utours.ace.profile.model.Ticket;
 
 import java.util.List;
 import java.util.Set;
@@ -9,13 +12,14 @@ import java.util.Set;
 class FirebasePlayerAccount {
 
     private String uid;
-    private String username;
+    private String username = PlayerAccount.DEFAULT_NAME;
     private String email;
-    private String description;
-    private Integer level;
-    private Integer starDustQuantity;
-    private List<String> cards;
-    private List<String> deck;
+    private String description = PlayerAccount.DEFAULT_DESCRIPTION;
+    private Integer level = PlayerAccount.DEFAULT_LEVEL;
+    private Integer starDustQuantity = StarDust.ZERO;
+    private Integer ticketQuantity = Ticket.ZERO;
+    private List<String> cards = List.of();
+    private List<String> deck = List.of();
 
     public FirebasePlayerAccount() { }
 
@@ -28,7 +32,9 @@ class FirebasePlayerAccount {
     }
 
     public void setUsername(String username) {
-        this.username = username;
+        if (username != null) {
+            this.username = username;
+        }
     }
 
     public void setUid(String uid) {
@@ -48,7 +54,9 @@ class FirebasePlayerAccount {
     }
 
     public void setDescription(String description) {
-        this.description = description;
+        if (description != null) {
+            this.description = description;
+        }
     }
 
     public void setEmail(String email) {
@@ -56,7 +64,9 @@ class FirebasePlayerAccount {
     }
 
     public void setLevel(Integer level) {
-        this.level = level;
+        if (level != null) {
+            this.level = level;
+        }
     }
 
     public List<String> getCards() {
@@ -64,7 +74,9 @@ class FirebasePlayerAccount {
     }
 
     public void setCards(List<String> cards) {
-        this.cards = cards;
+        if (cards != null) {
+            this.cards = cards;
+        }
     }
 
     public List<String> getDeck() {
@@ -72,7 +84,9 @@ class FirebasePlayerAccount {
     }
 
     public void setDeck(List<String> deck) {
-        this.deck = deck;
+        if (deck != null) {
+            this.deck = deck;
+        }
     }
 
     public Integer getStarDustQuantity() {
@@ -80,6 +94,19 @@ class FirebasePlayerAccount {
     }
 
     public void setStarDustQuantity(Integer starDustQuantity) {
-        this.starDustQuantity = starDustQuantity;
+        if (starDustQuantity != null) {
+            this.starDustQuantity = starDustQuantity;
+        }
     }
+
+    public Integer getTicketQuantity() {
+        return ticketQuantity;
+    }
+
+    public void setTicketQuantity(Integer ticketQuantity) {
+        if (ticketQuantity != null) {
+            this.ticketQuantity = ticketQuantity;
+        }
+    }
+
 }

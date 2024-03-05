@@ -64,7 +64,11 @@ public enum PlayerAccountContainer {
     }
 
     public GachaService getGachaService(Context context) {
-        return new GachaService(getCardService(context));
+        return getGachaService(getCardService(context));
+    }
+
+    public GachaService getGachaService(CardService cardService) {
+        return new GachaService(cardService);
     }
 
 }

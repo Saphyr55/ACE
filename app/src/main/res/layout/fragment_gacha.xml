@@ -37,14 +37,14 @@
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
-                android:text="300.SD Pull 1X" />
+                android:text="@string/_1_t_pull_1x" />
 
             <Button
                 android:id="@+id/btn_multi_pull"
                 android:layout_width="120dp"
                 android:layout_height="wrap_content"
                 android:layout_margin="15dp"
-                android:text="3000.SD Pull 10x" />
+                android:text="@string/_10_t_pull_10x" />
 
         </LinearLayout>
 

@@ -51,5 +51,8 @@
     <string name="tap_to_back">Tap to back</string>
     <string name="confirm">Confirm</string>
     <string name="are_you_sure_to_exit">Are you sure to exit ?</string>
+    <string name="_10_t_pull_10x">10.T Pull 10x</string>
+    <string name="_1_t_pull_1x">1.T Pull 1X</string>
+    <string name="loading">Loading</string>
 
 </resources>

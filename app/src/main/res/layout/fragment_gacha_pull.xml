@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:id="@+id/main"
-    tools:context=".profile.gacha.GachaPullingActivity"
+    tools:context=".profile.gacha.GachaPullActivity"
     >
 
     <androidx.recyclerview.widget.RecyclerView

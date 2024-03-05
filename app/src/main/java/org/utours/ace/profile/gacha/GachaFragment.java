@@ -17,8 +17,10 @@ import com.google.android.material.carousel.CarouselSnapHelper;
 import com.google.android.material.carousel.MultiBrowseCarouselStrategy;
 
 import org.utours.ace.R;
+import org.utours.ace.common.LoadingDialog;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.GachaService;
+import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
 
@@ -27,20 +29,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class GachaFragment extends Fragment {
 
     public static final int MAX_CARD_CAROUSEL = 5;
 
     private final CardService cardService;
+    private final GachaService gachaService;
+    private final PlayerAccountService playerAccountService;
     private final Map<String, ImageCard> imageCards;
     private final List<Card> cards;
     private PullConfirmationDialog singlePullConfirmationDialog;
     private PullConfirmationDialog multiPullConfirmationDialog;
 
+    public GachaFragment(CardService cardService,
+                         GachaService gachaService,
+                         PlayerAccountService playerAccountService) {
 
-    public GachaFragment(CardService cardService) {
         this.cardService = cardService;
+        this.gachaService = gachaService;
+        this.playerAccountService = playerAccountService;
         this.cards = new ArrayList<>();
         this.imageCards = new HashMap<>();
     }
@@ -102,15 +111,23 @@ public class GachaFragment extends Fragment {
     private void onPressPullDialogButton(Context context, PullConfirmationDialog dialog, int quantity) {
         dialog.getPullButton().setOnClickListener(v -> {
             dialog.dismiss();
-            Intent intent = new Intent(context, GachaPullingActivity.class);
-            intent.putExtra(GachaPullingActivity.PULL_QUANTITY, quantity);
-            startActivity(intent);
+            transactionPulling(context, quantity);
         });
     }
 
-    @Override
-    public void onStop() {
-        super.onStop();
+
+    private void transactionPulling(Context context, int quantity) {
+        CompletableFuture
+                .runAsync(() -> GachaPullActivity.setCards(gachaService.pullCards(quantity)))
+                .thenCompose(u -> cardService.provideImageCards(GachaPullActivity.getCards()))
+                .thenAccept(GachaPullActivity::setImageCards)
+                .thenRun(() -> launchPullingActivity(context))
+                ;
+    }
+
+    private void launchPullingActivity(Context context) {
+        Intent intent = new Intent(context, GachaPullActivity.class);
+        startActivity(intent);
     }
 
 }

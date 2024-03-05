@@ -17,9 +17,7 @@ import org.utours.ace.auth.feature.AuthAccountService;
 import org.utours.ace.infra.auth.AuthenticationContainer;
 import org.utours.ace.infra.auth.AuthAccountValidatorProvider;
 import org.utours.ace.auth.model.AuthAccount;
-import org.utours.ace.auth.port.AuthAccountRegistration;
 import org.utours.ace.infra.profile.PlayerAccountContainer;
-import org.utours.ace.profile.feature.PlayerAccountFactory;
 import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.port.PlayerAccountRepository;
 
@@ -80,13 +78,9 @@ public class RegisterActivity extends AppCompatActivity {
         progressBar.setVisibility(View.GONE);
     }
 
-    private void onSuccessRegistration(AuthAccount authAccount) {
-        PlayerAccount playerAccount =
-            PlayerAccountFactory.DEFAULT
-                    .create(authAccount.uid(), authAccount.email());
-
-        playerAccountRepository.store(playerAccount);
-
+    private void onSuccessRegistration(AuthAccount account) {
+        var playerAccountBuild = PlayerAccount.Builder.of(account.uid(), account.email());
+        playerAccountRepository.store(playerAccountBuild.build());
         redirectToConnectionActivity();
     }
 

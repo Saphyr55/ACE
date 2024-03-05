@@ -5,28 +5,37 @@ import org.utours.ace.profile.feature.CardRegistry;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.Deck;
 import org.utours.ace.profile.model.PlayerAccount;
+import org.utours.ace.profile.model.StarDust;
+import org.utours.ace.profile.model.Ticket;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FirebasePlayerAccountMapper {
 
+   PlayerAccount map(FirebasePlayerAccount account) {
 
-   PlayerAccount map(FirebasePlayerAccount playerAccount) {
-        if (playerAccount == null) return null;
-        return new PlayerAccount(
-                playerAccount.getUid(),
-                playerAccount.getUsername(),
-                playerAccount.getEmail(),
-                playerAccount.getLevel(),
-                playerAccount.getDescription(),
-                new Quantity<>(playerAccount.getStarDustQuantity()),
-                new Deck(Set.copyOf(cardsOfIds(playerAccount.getDeck()))),
-                Set.copyOf(cardsOfIds(playerAccount.getCards()))
-        );
+        if (account == null) return null;
+
+        var cards = Set.copyOf(cardsOfIds(account.getCards()));
+        var deck = new Deck(Set.copyOf(cardsOfIds(account.getDeck())));
+        var starDustQuantity = new Quantity<StarDust>(account.getStarDustQuantity());
+        var ticketQuantity = new Quantity<Ticket>(account.getTicketQuantity());
+
+        return PlayerAccount.Builder
+                .of(account.getUid(), account.getEmail())
+                .withDeck(deck)
+                .withLevel(account.getLevel())
+                .withUsername(account.getUsername())
+                .withDescription(account.getDescription())
+                .withStarDustQuantity(starDustQuantity)
+                .withTicketQuantity(ticketQuantity)
+                .withCards(cards)
+                .build();
     }
 
     FirebasePlayerAccount map(PlayerAccount playerAccount) {
@@ -40,6 +49,7 @@ public class FirebasePlayerAccountMapper {
         firebasePlayerAccount.setEmail(playerAccount.email());
         firebasePlayerAccount.setDescription(playerAccount.description());
         firebasePlayerAccount.setStarDustQuantity(playerAccount.starDustQuantity().quantity());
+        firebasePlayerAccount.setTicketQuantity(playerAccount.ticketQuantity().quantity());
         firebasePlayerAccount.setLevel(playerAccount.level());
         firebasePlayerAccount.setCards(playerAccount
                 .cards().stream()
@@ -54,16 +64,20 @@ public class FirebasePlayerAccountMapper {
     }
 
     public List<Card> cardsOfIds(List<String> ids) {
-        List<Card> cards = new ArrayList<>();
-        List<String> idsList = List.copyOf(ids);
+
+        var cards = new ArrayList<Card>();
+        var idsList = List.copyOf(ids);
+        var allCard = List.copyOf(CardRegistry.INSTANCE.CARDS);
+
         for (int i = 0; i < ids.size(); i++) {
-            for (int j = 0; j < CardRegistry.INSTANCE.CARDS.size(); j++) {
-                var card = CardRegistry.INSTANCE.CARDS.get(j).get();
+            for (int j = 0; j < allCard.size(); j++) {
+                var card = allCard.get(j);
                 if (card.pictureId().equals(idsList.get(i))) {
                     cards.add(card);
                 }
             }
         }
+
         return cards;
     }
 

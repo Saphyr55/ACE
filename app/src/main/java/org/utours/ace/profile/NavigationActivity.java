@@ -22,12 +22,14 @@ import org.utours.ace.main.MainFragment;
 import org.utours.ace.main.WaitFragment;
 import org.utours.ace.profile.deck.DeckFragment;
 import org.utours.ace.profile.feature.CardService;
+import org.utours.ace.profile.feature.GachaService;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.gacha.GachaFragment;
 import org.utours.ace.profile.profile.ProfileFragment;
 import org.utours.ace.shop.ShopFragment;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 public class NavigationActivity extends AppCompatActivity {
 
@@ -43,6 +45,7 @@ public class NavigationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         EdgeToEdge.enable(this);
         binding = ActivityNavigationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -53,17 +56,19 @@ public class NavigationActivity extends AppCompatActivity {
         binding.navBarView.setBackground(null);
         binding.navBarView.setSelectedItemId(R.id.item_main);
 
-        CardService cardService = PlayerAccountContainer.INSTANCE.getCardService(this);
         PlayerAccountService playerAccountService = PlayerAccountContainer.INSTANCE.getService();
+        CardService cardService = PlayerAccountContainer.INSTANCE.getCardService(this);
+        GachaService gachaService = PlayerAccountContainer.INSTANCE.getGachaService(this);
 
         mainFragment = new MainFragment();
         profileFragment = new ProfileFragment();
         deckFragment = new DeckFragment(cardService, playerAccountService);
-        gachaFragment = new GachaFragment(cardService);
+        gachaFragment = new GachaFragment(cardService, gachaService);
         shopFragment = new ShopFragment();
 
-        CompletableFuture
-                .runAsync(() -> deckFragment.setup())
+        cardService
+                .downloadAndInstallAllImages()
+                .thenCompose(unused -> deckFragment.setup())
                 .thenCompose(unused -> gachaFragment.setup())
                 .thenRun(this::startNavigationMain)
                 .exceptionally(this::messagingErrorFragment);

@@ -89,6 +89,10 @@ public class CardService {
         return FunctionalUtils.listOfFuturesToFutureList(imageCards, Function.identity());
     }
 
+    public CompletableFuture<Void> downloadAndInstallAllImages() {
+        return provideImageCards(CardRegistry.INSTANCE.CARDS).thenRun(() -> { });
+    }
+
     public List<Card> getRandomCards(int max, boolean unique) {
 
         var cards = new ArrayList<Card>();
@@ -99,7 +103,7 @@ public class CardService {
         var random = new Random();
         while (cards.size() != max) {
             int j = random.nextInt(size - 1);
-            var card = CardRegistry.INSTANCE.CARDS.get(j).get();
+            var card = CardRegistry.INSTANCE.CARDS.get(j);
             if (!unique) {
                 cards.add(card);
             } else if (!cards.contains(card)) {

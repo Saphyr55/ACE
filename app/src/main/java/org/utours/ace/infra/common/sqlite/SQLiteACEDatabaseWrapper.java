@@ -9,17 +9,22 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class SQLiteACEDatabaseWrapper extends SQLiteOpenHelper {
 
+
+    private static final String CREATE_CARD_TABLE_QUERY =
+        String.format(
+                "CREATE TABLE %s( %s TEXT UNIQUE, %s BLOB)",
+                CardTable.TABLE_NAME,
+                CardTable.ATTR_SOURCE,
+                CardTable.ATTR_IMAGE
+        );
+
     public SQLiteACEDatabaseWrapper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL(
-                "CREATE TABLE " + CardTable.TABLE_NAME +
-                "(" +   CardTable.ATTR_SOURCE + "UNIQUE TEXT," +
-                        CardTable.ATTR_IMAGE + " BLOB)"
-        );
+        db.execSQL(CREATE_CARD_TABLE_QUERY);
     }
 
     @Override

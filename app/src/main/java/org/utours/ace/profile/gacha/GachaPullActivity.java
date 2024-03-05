@@ -23,51 +23,32 @@ import org.utours.ace.profile.feature.GachaService;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-public class GachaPullingActivity extends AppCompatActivity {
+public class GachaPullActivity extends AppCompatActivity {
 
-    public static final String PULL_QUANTITY = "pull_quantity";
-    private GachaService gachaService;
     private RecyclerView carouselTopCards;
     private GachaCarouselAdapter carouselAdapter;
-    private CardService cardService;
-    private final List<Card> cards;
-    private final Map<String, ImageCard> imageCards;
-
-    public GachaPullingActivity() {
-        this.cards = new ArrayList<>();
-        this.imageCards = new HashMap<>();
-    }
+    private static List<Card> cards;
+    private static Map<String, ImageCard> imageCards;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_gacha_pulling);
+        setContentView(R.layout.fragment_gacha_pull);
         setLayoutPadding();
         setupCarousel();
-
-        gachaService = PlayerAccountContainer.INSTANCE.getGachaService(this);
-        cardService = PlayerAccountContainer.INSTANCE.getCardService(this);
 
         showConfirmDialogOnPressedBack();
 
         TextView textView = findViewById(R.id.text_tap_to_back);
 
         textView.setOnClickListener(v -> finish());
-
-        int pullQuantity = getIntent().getIntExtra(PULL_QUANTITY, 0);
-
-        CompletableFuture
-                .runAsync(() -> cards.addAll(gachaService.pullCards(pullQuantity)))
-                .thenCompose(u -> cardService.provideImageCards(cards))
-                .thenAccept(this::setImageCards);
     }
 
     private void setLayoutPadding() {
@@ -82,7 +63,7 @@ public class GachaPullingActivity extends AppCompatActivity {
         getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
             @Override
             public void handleOnBackPressed() {
-                var dialog = new BackConfirmDialog(GachaPullingActivity.this);
+                var dialog = new BackConfirmDialog(GachaPullActivity.this);
                 dialog.setOnConfirmButton(() -> finish());
                 dialog.show();
             }
@@ -90,23 +71,39 @@ public class GachaPullingActivity extends AppCompatActivity {
     }
 
     private void setupCarousel() {
+        
         carouselTopCards = findViewById(R.id.carousel_top_cards);
         carouselAdapter = new GachaCarouselAdapter(cards, imageCards);
         var carouselLayoutManager = new CarouselLayoutManager(new MultiBrowseCarouselStrategy());
         var carouselSnapHelper = new CarouselSnapHelper();
 
         carouselSnapHelper.attachToRecyclerView(carouselTopCards);
+
         carouselTopCards.setLayoutManager(carouselLayoutManager);
         carouselTopCards.setAdapter(carouselAdapter);
     }
 
-    private void setImageCards(List<ImageCard> imageCards) {
+    public static void setImageCards(List<ImageCard> imageCards) {
         var result = new HashMap<String, ImageCard>();
         for (int i = 0; i < imageCards.size(); i++) {
             Card card = cards.get(i);
             result.put(card.pictureId(), imageCards.get(i));
         }
-        this.imageCards.putAll(result);
+        GachaPullActivity.imageCards = result;
     }
 
+    public static List<Card> getCards() {
+        return cards;
+    }
+
+    public static void setCards(List<Card> cards) {
+        GachaPullActivity.cards = cards;
+    }
+
+    @Override
+    protected void onDestroy() {
+        cards = null;
+        imageCards = null;
+        super.onDestroy();
+    }
 }

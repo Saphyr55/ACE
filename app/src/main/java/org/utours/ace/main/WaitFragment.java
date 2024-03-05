@@ -23,7 +23,6 @@ public class WaitFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_wait, container, false);
         progressBar = view.findViewById(R.id.progress_waiting);
-
         return view;
     }
 

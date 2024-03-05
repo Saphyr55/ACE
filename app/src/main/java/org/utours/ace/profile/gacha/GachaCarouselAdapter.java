@@ -25,8 +25,7 @@ public class GachaCarouselAdapter
     private final List<Card> imageCards;
     private final Map<String, ImageCard> refs;
 
-    public GachaCarouselAdapter(List<Card> imageCards,
-                                Map<String, ImageCard> refs) {
+    public GachaCarouselAdapter(List<Card> imageCards, Map<String, ImageCard> refs) {
         this.imageCards = imageCards;
         this.refs = refs;
     }

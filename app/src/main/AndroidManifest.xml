@@ -15,6 +15,9 @@
         android:theme="@style/Theme.AniCardEnchantment"
         tools:targetApi="31">
         <activity
+            android:name=".profile.gacha.GachaPullingActivity"
+            android:exported="false" />
+        <activity
             android:name=".profile.NavigationActivity"
             android:exported="false" />
         <activity

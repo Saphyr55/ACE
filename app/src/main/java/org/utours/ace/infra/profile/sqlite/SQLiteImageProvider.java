@@ -34,7 +34,7 @@ public class SQLiteImageProvider implements ImageCardProvider {
 
                 Cursor cursor = database.rawQuery(
                     "SELECT * FROM " + SQLiteDetails.TABLE_CARD_IMAGE_NAME +
-                        " WHERE uid = ?", new String[]{ source });
+                        " WHERE source = ?", new String[]{ source });
 
                 cursor.moveToFirst();
 

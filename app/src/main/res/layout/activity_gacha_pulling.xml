@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:id="@+id/main"
+    tools:context=".profile.gacha.GachaPullingActivity"
+    >
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/carousel_top_cards"
+        android:layout_marginTop="100dp"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:clipChildren="true"
+        android:clipToPadding="true"
+        android:orientation="horizontal"
+        android:rotation="-5"
+        app:carousel_alignment="center"
+        app:layoutManager="com.google.android.material.carousel.CarouselLayoutManager"
+        />
+
+    <TextView
+        android:id="@+id/text_tap_to_back"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:textAlignment="center"
+        android:gravity="center"
+        android:textSize="30sp"
+        android:text="@string/tap_to_back" />
+
+</LinearLayout>

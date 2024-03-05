@@ -64,7 +64,7 @@ public class CardService {
                         .orElseGet(() -> imageCardInstaller.install(imageCard)));
     }
 
-    public CompletableFuture<ImageCard> provideCardImage(String uid) {
+    public CompletableFuture<ImageCard> provideImageCard(String uid) {
 
         Supplier<CompletableFuture<ImageCard>> downloadAndInstall =
                 () -> imageCardDownloader
@@ -78,10 +78,10 @@ public class CardService {
                         .orElseGet(downloadAndInstall));
     }
 
-    public CompletableFuture<List<ImageCard>> provideAllCardImage(List<Card> cards) {
+    public CompletableFuture<List<ImageCard>> provideImageCards(List<Card> cards) {
 
         var imageCards = cards.stream()
-                .map(card -> provideCardImage(card.pictureId()))
+                .map(card -> provideImageCard(card.pictureId()))
                 .collect(Collectors.toList());
 
         return FunctionalUtils.listOfFuturesToFutureList(imageCards, Function.identity());

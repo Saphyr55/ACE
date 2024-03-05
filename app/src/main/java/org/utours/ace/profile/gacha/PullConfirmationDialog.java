@@ -7,6 +7,7 @@ import android.widget.Button;
 import androidx.annotation.NonNull;
 
 import org.utours.ace.R;
+import org.utours.ace.profile.feature.GachaService;
 
 import java.util.Optional;
 
@@ -16,9 +17,9 @@ public class PullConfirmationDialog extends Dialog {
     private final Button pullButton;
 
     public PullConfirmationDialog(@NonNull Context context) {
-
         super(context);
         setContentView(R.layout.dialog_pull_confirmation);
+        
         Optional.ofNullable(getWindow())
                 .ifPresent(window -> window.setWindowAnimations(R.style.DialogAnimations));
 
@@ -35,7 +36,5 @@ public class PullConfirmationDialog extends Dialog {
     public Button getPullButton() {
         return pullButton;
     }
-
-
 
 }

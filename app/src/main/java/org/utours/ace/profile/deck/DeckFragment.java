@@ -67,7 +67,7 @@ public class DeckFragment extends Fragment {
 
     public CompletableFuture<Void> setup() {
         return cardService
-                .provideAllCardImage(playerAccountService.currentPlayerAccount().cards())
+                .provideImageCards(playerAccountService.currentPlayerAccount().cards())
                 .thenAccept(this::fillCardImages);
     }
 

@@ -19,12 +19,11 @@ import org.utours.ace.profile.port.ImageCardDownloader;
 import org.utours.ace.profile.port.PlayerAccountRepository;
 
 import java.util.HashMap;
-import java.util.Map;
 
 public enum PlayerAccountContainer {
     INSTANCE;
 
-    private final Map<Context, SQLiteACEDatabaseWrapper> databaseMap;
+    private SQLiteACEDatabaseWrapper sqLiteACEDatabaseWrapper;
     private final PlayerAccountRepository playerAccountRepository;
     private final PlayerAccountService playerAccountService;
     private final ImageCardDownloader imageCardDownloader;
@@ -34,7 +33,6 @@ public enum PlayerAccountContainer {
         var database = FirebaseDatabase.getInstance();
         var refs = new FirebaseDatabaseReferences(database);
 
-        this.databaseMap = new HashMap<>();
         this.playerAccountRepository = new FirebasePlayerAccountRepository(
                         refs.playerAccountsReference(),
                         new FirebasePlayerAccountMapper());
@@ -52,12 +50,11 @@ public enum PlayerAccountContainer {
 
     public CardService getCardService(Context context) {
 
-        if (!databaseMap.containsKey(context)) {
-            databaseMap.put(context, new SQLiteACEDatabaseWrapper(context));
+        if (sqLiteACEDatabaseWrapper == null) {
+            sqLiteACEDatabaseWrapper = new SQLiteACEDatabaseWrapper(context);
         }
 
-        SQLiteACEDatabaseWrapper ace = databaseMap.get(context);
-        assert ace != null;
+        SQLiteACEDatabaseWrapper ace = sqLiteACEDatabaseWrapper;
 
         return new CardService(
                 new SQLiteImageInstaller(ace.getWritableDatabase()),

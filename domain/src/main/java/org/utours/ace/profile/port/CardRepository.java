@@ -4,7 +4,7 @@ import org.utours.ace.profile.model.Card;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface ProfileCardRepository {
+public interface CardRepository {
 
     CompletableFuture<Card> getByUID(String id);
 

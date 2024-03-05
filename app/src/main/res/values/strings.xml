@@ -48,5 +48,8 @@
     <string name="pull_confirmation">Pull Confirmation</string>
     <string name="pull">Pull</string>
     <string name="cancel">Cancel</string>
+    <string name="tap_to_back">Tap to back</string>
+    <string name="confirm">Confirm</string>
+    <string name="are_you_sure_to_exit">Are you sure to exit ?</string>
 
 </resources>

@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 public enum CardRegistry {
-    INSTANCE();
+    INSTANCE;
 
     public final static Supplier<Card> FERN_CARD = INSTANCE.register(() -> new Card("7", "Fern",
             "https://cdn.myanimelist.net/images/characters/13/519083.jpg",
@@ -53,6 +53,34 @@ public enum CardRegistry {
             10,
             5,
             CardRarity.SR));
+
+    public final static Supplier<Card> HEITER_CARD = INSTANCE.register(() -> new Card("1", "Heiter",
+            "https://cdn.myanimelist.net/images/characters/9/471528.jpg",
+            20,
+            10,
+            5,
+            CardRarity.SR));
+
+    public final static Supplier<Card> METHODE_CARD = INSTANCE.register(() -> new Card("8", "Methode",
+            "https://cdn.myanimelist.net/images/characters/14/538692.jpg",
+            20,
+            10,
+            5,
+            CardRarity.R));
+
+    public final static Supplier<Card> SEIN_CARD = INSTANCE.register(() -> new Card("9", "Sein",
+            "https://cdn.myanimelist.net/images/characters/3/442553.jpg",
+            20,
+            10,
+            5,
+            CardRarity.R));
+
+    public final static Supplier<Card> FLAMME_CARD = INSTANCE.register(() -> new Card("10", "Flamme",
+            "https://cdn.myanimelist.net/images/characters/10/528177.jpg",
+            20,
+            10,
+            5,
+            CardRarity.R));
 
     public final List<Supplier<Card>> CARDS = new LinkedList<>();
     public final Map<String, String> REFS;

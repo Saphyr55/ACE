@@ -15,6 +15,7 @@ import org.utours.ace.R;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 

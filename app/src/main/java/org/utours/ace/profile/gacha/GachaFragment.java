@@ -1,5 +1,7 @@
 package org.utours.ace.profile.gacha;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -28,8 +30,8 @@ import java.util.concurrent.CompletableFuture;
 
 public class GachaFragment extends Fragment {
 
-    private static final int MAX_CARD_CAROUSEL = 5;
-    private final GachaService gachaService;
+    public static final int MAX_CARD_CAROUSEL = 5;
+
     private final CardService cardService;
     private final Map<String, ImageCard> imageCards;
     private final List<Card> cards;
@@ -37,9 +39,7 @@ public class GachaFragment extends Fragment {
     private PullConfirmationDialog multiPullConfirmationDialog;
 
 
-    public GachaFragment(GachaService gachaService,
-                         CardService cardService) {
-        this.gachaService = gachaService;
+    public GachaFragment(CardService cardService) {
         this.cardService = cardService;
         this.cards = new ArrayList<>();
         this.imageCards = new HashMap<>();
@@ -49,41 +49,32 @@ public class GachaFragment extends Fragment {
         return CompletableFuture
                 .runAsync(this::onSetup)
                 .thenAccept(unused -> cardService
-                .provideAllCardImage(this.cards)
+                .provideImageCards(this.cards)
                 .thenAccept(this::fillCardImages));
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Setup
         View fragmentView = inflater.inflate(R.layout.fragment_gacha, container, false);
+        Context context = fragmentView.getContext();
 
         // Manage carousel.
         RecyclerView carouselTopCards = fragmentView.findViewById(R.id.carousel_top_cards);
         var gachaCarouselAdapter = new GachaCarouselAdapter(cards, imageCards);
         var carouselLayoutManager = new CarouselLayoutManager(new MultiBrowseCarouselStrategy());
-        var carouselSnapHelper = new CarouselSnapHelper(false);
+        var carouselSnapHelper = new CarouselSnapHelper();
 
-        // carouselSnapHelper.findSnapView(carouselLayoutManager);
         carouselSnapHelper.attachToRecyclerView(carouselTopCards);
-
         carouselTopCards.setLayoutManager(carouselLayoutManager);
         carouselTopCards.setAdapter(gachaCarouselAdapter);
 
         // Manage pull confirmation.
-        multiPullConfirmationDialog = new PullConfirmationDialog(fragmentView.getContext());
-        singlePullConfirmationDialog = new PullConfirmationDialog(fragmentView.getContext());
+        multiPullConfirmationDialog = new PullConfirmationDialog(context);
+        singlePullConfirmationDialog = new PullConfirmationDialog(context);
 
-        multiPullConfirmationDialog.getPullButton().setOnClickListener(v -> {
-            gachaService.multiPull();
-            multiPullConfirmationDialog.dismiss();
-        });
-        singlePullConfirmationDialog.getPullButton().setOnClickListener(v -> {
-            gachaService.singlePull();
-            singlePullConfirmationDialog.dismiss();
-        });
+        onPressPullDialogButton(context, multiPullConfirmationDialog, GachaService.MULTI_QUANTITY);
+        onPressPullDialogButton(context, singlePullConfirmationDialog, GachaService.SINGLE_QUANTITY);
 
         Button singlePullButton = fragmentView.findViewById(R.id.btn_single_pull);
         Button multiPullButton = fragmentView.findViewById(R.id.btn_multi_pull);
@@ -106,6 +97,15 @@ public class GachaFragment extends Fragment {
             result.put(card.pictureId(), imageCards.get(i));
         }
         this.imageCards.putAll(result);
+    }
+
+    private void onPressPullDialogButton(Context context, PullConfirmationDialog dialog, int quantity) {
+        dialog.getPullButton().setOnClickListener(v -> {
+            dialog.dismiss();
+            Intent intent = new Intent(context, GachaPullingActivity.class);
+            intent.putExtra(GachaPullingActivity.PULL_QUANTITY, quantity);
+            startActivity(intent);
+        });
     }
 
     @Override

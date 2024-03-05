@@ -63,7 +63,7 @@ public class NavigationActivity extends AppCompatActivity {
         mainFragment = new MainFragment();
         profileFragment = new ProfileFragment();
         deckFragment = new DeckFragment(cardService, playerAccountService);
-        gachaFragment = new GachaFragment(cardService, gachaService);
+        gachaFragment = new GachaFragment(cardService, gachaService, playerAccountService);
         shopFragment = new ShopFragment();
 
         cardService

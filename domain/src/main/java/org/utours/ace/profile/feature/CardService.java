@@ -10,6 +10,7 @@ import org.utours.ace.profile.port.ImageCardInstaller;
 import org.utours.ace.profile.port.ImageCardProvider;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
@@ -33,7 +34,7 @@ public class CardService {
         this.imageCardDownloader = imageCardDownloader;
     }
 
-    public List<Card> sortedByRarity(List<Card> cards) {
+    public List<Card> sortedByRarity(Collection<Card> cards) {
         return cards.stream()
                 .sorted((c1, c2) -> {
                     if (c1.rarity().ordinal() > c2.rarity().ordinal()) {
@@ -47,8 +48,9 @@ public class CardService {
     }
 
     public List<Card> cardsDeckFirst(PlayerAccount playerAccount) {
-        var cards = new ArrayList<>(sortedByRarity(playerAccount.deck().cards()));
-        for (Card card : sortedByRarity(playerAccount.cards())) {
+        var deckCards = List.copyOf(playerAccount.deck().cards());
+        var cards = sortedByRarity(deckCards);
+        for (Card card : sortedByRarity(List.copyOf(playerAccount.cards()))) {
             if (!cards.contains(card)) {
                 cards.add(card);
             }
@@ -78,7 +80,7 @@ public class CardService {
                         .orElseGet(downloadAndInstall));
     }
 
-    public CompletableFuture<List<ImageCard>> provideImageCards(List<Card> cards) {
+    public CompletableFuture<List<ImageCard>> provideImageCards(Collection<Card> cards) {
 
         var imageCards = cards.stream()
                 .map(card -> provideImageCard(card.pictureId()))

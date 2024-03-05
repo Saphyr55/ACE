@@ -1,10 +1,9 @@
 package org.utours.ace.infra.profile.sqlite;
 
-import static org.utours.ace.infra.common.sqlite.SQLiteDetails.TABLE_CARD_IMAGE_NAME;
-
 import android.content.ContentValues;
 import android.database.sqlite.SQLiteDatabase;
 
+import org.utours.ace.infra.common.sqlite.SQLiteDetails;
 import org.utours.ace.profile.model.ImageCard;
 import org.utours.ace.profile.port.ImageCardInstaller;
 
@@ -21,12 +20,10 @@ public final class SQLiteImageInstaller implements ImageCardInstaller {
     @Override
     public CompletableFuture<ImageCard> install(ImageCard imageCard) {
         return CompletableFuture.supplyAsync(() -> {
-
             var contentValues = new ContentValues();
-            // contentValues.put("card_id", imageCard.cardId());
-            contentValues.put("source", imageCard.source());
-            contentValues.put("image", imageCard.content());
-            if (database.insert(TABLE_CARD_IMAGE_NAME, null, contentValues) == -1)
+            contentValues.put(SQLiteDetails.CardTable.ATTR_SOURCE, imageCard.source());
+            contentValues.put(SQLiteDetails.CardTable.ATTR_IMAGE, imageCard.content());
+            if (database.insert(SQLiteDetails.CardTable.TABLE_NAME, null, contentValues) == -1)
                 throw new RuntimeException();
 
             return imageCard;

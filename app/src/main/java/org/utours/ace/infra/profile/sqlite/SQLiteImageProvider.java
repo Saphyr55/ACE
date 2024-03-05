@@ -16,6 +16,10 @@ public class SQLiteImageProvider implements ImageCardProvider {
     private final SQLiteDatabase database;
     private final HashMap<String, ImageCard> cache;
 
+    private static final String QUERY =
+                " SELECT * FROM " + SQLiteDetails.CardTable.TABLE_NAME +
+                " WHERE " + SQLiteDetails.CardTable.ATTR_SOURCE + " = ?";
+
     public SQLiteImageProvider(SQLiteDatabase database) {
         this.database = database;
         cache = new HashMap<>();
@@ -31,17 +35,14 @@ public class SQLiteImageProvider implements ImageCardProvider {
 
         return CompletableFuture.supplyAsync(() -> {
             try {
-
-                Cursor cursor = database.rawQuery(
-                    "SELECT * FROM " + SQLiteDetails.TABLE_CARD_IMAGE_NAME +
-                        " WHERE source = ?", new String[]{ source });
+                Cursor cursor = database.rawQuery(QUERY, new String[]{ source });
 
                 cursor.moveToFirst();
 
                 // int cIndexID = cursor.getColumnIndex("card_id");
                 // String cardID = cursor.getString(cIndexID);
 
-                int cIndexImage = cursor.getColumnIndex("image");
+                int cIndexImage = cursor.getColumnIndex(SQLiteDetails.CardTable.ATTR_IMAGE);
                 byte[] bitmap = cursor.getBlob(cIndexImage);
 
                 cursor.close();

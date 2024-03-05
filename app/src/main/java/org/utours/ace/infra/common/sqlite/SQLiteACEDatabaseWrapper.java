@@ -15,12 +15,16 @@ public class SQLiteACEDatabaseWrapper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_CARD_IMAGE_NAME + "(source TEXT, image BLOB)");
+        db.execSQL(
+                "CREATE TABLE " + CardTable.TABLE_NAME +
+                "(" +   CardTable.ATTR_SOURCE + "UNIQUE TEXT," +
+                        CardTable.ATTR_IMAGE + " BLOB)"
+        );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_CARD_IMAGE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + CardTable.TABLE_NAME);
         onCreate(db);
     }
 

@@ -109,7 +109,7 @@ public class DeckFragment extends Fragment {
             cardGridAdapter.setCards(cardService.sortedByRarity(playerAccount.cards()));
 
             // Save data on quiting deck mode.
-            playerAccountService.updateCurrentPlayerAccount();
+            playerAccountService.storeCurrentPlayerAccount();
         }
         cardGridAdapter.notifyDataSetChanged();
     }
@@ -215,8 +215,9 @@ public class DeckFragment extends Fragment {
 
     private void fillCardImages(List<ImageCard> imageCards) {
         var result = new HashMap<String, ImageCard>();
+        var list = List.copyOf(playerAccountService.currentPlayerAccount().cards());
         for (int i = 0; i < imageCards.size(); i++) {
-            Card card = playerAccountService.currentPlayerAccount().cards().get(i);
+            Card card = list.get(i);
             result.put(card.pictureId(), imageCards.get(i));
         }
         this.cardImages.putAll(result);

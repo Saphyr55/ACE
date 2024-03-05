@@ -7,7 +7,9 @@ import org.utours.ace.profile.model.Deck;
 import org.utours.ace.profile.model.PlayerAccount;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FirebasePlayerAccountMapper {
@@ -22,8 +24,8 @@ public class FirebasePlayerAccountMapper {
                 playerAccount.getLevel(),
                 playerAccount.getDescription(),
                 new Quantity<>(playerAccount.getStarDustQuantity()),
-                new Deck(stringsToCards(playerAccount.getDeck())),
-                stringsToCards(playerAccount.getCards())
+                new Deck(Set.copyOf(cardsOfIds(playerAccount.getDeck()))),
+                Set.copyOf(cardsOfIds(playerAccount.getCards()))
         );
     }
 
@@ -39,12 +41,10 @@ public class FirebasePlayerAccountMapper {
         firebasePlayerAccount.setDescription(playerAccount.description());
         firebasePlayerAccount.setStarDustQuantity(playerAccount.starDustQuantity().quantity());
         firebasePlayerAccount.setLevel(playerAccount.level());
-
         firebasePlayerAccount.setCards(playerAccount
                 .cards().stream()
                 .map(Card::pictureId)
                 .collect(Collectors.toList()));
-
         firebasePlayerAccount.setDeck(playerAccount.deck()
                 .cards().stream()
                 .map(Card::pictureId)
@@ -53,12 +53,13 @@ public class FirebasePlayerAccountMapper {
         return firebasePlayerAccount;
     }
 
-    public List<Card> stringsToCards(List<String> ids) {
+    public List<Card> cardsOfIds(List<String> ids) {
         List<Card> cards = new ArrayList<>();
+        List<String> idsList = List.copyOf(ids);
         for (int i = 0; i < ids.size(); i++) {
             for (int j = 0; j < CardRegistry.INSTANCE.CARDS.size(); j++) {
                 var card = CardRegistry.INSTANCE.CARDS.get(j).get();
-                if (card.pictureId().equals(ids.get(i))) {
+                if (card.pictureId().equals(idsList.get(i))) {
                     cards.add(card);
                 }
             }

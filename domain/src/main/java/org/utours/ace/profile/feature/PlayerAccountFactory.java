@@ -6,6 +6,7 @@ import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.model.StarDust;
 
 import java.util.List;
+import java.util.Set;
 
 public interface PlayerAccountFactory {
 
@@ -16,12 +17,12 @@ public interface PlayerAccountFactory {
                     1,
                     "",
                     new Quantity<>(3000),
-                    new Deck(List.of(
+                    new Deck(Set.of(
                             CardRegistry.UBEL_CARD.get(),
                             CardRegistry.HIMMEL_CARD.get(),
                             CardRegistry.FERN_CARD.get()
                     )),
-                    List.of(
+                    Set.of(
                             CardRegistry.UBEL_CARD.get(),
                             CardRegistry.EISEN_CARD.get(),
                             CardRegistry.FRIEREN_CARD.get(),

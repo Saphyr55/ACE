@@ -1,9 +1,9 @@
 package org.utours.ace.profile.model;
 
-import java.util.List;
+import java.util.Set;
 
 public record Deck(
-        List<Card> cards
+        Set<Card> cards
 ) {
 
     public static final int MAX_SLOT = 20;

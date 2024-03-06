@@ -7,14 +7,14 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public record Deck(
-        Set<Card> cards
+        Set<Card> cards // Immutable set.
 ) {
 
     public static final int MAX_SLOT = 20;
 
     public Deck {
         if (cards.size() > MAX_SLOT) {
-            throw new IllegalStateException();
+            throw new IllegalArgumentException();
         }
     }
 

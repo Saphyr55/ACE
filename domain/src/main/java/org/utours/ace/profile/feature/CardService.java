@@ -1,8 +1,10 @@
 package org.utours.ace.profile.feature;
 
 import org.utours.ace.common.FunctionalUtils;
+import org.utours.ace.common.ProbabilityUtils;
 import org.utours.ace.common.annotation.DomainService;
 import org.utours.ace.profile.model.Card;
+import org.utours.ace.profile.model.CardRarity;
 import org.utours.ace.profile.model.ImageCard;
 import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.port.ImageCardDownloader;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
+import java.util.SplittableRandom;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -93,24 +96,59 @@ public class CardService {
         return provideImageCards(CardRegistry.INSTANCE.CARDS).thenRun(() -> { });
     }
 
-    public List<Card> getRandomCards(int max, boolean unique) {
+    public List<Card> stochasticCards(int max, boolean unique) {
 
-        var cards = new ArrayList<Card>();
         int size = CardRegistry.INSTANCE.CARDS.size();
         if (max > size)
             throw new IllegalStateException();
 
+        var cards = new ArrayList<Card>();
+        var registry = List.copyOf(CardRegistry.INSTANCE.CARDS);
+
         var random = new Random();
+
         while (cards.size() != max) {
             int j = random.nextInt(size - 1);
-            var card = CardRegistry.INSTANCE.CARDS.get(j);
+            var card = registry.get(j);
             if (!unique) {
                 cards.add(card);
             } else if (!cards.contains(card)) {
                 cards.add(card);
             }
         }
+
         return cards;
+    }
+
+    public List<Card> probabilistStochasticCards(int max) {
+
+        List<Card> cards = new ArrayList<>();
+
+        final int maxSize = CardRegistry.INSTANCE.CARDS.size();
+
+        if (max > maxSize)
+            throw new IllegalStateException();
+
+        List<Card> registry = List.copyOf(CardRegistry.INSTANCE.CARDS);
+
+        while (cards.size() != max) {
+            int j = new Random().nextInt(maxSize);
+            var card = registry.get(j);
+            if (Math.random() >= 1 - cardRarityProbabilities(card.rarity())) {
+                cards.add(card);
+            }
+        }
+
+        return cards;
+    }
+
+    public double cardRarityProbabilities(CardRarity rarity) {
+        return switch (rarity) {
+            case UR -> 0.02;
+            case SSR -> 0.15;
+            case SR -> 0.4;
+            case R -> 0.43;
+        };
     }
 
 }

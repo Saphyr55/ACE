@@ -15,6 +15,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import org.utours.ace.R;
+import org.utours.ace.common.EdgeManager;
 import org.utours.ace.databinding.ActivityNavigationBinding;
 import org.utours.ace.infra.profile.PlayerAccountContainer;
 import org.utours.ace.main.ErrorFragment;
@@ -49,7 +50,7 @@ public class NavigationActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         binding = ActivityNavigationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        setDefaultPadding();
+        EdgeManager.setDefaultPadding(findViewById(R.id.main));
 
         replaceFragment(new WaitFragment());
         binding.navBar.setVisibility(View.GONE);
@@ -63,7 +64,7 @@ public class NavigationActivity extends AppCompatActivity {
         mainFragment = new MainFragment();
         profileFragment = new ProfileFragment();
         deckFragment = new DeckFragment(cardService, playerAccountService);
-        gachaFragment = new GachaFragment(cardService, gachaService, playerAccountService);
+        gachaFragment = new GachaFragment(cardService, gachaService, this);
         shopFragment = new ShopFragment();
 
         cardService
@@ -74,13 +75,6 @@ public class NavigationActivity extends AppCompatActivity {
                 .exceptionally(this::messagingErrorFragment);
     }
 
-    private void setDefaultPadding() {
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
-        });
-    }
 
     private void startNavigationMain() {
         runOnUiThread(() -> {
@@ -91,7 +85,6 @@ public class NavigationActivity extends AppCompatActivity {
     }
 
     private boolean switchBetweenFragment(MenuItem menuItem) {
-
         if (menuItem.getItemId() == R.id.item_main) {
             replaceFragment(mainFragment);
         } else if (menuItem.getItemId() == R.id.item_profile) {
@@ -103,15 +96,7 @@ public class NavigationActivity extends AppCompatActivity {
         } else if (menuItem.getItemId() == R.id.item_shop) {
             replaceFragment(shopFragment);
         }
-
         return true;
-    }
-
-    private void replaceFragment(Fragment fragment) {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.frame_layout, fragment);
-        fragmentTransaction.commit();
     }
 
     private Void messagingErrorFragment(Throwable throwable) {
@@ -120,6 +105,40 @@ public class NavigationActivity extends AppCompatActivity {
             Log.e(TAG, throwable.getMessage(), throwable);
         });
         throw new RuntimeException(throwable);
+    }
+
+    public void redirectToMain() {
+        binding.navBarView.setSelectedItemId(R.id.item_main);
+        replaceFragment(mainFragment);
+    }
+
+    public void redirectToProfile() {
+        binding.navBarView.setSelectedItemId(R.id.item_profile);
+        replaceFragment(profileFragment);
+    }
+
+    public void redirectToDeck() {
+        binding.navBarView.setSelectedItemId(R.id.item_deck);
+        replaceFragment(deckFragment);
+    }
+
+    public void redirectToGacha() {
+        binding.navBarView.setSelectedItemId(R.id.item_gacha);
+        replaceFragment(gachaFragment);
+    }
+
+    public void redirectToShop() {
+        binding.navBarView.setSelectedItemId(R.id.item_shop);
+        replaceFragment(shopFragment);
+    }
+
+    private void replaceFragment(Fragment fragment) {
+        runOnUiThread(() -> {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+            fragmentTransaction.replace(R.id.frame_layout, fragment);
+            fragmentTransaction.commit();
+        });
     }
 
 }

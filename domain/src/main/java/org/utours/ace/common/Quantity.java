@@ -17,6 +17,14 @@ public record Quantity<T>(int quantity)
         return new Quantity<>(quantity() + q);
     }
 
+    public Quantity<T> sub(Quantity<T> q) {
+        return new Quantity<>(quantity() - q.quantity());
+    }
+
+    public Quantity<T> add(Quantity<T> q) {
+        return new Quantity<>(quantity() + q.quantity());
+    }
+
     public Quantity<T> apply(Function<Integer, Integer> function) {
         return new Quantity<>(function.apply(quantity()));
     }

@@ -54,5 +54,8 @@
     <string name="_10_t_pull_10x">10.T Pull 10x</string>
     <string name="_1_t_pull_1x">1.T Pull 1X</string>
     <string name="loading">Loading</string>
+    <string name="go_to_the_shop">Go to the shop</string>
+    <string name="back">Back</string>
+    <string name="you_have_not_enough_ticket">You have not enough ticket.</string>
 
 </resources>

@@ -1,11 +1,14 @@
 package org.utours.ace.profile.feature;
 
+import org.utours.ace.common.Quantity;
+import org.utours.ace.common.Result;
 import org.utours.ace.common.annotation.DomainService;
+import org.utours.ace.profile.exception.NotEnoughTicketException;
 import org.utours.ace.profile.model.Card;
+import org.utours.ace.profile.model.PlayerAccount;
+import org.utours.ace.profile.model.Ticket;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @DomainService
 public class GachaService {
@@ -14,31 +17,32 @@ public class GachaService {
     public static final int SINGLE_QUANTITY = 1;
 
     private final CardService cardService;
+    private final PlayerAccountService playerAccountService;
 
-    public GachaService(CardService cardService) {
+    public GachaService(CardService cardService, PlayerAccountService playerAccountService) {
         this.cardService = cardService;
+        this.playerAccountService = playerAccountService;
     }
 
-    public Card singlePull() {
-        return cardService.getRandomCards(SINGLE_QUANTITY, false).get(0);
-    }
+    public Result<List<Card>, NotEnoughTicketException> pullCards(int pullQuantity) {
 
-    public List<Card> multiPull() {
-        return List.copyOf(cardService.getRandomCards(MULTI_QUANTITY, false));
-    }
+        PlayerAccount currentPlayerAccount = playerAccountService.currentPlayerAccount();
+        Quantity<Ticket> cTicketQuantity = currentPlayerAccount.ticketQuantity();
 
-    public List<Card> pullCards(int pullQuantity) {
-        List<Card> cards;
-        if (pullQuantity == GachaService.MULTI_QUANTITY)
-            cards = multiPull();
-        else if (pullQuantity == GachaService.SINGLE_QUANTITY) {
-            cards = List.of(singlePull());
-        } else {
-            throw new RuntimeException();
+        if (cTicketQuantity.quantity() < pullQuantity) {
+            return Result.errorOf(new NotEnoughTicketException());
         }
-        System.out.println("Quantity=" + pullQuantity + " CARDS: " + cards);
-        return cards;
-    }
 
+        var cards = cardService.probabilistStochasticCards(pullQuantity);
+        playerAccountService.setCurrentPlayerAccount(playerAccount -> {
+            Quantity<Ticket> ticketQuantity = playerAccount.ticketQuantity().sub(pullQuantity);
+            return playerAccount.ticketQuantity(ticketQuantity);
+        });
+
+        playerAccountService.addCardsInCurrentPlayerAccount(cards);
+        playerAccountService.updateCurrentPlayerAccount();
+
+        return Result.successOf(cards);
+    }
 
 }

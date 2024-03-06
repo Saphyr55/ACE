@@ -41,7 +41,7 @@ public class StartActivity extends AppCompatActivity {
     private void initPlayerAccount(PlayerAccount playerAccount) {
 
         PlayerAccountContainer.INSTANCE.getService()
-                .updateCurrentPlayerAccount(pa -> playerAccount);
+                .setCurrentPlayerAccount(pa -> playerAccount);
 
         parameterStartButton.setOnClickListener(v -> openParameter());
         startACETextView.setOnClickListener(v -> redirectToNavigationActivity());

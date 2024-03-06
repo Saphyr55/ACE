@@ -14,7 +14,7 @@ public record PlayerAccount(
         Quantity<Ticket> ticketQuantity,
         Quantity<StarDust> starDustQuantity,
         Deck deck,
-        Set<Card> cards
+        Set<Card> cards // Immutable set.
 ) {
 
 
@@ -29,6 +29,14 @@ public record PlayerAccount(
                 .withStarDustQuantity(newStarDust)
                 .build();
     }
+
+    public PlayerAccount ticketQuantity(Quantity<Ticket> quantity) {
+        var newTicketQuantity = new Quantity<Ticket>(quantity.quantity());
+        return Builder.of(this)
+                .withTicketQuantity(newTicketQuantity)
+                .build();
+    }
+
 
     public PlayerAccount addCardInDeck(Card card) {
 

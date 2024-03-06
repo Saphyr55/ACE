@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,7 +18,10 @@ import com.google.android.material.carousel.CarouselSnapHelper;
 import com.google.android.material.carousel.MultiBrowseCarouselStrategy;
 
 import org.utours.ace.R;
-import org.utours.ace.common.LoadingDialog;
+import org.utours.ace.common.Result;
+import org.utours.ace.profile.NavigationActivity;
+import org.utours.ace.profile.dialog.NotEnoughTicketDialog;
+import org.utours.ace.profile.exception.NotEnoughTicketException;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.GachaService;
 import org.utours.ace.profile.feature.PlayerAccountService;
@@ -29,7 +33,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 public class GachaFragment extends Fragment {
 
@@ -37,20 +40,20 @@ public class GachaFragment extends Fragment {
 
     private final CardService cardService;
     private final GachaService gachaService;
-    private final PlayerAccountService playerAccountService;
-    private final Map<String, ImageCard> imageCards;
-    private final List<Card> cards;
+    private final NavigationActivity navigationActivity;
+    private Map<String, ImageCard> imageCards;
+    private List<Card> showcaseCards;
     private PullConfirmationDialog singlePullConfirmationDialog;
     private PullConfirmationDialog multiPullConfirmationDialog;
 
     public GachaFragment(CardService cardService,
                          GachaService gachaService,
-                         PlayerAccountService playerAccountService) {
+                         NavigationActivity navigationActivity) {
 
         this.cardService = cardService;
         this.gachaService = gachaService;
-        this.playerAccountService = playerAccountService;
-        this.cards = new ArrayList<>();
+        this.navigationActivity = navigationActivity;
+        this.showcaseCards = new ArrayList<>();
         this.imageCards = new HashMap<>();
     }
 
@@ -58,8 +61,8 @@ public class GachaFragment extends Fragment {
         return CompletableFuture
                 .runAsync(this::onSetup)
                 .thenAccept(unused -> cardService
-                .provideImageCards(this.cards)
-                .thenAccept(this::fillCardImages));
+                        .provideImageCards(showcaseCards)
+                        .thenAccept(this::setImagesCards));
     }
 
     @Override
@@ -70,9 +73,9 @@ public class GachaFragment extends Fragment {
 
         // Manage carousel.
         RecyclerView carouselTopCards = fragmentView.findViewById(R.id.carousel_top_cards);
-        var gachaCarouselAdapter = new GachaCarouselAdapter(cards, imageCards);
-        var carouselLayoutManager = new CarouselLayoutManager(new MultiBrowseCarouselStrategy());
-        var carouselSnapHelper = new CarouselSnapHelper();
+        GachaCarouselAdapter gachaCarouselAdapter = new GachaCarouselAdapter(showcaseCards, imageCards);
+        CarouselLayoutManager carouselLayoutManager = new CarouselLayoutManager(new MultiBrowseCarouselStrategy());
+        CarouselSnapHelper carouselSnapHelper = new CarouselSnapHelper();
 
         carouselSnapHelper.attachToRecyclerView(carouselTopCards);
         carouselTopCards.setLayoutManager(carouselLayoutManager);
@@ -95,39 +98,62 @@ public class GachaFragment extends Fragment {
     }
 
     private void onSetup() {
-        var cards = cardService.getRandomCards(MAX_CARD_CAROUSEL, true);
-        this.cards.addAll(cards);
-    }
-
-    private void fillCardImages(List<ImageCard> imageCards) {
-        var result = new HashMap<String, ImageCard>();
-        for (int i = 0; i < imageCards.size(); i++) {
-            Card card = cards.get(i);
-            result.put(card.pictureId(), imageCards.get(i));
-        }
-        this.imageCards.putAll(result);
+        this.showcaseCards = cardService.stochasticCards(MAX_CARD_CAROUSEL, true);
     }
 
     private void onPressPullDialogButton(Context context, PullConfirmationDialog dialog, int quantity) {
         dialog.getPullButton().setOnClickListener(v -> {
             dialog.dismiss();
-            transactionPulling(context, quantity);
+            startPullingTransaction(context, quantity);
         });
     }
 
+    private void onNotEnoughTicket(Context context) {
+        navigationActivity.runOnUiThread(() -> {
+            NotEnoughTicketDialog notEnoughTicketDialog = new NotEnoughTicketDialog(context, navigationActivity);
+            notEnoughTicketDialog.show();
+        });
+    }
 
-    private void transactionPulling(Context context, int quantity) {
+    private void startPullingTransaction(Context context, int quantity) {
         CompletableFuture
-                .runAsync(() -> GachaPullActivity.setCards(gachaService.pullCards(quantity)))
-                .thenCompose(u -> cardService.provideImageCards(GachaPullActivity.getCards()))
-                .thenAccept(GachaPullActivity::setImageCards)
-                .thenRun(() -> launchPullingActivity(context))
-                ;
+                .supplyAsync(() -> gachaService.pullCards(quantity))
+                .thenApply(r -> r.mapValue(cards -> {
+                    GachaPullActivity.setCards(cards);
+                    return cardService.provideImageCards(cards);
+                }))
+                .thenCompose(r -> {
+                    if (r.isError()) {
+                        return CompletableFuture.completedFuture(null);
+                    }
+                    return r.getValue();
+                })
+                .thenAccept(imageCards -> {
+                    if (imageCards == null) {
+                        onNotEnoughTicket(context);
+                        return;
+                    }
+                    GachaPullActivity.setImageCards(imageCards);
+                    launchPullingActivity(context);
+                })
+                .exceptionally(throwable -> {
+                    Log.e("PULL EXCEPTION", throwable.getMessage(), throwable);
+                    return null;
+                });
     }
 
     private void launchPullingActivity(Context context) {
         Intent intent = new Intent(context, GachaPullActivity.class);
         startActivity(intent);
+    }
+
+    private void setImagesCards(List<ImageCard> imageCards) {
+        var result = new HashMap<String, ImageCard>();
+        for (int i = 0; i < imageCards.size(); i++) {
+            Card card = showcaseCards.get(i);
+            result.put(card.pictureId(), imageCards.get(i));
+        }
+        this.imageCards = result;
     }
 
 }

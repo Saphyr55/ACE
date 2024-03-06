@@ -4,6 +4,7 @@ import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.CardRarity;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -119,7 +120,7 @@ public enum CardRegistry {
             CardRarity.SSR));
 
 
-    public final List<Card> CARDS = new LinkedList<>();
+    public final Set<Card> CARDS = new HashSet<>();
     public final Map<String, String> IMAGE_REFERENCES;
 
     CardRegistry() {

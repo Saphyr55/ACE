@@ -85,7 +85,6 @@ public class DeckFragment extends Fragment {
         lifePointText = viewFragment.findViewById(R.id.text_lifePoint);
 
         deckToggleButton.setOnCheckedChangeListener(this::onToggleDeck);
-
         var playerAccount = playerAccountService.currentPlayerAccount();
         cardGridAdapter = new CardGridAdapter(
                 getContext(),
@@ -93,8 +92,10 @@ public class DeckFragment extends Fragment {
                 cardImages,
                 this::onCreateCardViewCardsMode);
 
-        gridView.setAdapter(cardGridAdapter);
-        setupCardDetailsOnSelect(null);
+        setup().thenRun(() -> {
+            gridView.setAdapter(cardGridAdapter);
+            setupCardDetailsOnSelect(null);
+        });
 
         return viewFragment;
     }
@@ -107,27 +108,29 @@ public class DeckFragment extends Fragment {
         } else {
             cardGridAdapter.setOnCreateCardView(this::onCreateCardViewCardsMode);
             cardGridAdapter.setCards(cardService.sortedByRarity(playerAccount.cards()));
-
-            // Save data on quiting deck mode.
-            playerAccountService.storeCurrentPlayerAccount();
         }
+        // Save data on quiting deck mode.
+        playerAccountService.updateCurrentPlayerAccount();
+
         cardGridAdapter.notifyDataSetChanged();
     }
 
     private void onCreateCardViewDeckMode(CardView cardView, Card card) {
+
         var playerAccount = playerAccountService.currentPlayerAccount();
         var selectedCardIsInDeck = playerAccount.deck().cards().contains(card);
+
         if (selectedCardIsInDeck) {
             setSelectedBackgroundColor.accept(cardView);
             cardView.setOnClickListener(v -> {
-                playerAccountService.updateCurrentPlayerAccount(pa -> pa.removeCardInDeck(card));
+                playerAccountService.setCurrentPlayerAccount(pa -> pa.removeCardInDeck(card));
                 cardGridAdapter.notifyDataSetChanged();
             });
         } else {
             setDefaultCardViewBackground.accept(cardView);
             cardView.setOnClickListener(v -> {
                 if (playerAccount.deck().cards().size() > Deck.MAX_SLOT) return;
-                playerAccountService.updateCurrentPlayerAccount(pa -> pa.addCardInDeck(card));
+                playerAccountService.setCurrentPlayerAccount(pa -> pa.addCardInDeck(card));
                 cardGridAdapter.notifyDataSetChanged();
             });
         }

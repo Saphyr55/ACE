@@ -1,9 +1,6 @@
 package org.utours.ace.common;
 
-import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Context;
 import android.widget.TextView;
@@ -11,9 +8,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import org.utours.ace.R;
-import org.w3c.dom.Text;
-
-import java.util.concurrent.CompletableFuture;
 
 
 public class LoadingDialog extends Dialog {

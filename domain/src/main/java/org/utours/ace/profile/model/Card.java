@@ -38,6 +38,10 @@ public record Card(
             return new Builder();
         }
 
+        public static Card copy(Card card) {
+            return of(card).build();
+        }
+
         public Builder withAttackPoint(Integer attackPoint) {
             this.attackPoint = attackPoint;
             return this;

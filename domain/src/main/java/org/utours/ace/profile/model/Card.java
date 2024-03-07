@@ -23,8 +23,8 @@ public record Card(
 
         }
 
-        public static Builder of(Card card) {
-            return of()
+        public static Builder newBuilder(Card card) {
+            return newBuilder()
                     .withId(card.id)
                     .withName(card.name)
                     .withAttackPoint(card.attackPoint)
@@ -34,12 +34,12 @@ public record Card(
                     .withRarity(card.rarity);
         }
 
-        public static Builder of() {
+        public static Builder newBuilder() {
             return new Builder();
         }
 
         public static Card copy(Card card) {
-            return of(card).build();
+            return newBuilder(card).build();
         }
 
         public Builder withAttackPoint(Integer attackPoint) {

@@ -1,14 +1,15 @@
 package org.utours.ace.infra.profile.firebase;
 
 import org.utours.ace.common.annotation.Bean;
+import org.utours.ace.infra.common.firebase.annotation.FirebaseModel;
 import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.model.StarDust;
 import org.utours.ace.profile.model.Ticket;
 
 import java.util.List;
-import java.util.Set;
 
 @Bean
+@FirebaseModel
 class FirebasePlayerAccount {
 
     private String uid;
@@ -18,7 +19,7 @@ class FirebasePlayerAccount {
     private Integer level = PlayerAccount.DEFAULT_LEVEL;
     private Integer starDustQuantity = StarDust.ZERO;
     private Integer ticketQuantity = Ticket.ZERO;
-    private List<String> cards = List.of();
+    private List<FirebaseCard> cards = List.of();
     private List<String> deck = List.of();
 
     public FirebasePlayerAccount() { }
@@ -69,11 +70,11 @@ class FirebasePlayerAccount {
         }
     }
 
-    public List<String> getCards() {
+    public List<FirebaseCard> getCards() {
         return cards;
     }
 
-    public void setCards(List<String> cards) {
+    public void setCards(List<FirebaseCard> cards) {
         if (cards != null) {
             this.cards = cards;
         }

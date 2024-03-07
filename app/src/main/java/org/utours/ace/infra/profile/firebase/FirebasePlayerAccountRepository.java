@@ -17,32 +17,31 @@ public class FirebasePlayerAccountRepository implements PlayerAccountRepository 
 
     private final DatabaseReference reference;
     private final FirebasePlayerAccountMapper mapper;
-    private final Map<String, PlayerAccount> caches;
+    private final Map<String, PlayerAccount> cache;
 
     public FirebasePlayerAccountRepository(DatabaseReference reference,
                                            FirebasePlayerAccountMapper mapper) {
         this.reference = reference;
         this.mapper = mapper;
-        this.caches = new HashMap<>();
+        this.cache = new HashMap<>();
     }
 
     @Override
     public CompletableFuture<Optional<PlayerAccount>> getByUID(String uid) {
 
-        if (caches.containsKey(uid)) {
-            var opt = Optional.ofNullable(caches.get(uid));
+        if (cache.containsKey(uid)) {
+            var opt = Optional.ofNullable(cache.get(uid));
             return CompletableFuture.completedFuture(opt);
         }
 
-        CompletableFuture<Optional<PlayerAccount>> future =
-                new CompletableFuture<>();
+        CompletableFuture<Optional<PlayerAccount>> future = new CompletableFuture<>();
 
         reference.child(uid).get()
                 .addOnCanceledListener(() -> future.complete(Optional.empty()))
                 .addOnSuccessListener(task -> {
                     var fbPlayerAccount = task.getValue(FirebasePlayerAccount.class);
                     var playerAccount = mapper.map(fbPlayerAccount);
-                    caches.put(playerAccount.uid(), playerAccount);
+                    cache.put(playerAccount.uid(), playerAccount);
                     future.complete(Optional.of(playerAccount));
                 });
 
@@ -51,7 +50,7 @@ public class FirebasePlayerAccountRepository implements PlayerAccountRepository 
 
     @Override
     public CompletableFuture<List<PlayerAccount>> getByUsername(String username) {
-        throw new RuntimeException("Not implemented.");
+        throw new RuntimeException("Not implemented yet.");
     }
 
     @Override

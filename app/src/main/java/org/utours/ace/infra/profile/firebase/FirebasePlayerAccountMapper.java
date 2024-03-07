@@ -9,22 +9,30 @@ import org.utours.ace.profile.model.StarDust;
 import org.utours.ace.profile.model.Ticket;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public class FirebasePlayerAccountMapper {
 
-   PlayerAccount map(FirebasePlayerAccount account) {
+    private final FirebaseCardMapper cardMapper;
+
+    public FirebasePlayerAccountMapper(FirebaseCardMapper cardMapper) {
+
+        this.cardMapper = cardMapper;
+    }
+
+    PlayerAccount map(FirebasePlayerAccount account) {
 
         if (account == null) return null;
 
-        var cards = Set.copyOf(cardsOfIds(account.getCards()));
-        var deck = new Deck(Set.copyOf(cardsOfIds(account.getDeck())));
-        var starDustQuantity = new Quantity<StarDust>(account.getStarDustQuantity());
-        var ticketQuantity = new Quantity<Ticket>(account.getTicketQuantity());
+        Set<Card> cards = account.getCards().stream()
+                .map(cardMapper::map)
+                .collect(Collectors.toSet());
+
+        Deck deck = new Deck(Set.copyOf(cardsOfIds(account.getDeck())));
+        Quantity<StarDust> starDustQuantity = new Quantity<>(account.getStarDustQuantity());
+        Quantity<Ticket> ticketQuantity = new Quantity<>(account.getTicketQuantity());
 
         return PlayerAccount.Builder
                 .of(account.getUid(), account.getEmail())
@@ -51,13 +59,15 @@ public class FirebasePlayerAccountMapper {
         firebasePlayerAccount.setStarDustQuantity(playerAccount.starDustQuantity().quantity());
         firebasePlayerAccount.setTicketQuantity(playerAccount.ticketQuantity().quantity());
         firebasePlayerAccount.setLevel(playerAccount.level());
+
         firebasePlayerAccount.setCards(playerAccount
                 .cards().stream()
-                .map(Card::pictureId)
+                .map(cardMapper::map)
                 .collect(Collectors.toList()));
+
         firebasePlayerAccount.setDeck(playerAccount.deck()
                 .cards().stream()
-                .map(Card::pictureId)
+                .map(Card::id)
                 .collect(Collectors.toList()));
 
         return firebasePlayerAccount;
@@ -72,7 +82,7 @@ public class FirebasePlayerAccountMapper {
         for (int i = 0; i < ids.size(); i++) {
             for (int j = 0; j < allCard.size(); j++) {
                 var card = allCard.get(j);
-                if (card.pictureId().equals(idsList.get(i))) {
+                if (card.id().equals(idsList.get(i))) {
                     cards.add(card);
                 }
             }

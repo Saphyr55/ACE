@@ -5,6 +5,7 @@ import android.content.Context;
 import com.google.firebase.database.FirebaseDatabase;
 
 import org.utours.ace.infra.common.http.HttpImageDownloader;
+import org.utours.ace.infra.profile.firebase.FirebaseCardMapper;
 import org.utours.ace.infra.profile.firebase.FirebaseDatabaseReferences;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountMapper;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountRepository;
@@ -35,7 +36,7 @@ public enum PlayerAccountContainer {
 
         this.playerAccountRepository = new FirebasePlayerAccountRepository(
                         refs.playerAccountsReference(),
-                        new FirebasePlayerAccountMapper());
+                        new FirebasePlayerAccountMapper(new FirebaseCardMapper()));
         this.imageCardDownloader = new MalImageCardDownloader(new HttpImageDownloader());
         this.playerAccountService = new PlayerAccountService(playerAccountRepository);
     }

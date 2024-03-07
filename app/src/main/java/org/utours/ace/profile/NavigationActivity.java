@@ -75,7 +75,6 @@ public class NavigationActivity extends AppCompatActivity {
                 .exceptionally(this::messagingErrorFragment);
     }
 
-
     private void startNavigationMain() {
         runOnUiThread(() -> {
             binding.navBar.setVisibility(View.VISIBLE);

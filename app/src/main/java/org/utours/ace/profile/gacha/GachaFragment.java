@@ -124,15 +124,13 @@ public class GachaFragment extends Fragment {
                 }))
                 .thenCompose(r -> {
                     if (r.isError()) {
+                        onNotEnoughTicket(context);
                         return CompletableFuture.completedFuture(null);
                     }
                     return r.getValue();
                 })
                 .thenAccept(imageCards -> {
-                    if (imageCards == null) {
-                        onNotEnoughTicket(context);
-                        return;
-                    }
+                    if (imageCards == null) return;
                     GachaPullActivity.setImageCards(imageCards);
                     launchPullingActivity(context);
                 })

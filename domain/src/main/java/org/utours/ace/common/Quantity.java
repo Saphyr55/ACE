@@ -9,6 +9,10 @@ public record Quantity<T>(int quantity)
         return new Quantity<>(0);
     }
 
+    public static <T> Quantity<T> of(int quantity) {
+        return new Quantity<>(quantity);
+    }
+
     public Quantity<T> sub(int q) {
         return new Quantity<>(quantity() - q);
     }

@@ -5,9 +5,6 @@ import org.utours.ace.profile.model.CardRarity;
 
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -49,7 +46,7 @@ public enum CardRegistry {
      * Stark
      */
     public static final Supplier<Card> STARK_CARD = INSTANCE.register(() ->
-            Card.Builder.of()
+            Card.Builder.newBuilder()
                     .withName("Stark")
                     .withId("4")
                     .withPictureId("https://cdn.myanimelist.net/images/characters/3/423034.jpg")

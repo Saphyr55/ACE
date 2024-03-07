@@ -47,10 +47,8 @@ public class NavigationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        EdgeToEdge.enable(this);
         binding = ActivityNavigationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        EdgeManager.setDefaultPadding(findViewById(R.id.main));
 
         replaceFragment(new WaitFragment());
         binding.navBar.setVisibility(View.GONE);

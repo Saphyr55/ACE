@@ -3,28 +3,26 @@ package org.utours.ace.profile.gacha;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.android.material.carousel.CarouselLayoutManager;
 import com.google.android.material.carousel.CarouselSnapHelper;
 import com.google.android.material.carousel.MultiBrowseCarouselStrategy;
 
 import org.utours.ace.R;
-import org.utours.ace.common.Result;
 import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.dialog.NotEnoughTicketDialog;
-import org.utours.ace.profile.exception.NotEnoughTicketException;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.GachaService;
-import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
 
@@ -67,12 +65,18 @@ public class GachaFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_gacha, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         // Setup
-        View fragmentView = inflater.inflate(R.layout.fragment_gacha, container, false);
-        Context context = fragmentView.getContext();
+        Context context = view.getContext();
+        RecyclerView carouselTopCards = view.findViewById(R.id.carousel_top_cards);
+        Button singlePullButton = view.findViewById(R.id.btn_single_pull);
+        Button multiPullButton = view.findViewById(R.id.btn_multi_pull);
 
         // Manage carousel.
-        RecyclerView carouselTopCards = fragmentView.findViewById(R.id.carousel_top_cards);
         GachaCarouselAdapter gachaCarouselAdapter = new GachaCarouselAdapter(showcaseCards, imageCards);
         CarouselLayoutManager carouselLayoutManager = new CarouselLayoutManager(new MultiBrowseCarouselStrategy());
         CarouselSnapHelper carouselSnapHelper = new CarouselSnapHelper();
@@ -88,13 +92,8 @@ public class GachaFragment extends Fragment {
         onPressPullDialogButton(context, multiPullConfirmationDialog, GachaService.MULTI_QUANTITY);
         onPressPullDialogButton(context, singlePullConfirmationDialog, GachaService.SINGLE_QUANTITY);
 
-        Button singlePullButton = fragmentView.findViewById(R.id.btn_single_pull);
-        Button multiPullButton = fragmentView.findViewById(R.id.btn_multi_pull);
-
         singlePullButton.setOnClickListener(v -> singlePullConfirmationDialog.show());
         multiPullButton.setOnClickListener(v -> multiPullConfirmationDialog.show());
-
-        return fragmentView;
     }
 
     private void onSetup() {

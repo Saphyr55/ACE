@@ -2,6 +2,8 @@ package org.utours.ace.main;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -21,9 +23,12 @@ public class WaitFragment extends Fragment {
                              ViewGroup container,
                              Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_wait, container, false);
+        return inflater.inflate(R.layout.fragment_wait, container, false);
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         progressBar = view.findViewById(R.id.progress_waiting);
-        return view;
     }
 
     public ProgressBar getProgressBar() {

@@ -5,6 +5,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatToggleButton;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
@@ -72,12 +74,13 @@ public class DeckFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment_deck, container, false);
+    }
 
-        viewFragment = inflater.inflate(R.layout.fragment_deck, container, false);
-
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        viewFragment = view;
         deckToggleButton = viewFragment.findViewById(R.id.toggle_deck);
         gridView = viewFragment.findViewById(R.id.grid_cards);
         attackPointText = viewFragment.findViewById(R.id.text_attackPoint);
@@ -96,8 +99,6 @@ public class DeckFragment extends Fragment {
             gridView.setAdapter(cardGridAdapter);
             setupCardDetailsOnSelect(null);
         });
-
-        return viewFragment;
     }
 
     private void onToggleDeck(CompoundButton compoundButton, boolean isActive) {

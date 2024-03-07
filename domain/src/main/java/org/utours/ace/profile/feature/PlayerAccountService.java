@@ -16,12 +16,10 @@ import java.util.stream.Stream;
 @DomainService
 public final class PlayerAccountService {
 
-    private final CardService cardService;
     private final PlayerAccountRepository playerAccountRepository;
     private PlayerAccount currentPlayerAccount;
 
-    public PlayerAccountService(CardService cardService, PlayerAccountRepository playerAccountRepository) {
-        this.cardService = cardService;
+    public PlayerAccountService(PlayerAccountRepository playerAccountRepository) {
         this.playerAccountRepository = playerAccountRepository;
     }
 
@@ -43,7 +41,7 @@ public final class PlayerAccountService {
 
         for (Card card : cards) {
             if (currentPlayerAccount.cards().contains(card)) {
-                Quantity<StarDust> starDustQuantity = cardService.determineStarDustConversion(card);
+                Quantity<StarDust> starDustQuantity = determineStarDustConversion(card);
                 Quantity<StarDust> newStarDustQuantity = newPlayerAccount
                         .starDustQuantity()
                         .add(starDustQuantity);
@@ -64,5 +62,13 @@ public final class PlayerAccountService {
         currentPlayerAccount = newPlayerAccount;
     }
 
+    public Quantity<StarDust> determineStarDustConversion(Card card) {
+        return switch (card.rarity()) {
+            case R -> new Quantity<>(100);
+            case SR -> new Quantity<>(300);
+            case SSR -> new Quantity<>(1000);
+            case UR -> new Quantity<>(3000);
+        };
+    }
 
 }

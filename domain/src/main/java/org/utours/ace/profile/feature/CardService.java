@@ -144,15 +144,6 @@ public class CardService {
         return cards;
     }
 
-    public Quantity<StarDust> determineStarDustConversion(Card card) {
-        return switch (card.rarity()) {
-            case R -> new Quantity<>(100);
-            case SR -> new Quantity<>(300);
-            case SSR -> new Quantity<>(1000);
-            case UR -> new Quantity<>(3000);
-        };
-    }
-
     public double cardRarityProbabilities(CardRarity rarity) {
         return switch (rarity) {
             case UR -> 0.04;

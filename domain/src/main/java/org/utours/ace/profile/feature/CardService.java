@@ -2,11 +2,13 @@ package org.utours.ace.profile.feature;
 
 import org.utours.ace.common.FunctionalUtils;
 import org.utours.ace.common.ProbabilityUtils;
+import org.utours.ace.common.Quantity;
 import org.utours.ace.common.annotation.DomainService;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.CardRarity;
 import org.utours.ace.profile.model.ImageCard;
 import org.utours.ace.profile.model.PlayerAccount;
+import org.utours.ace.profile.model.StarDust;
 import org.utours.ace.profile.port.ImageCardDownloader;
 import org.utours.ace.profile.port.ImageCardInstaller;
 import org.utours.ace.profile.port.ImageCardProvider;
@@ -142,12 +144,21 @@ public class CardService {
         return cards;
     }
 
+    public Quantity<StarDust> determineStarDustConversion(Card card) {
+        return switch (card.rarity()) {
+            case R -> new Quantity<>(100);
+            case SR -> new Quantity<>(300);
+            case SSR -> new Quantity<>(1000);
+            case UR -> new Quantity<>(3000);
+        };
+    }
+
     public double cardRarityProbabilities(CardRarity rarity) {
         return switch (rarity) {
-            case UR -> 0.02;
-            case SSR -> 0.15;
-            case SR -> 0.4;
-            case R -> 0.43;
+            case UR -> 0.04;
+            case SSR -> 0.16;
+            case SR -> 0.35;
+            case R -> 0.45;
         };
     }
 

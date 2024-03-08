@@ -102,7 +102,7 @@ public class CardService {
 
         int size = CardRegistry.INSTANCE.CARDS.size();
         if (max > size)
-            throw new IllegalStateException();
+            throw new IllegalArgumentException();
 
         var cards = new ArrayList<Card>();
         var registry = List.copyOf(CardRegistry.INSTANCE.CARDS);

@@ -41,13 +41,9 @@ public final class PlayerAccountService {
 
         for (Card card : cards) {
             if (currentPlayerAccount.cards().contains(card)) {
-                Quantity<StarDust> starDustQuantity = determineStarDustConversion(card);
-                Quantity<StarDust> newStarDustQuantity = newPlayerAccount
+                newPlayerAccount = newPlayerAccount.starDustQuantity(newPlayerAccount
                         .starDustQuantity()
-                        .add(starDustQuantity);
-                newPlayerAccount = PlayerAccount.Builder.of(newPlayerAccount)
-                        .withStarDustQuantity(newStarDustQuantity)
-                        .build();
+                        .add(determineStarDustConversion(card)));
             } else {
                 Stream<Card> newPlayerAccountCardStream = newPlayerAccount.cards().stream();
                 Stream<Card> singletonCard = Set.of(card).stream();

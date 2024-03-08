@@ -19,7 +19,9 @@ public class GachaService {
     private final CardService cardService;
     private final PlayerAccountService playerAccountService;
 
-    public GachaService(CardService cardService, PlayerAccountService playerAccountService) {
+    public GachaService(CardService cardService,
+                        PlayerAccountService playerAccountService) {
+
         this.cardService = cardService;
         this.playerAccountService = playerAccountService;
     }

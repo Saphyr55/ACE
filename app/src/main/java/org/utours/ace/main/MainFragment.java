@@ -19,6 +19,8 @@ import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
 
+import java.util.concurrent.CompletableFuture;
+
 public class MainFragment extends Fragment {
 
 
@@ -46,14 +48,14 @@ public class MainFragment extends Fragment {
         TextView textView = view.findViewById(R.id.text_findParty);
 
         textView.setOnClickListener(v -> onFindPartyTextPressed());
-
     }
 
     void onFindPartyTextPressed() {
         CardService cardService = PlayerAccountContainer.INSTANCE.getCardService(navigationActivity);
         PlayerAccountService playerAccountService = PlayerAccountContainer.INSTANCE.getService();
         GameFragment gameFragment = GameFragment.newInstance(navigationActivity, cardService, playerAccountService);
-        navigationActivity.fullyReplaceFragment(gameFragment);
+
+        gameFragment.setup().thenRun(() -> navigationActivity.fullyReplaceFragment(gameFragment));
     }
 
 

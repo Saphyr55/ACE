@@ -2,12 +2,15 @@ package org.utours.ace.game;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import org.utours.ace.R;
@@ -16,6 +19,7 @@ import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.feature.CardRegistry;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
+import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
 
 import java.util.List;
@@ -37,12 +41,6 @@ public class GameFragment extends Fragment {
                                            CardService cardService,
                                            PlayerAccountService playerAccountService) {
 
-        GameFragment gameFragment = new GameFragment();
-
-        gameFragment.cardService = cardService;
-        gameFragment.navigationActivity = navigationActivity;
-        gameFragment.playerAccountService = playerAccountService;
-
         var cards = List.of(
                 CardRegistry.FERN_CARD.get(),
                 CardRegistry.UBEL_CARD.get(),
@@ -53,6 +51,11 @@ public class GameFragment extends Fragment {
         Player player = new Player(List.copyOf(cards));
         Player opponent = new Player(List.copyOf(cards));
 
+        GameFragment gameFragment = new GameFragment();
+
+        gameFragment.cardService = cardService;
+        gameFragment.navigationActivity = navigationActivity;
+        gameFragment.playerAccountService = playerAccountService;
         gameFragment.player = player;
         gameFragment.opponent = opponent;
 
@@ -65,7 +68,7 @@ public class GameFragment extends Fragment {
                 .thenRun(this::provideImages);
     }
 
-    private void onSetup() {  }
+    private void onSetup() { }
 
     @Nullable
     @Override
@@ -80,14 +83,12 @@ public class GameFragment extends Fragment {
     public void onViewCreated(@NonNull View view,
                               @Nullable Bundle savedInstanceState) {
 
-        RecyclerView playerCardsRecycler = view.findViewById(R.id.recycler_playerCards);
-        RecyclerView opponentCardsRecycler = view.findViewById(R.id.recycler_opponentCards);
+        LinearLayout playerCardsLayout = view.findViewById(R.id.layout_playerCards);
+        LinearLayout opponentCardsLayout = view.findViewById(R.id.layout_opponentCards);
 
-        PlayerCardsAdapter playerCardsAdapter = new PlayerCardsAdapter(player, imageCardsReferences);
-        PlayerCardsAdapter opponentCardsAdapter = new PlayerCardsAdapter(opponent, imageCardsReferences);
+        bindCardsLayout(playerCardsLayout);
+        bindCardsLayout(opponentCardsLayout);
 
-        playerCardsRecycler.setAdapter(playerCardsAdapter);
-        opponentCardsRecycler.setAdapter(opponentCardsAdapter);
     }
 
     private void provideImages() {
@@ -96,6 +97,19 @@ public class GameFragment extends Fragment {
 
     private void fillImages(List<ImageCard> imageCards) {
         imageCardsReferences = cardService.getMapReferences(player.hand(), imageCards);
+    }
+
+    private void bindCardsLayout(LinearLayout layout) {
+        for (int i = 0; i < layout.getChildCount(); i++) {
+
+            PlayerCardView playerCardView = new PlayerCardView(layout.getChildAt(i));
+
+            Card card = player.hand().get(i);
+            ImageCard imageCard = imageCardsReferences.get(card.pictureId());
+            assert imageCard != null;
+
+            playerCardView.bind(card, imageCard);
+        }
     }
 
 }

@@ -36,13 +36,12 @@ import java.util.function.Consumer;
 
 public class DeckFragment extends Fragment {
 
-    private final CardService cardService;
-    private final PlayerAccountService playerAccountService;
-    private final Map<String, ImageCard> cardImages;
+    private Map<String, ImageCard> cardImages;
+    private CardService cardService;
+    private PlayerAccountService playerAccountService;
     private GridView gridView;
     private View viewFragment;
     private CardGridAdapter cardGridAdapter;
-    private AppCompatToggleButton deckToggleButton;
     private Consumer<CardView> setDefaultCardViewBackground;
     private Consumer<CardView> setSelectedBackgroundColor;
     private Card cardSelected;
@@ -51,26 +50,36 @@ public class DeckFragment extends Fragment {
     private TextView manaPointText;
     private TextView lifePointText;
 
-    public DeckFragment(CardService cardService,
-                        PlayerAccountService playerAccountService) {
 
-        this.cardService = cardService;
-        this.playerAccountService = playerAccountService;
-        this.cardImages = new HashMap<>();
-        this.setDefaultCardViewBackground = (cardView) -> {
-            var theme = viewFragment.getContext().getTheme();
-            cardView.setBackgroundColor(getResources().getColor(R.color.white, theme));
+    public static DeckFragment newInstance(CardService cardService,
+                                           PlayerAccountService playerAccountService) {
+
+        DeckFragment deckFragment = new DeckFragment();
+
+        deckFragment.cardService = cardService;
+        deckFragment.playerAccountService = playerAccountService;
+
+        deckFragment.setDefaultCardViewBackground = (cardView) -> {
+            var theme = deckFragment.viewFragment.getContext().getTheme();
+            cardView.setBackgroundColor(deckFragment.getResources().getColor(R.color.white, theme));
         };
-        this.setSelectedBackgroundColor = (cardView) -> {
+
+        deckFragment.setSelectedBackgroundColor = (cardView) -> {
             int color = Color.rgb(255, 187, 156);
             cardView.setBackgroundColor(color);
         };
+
+        deckFragment.cardImages = new HashMap<>();
+
+        return deckFragment;
     }
+
+    public DeckFragment() { }
 
     public CompletableFuture<Void> setup() {
         return cardService
                 .provideImageCards(playerAccountService.currentPlayerAccount().cards())
-                .thenAccept(this::fillCardImages);
+                .thenAccept(this::setImageCardReferences);
     }
 
     @Override
@@ -81,7 +90,7 @@ public class DeckFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         viewFragment = view;
-        deckToggleButton = viewFragment.findViewById(R.id.toggle_deck);
+        AppCompatToggleButton deckToggleButton = viewFragment.findViewById(R.id.toggle_deck);
         gridView = viewFragment.findViewById(R.id.grid_cards);
         attackPointText = viewFragment.findViewById(R.id.text_attackPoint);
         manaPointText = viewFragment.findViewById(R.id.text_manaCost);
@@ -185,7 +194,7 @@ public class DeckFragment extends Fragment {
             rarityTextView.setText(R.string.rarity);
 
         } else {
-            setupCardView(selectedViewCard, card, (cardView, card1) -> {}, cardImages);
+            bindCardView(selectedViewCard, card, (cardView, card1) -> { }, cardImages);
             attackPoint = String.valueOf(card.attackPoint());
             manaPoint = String.valueOf(card.manaPoint());
             lifePoint = String.valueOf(card.lifePoint());
@@ -196,9 +205,9 @@ public class DeckFragment extends Fragment {
         lifePointText.setText(lifePoint);
     }
 
-    public static void setupCardView(View view, Card card,
-                                     BiConsumer<CardView, Card> cardBiConsumer,
-                                     Map<String, ImageCard> cardImages) {
+    public static void bindCardView(View view, Card card,
+                                    BiConsumer<CardView, Card> cardBiConsumer,
+                                    Map<String, ImageCard> cardImages) {
 
         CardView cardView = view.findViewById(R.id.card_card);
         ImageView iconImageView = view.findViewById(R.id.image_card);
@@ -217,14 +226,9 @@ public class DeckFragment extends Fragment {
         rarityTextView.setText(card.rarity().name());
     }
 
-    private void fillCardImages(List<ImageCard> imageCards) {
-        var result = new HashMap<String, ImageCard>();
-        var list = List.copyOf(playerAccountService.currentPlayerAccount().cards());
-        for (int i = 0; i < imageCards.size(); i++) {
-            Card card = list.get(i);
-            result.put(card.pictureId(), imageCards.get(i));
-        }
-        this.cardImages.putAll(result);
+    private void setImageCardReferences(List<ImageCard> imageCards) {
+        var cards = List.copyOf(playerAccountService.currentPlayerAccount().cards());
+        cardImages = cardService.getMapReferences(cards, imageCards);
     }
 
 }

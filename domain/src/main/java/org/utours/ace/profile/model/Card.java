@@ -7,8 +7,21 @@ public record Card(
         Integer lifePoint,
         Integer attackPoint,
         Integer manaPoint,
-        CardRarity rarity
+        CardRarity rarity,
+        ClassCoin classCoin
 ) {
+
+    public Card(String id,
+                String name,
+                String pictureId,
+                Integer lifePoint,
+                Integer attackPoint,
+                Integer manaPoint,
+                CardRarity rarity) {
+
+        this(id, name, pictureId, lifePoint, attackPoint, manaPoint, rarity,
+                new ClassCoin(ClassCoin.Type.EMPTY));
+    }
 
     public static class Builder {
         private String id;
@@ -18,10 +31,9 @@ public record Card(
         private Integer attackPoint;
         private Integer manaPoint;
         private CardRarity rarity;
+        private ClassCoin classCoin = new ClassCoin(ClassCoin.Type.EMPTY);
 
-        private Builder() {
-
-        }
+        private Builder() { }
 
         public static Builder newBuilder(Card card) {
             return newBuilder()
@@ -77,6 +89,12 @@ public record Card(
             return this;
         }
 
+        public Builder withClassCoin(ClassCoin classCoin) {
+            this.classCoin = classCoin;
+            return this;
+        }
+
+
         public Card build() {
             return new Card(
                     id,
@@ -85,7 +103,8 @@ public record Card(
                     lifePoint,
                     attackPoint,
                     manaPoint,
-                    rarity
+                    rarity,
+                    classCoin
             );
         }
 

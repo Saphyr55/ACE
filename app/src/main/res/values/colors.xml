@@ -6,4 +6,6 @@
     <color name="dark_gray">#242424</color>
     <color name="gold">#FFD700</color>
     <color name="danger">#781313</color>
+    <color name="mana">#0044b0</color>
+    <color name="lifePoint">#bf1f1f</color>
 </resources>

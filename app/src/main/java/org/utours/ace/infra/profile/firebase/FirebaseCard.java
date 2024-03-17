@@ -2,6 +2,7 @@ package org.utours.ace.infra.profile.firebase;
 
 import org.utours.ace.common.annotation.Bean;
 import org.utours.ace.infra.common.firebase.annotation.FirebaseModel;
+import org.utours.ace.profile.model.ClassCoin;
 
 @Bean
 @FirebaseModel
@@ -14,6 +15,7 @@ class FirebaseCard {
     private Integer attackPoint;
     private Integer manaPoint;
     private String rarity;
+    private String classCoin = ClassCoin.Type.EMPTY.name();
 
     public FirebaseCard() {
 
@@ -75,4 +77,11 @@ class FirebaseCard {
         this.rarity = rarity;
     }
 
+    public String getClassCoin() {
+        return classCoin;
+    }
+
+    public void setClassCoin(String classCoin) {
+        this.classCoin = classCoin;
+    }
 }

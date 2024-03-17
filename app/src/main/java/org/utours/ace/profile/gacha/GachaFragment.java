@@ -58,9 +58,7 @@ public class GachaFragment extends Fragment {
     public CompletableFuture<Void> setup() {
         return CompletableFuture
                 .runAsync(this::onSetup)
-                .thenAccept(unused -> cardService
-                        .provideImageCards(showcaseCards)
-                        .thenAccept(this::setImagesCards));
+                .thenAccept(unused -> provideImages());
     }
 
     @Override
@@ -144,13 +142,13 @@ public class GachaFragment extends Fragment {
         startActivity(intent);
     }
 
-    private void setImagesCards(List<ImageCard> imageCards) {
-        var result = new HashMap<String, ImageCard>();
-        for (int i = 0; i < imageCards.size(); i++) {
-            Card card = showcaseCards.get(i);
-            result.put(card.pictureId(), imageCards.get(i));
-        }
-        this.imageCards = result;
+    private void fillImageCardsReferences(List<ImageCard> refs) {
+        imageCards = cardService.getMapReferences(showcaseCards, refs);
     }
 
+    private void provideImages() {
+        cardService
+                .provideImageCards(showcaseCards)
+                .thenAccept(this::fillImageCardsReferences);
+    }
 }

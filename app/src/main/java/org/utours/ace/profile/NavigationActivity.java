@@ -59,9 +59,9 @@ public class NavigationActivity extends AppCompatActivity {
         CardService cardService = PlayerAccountContainer.INSTANCE.getCardService(this);
         GachaService gachaService = PlayerAccountContainer.INSTANCE.getGachaService(this);
 
-        mainFragment = new MainFragment();
+        mainFragment = MainFragment.newInstance(this);
         profileFragment = new ProfileFragment();
-        deckFragment = new DeckFragment(cardService, playerAccountService);
+        deckFragment = DeckFragment.newInstance(cardService, playerAccountService);
         gachaFragment = new GachaFragment(cardService, gachaService, this);
         shopFragment = new ShopFragment();
 
@@ -129,13 +129,18 @@ public class NavigationActivity extends AppCompatActivity {
         replaceFragment(shopFragment);
     }
 
-    private void replaceFragment(Fragment fragment) {
+    public void replaceFragment(Fragment fragment) {
         runOnUiThread(() -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.frame_layout, fragment);
             fragmentTransaction.commit();
         });
+    }
+
+    public void fullyReplaceFragment(Fragment fragment) {
+        runOnUiThread(() -> binding.navBar.setVisibility(View.GONE));
+        replaceFragment(fragment);
     }
 
 }

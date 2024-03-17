@@ -15,7 +15,9 @@ import org.utours.ace.profile.port.ImageCardProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.SplittableRandom;
 import java.util.concurrent.CompletableFuture;
@@ -96,6 +98,15 @@ public class CardService {
 
     public CompletableFuture<Void> downloadAndInstallAllImages() {
         return provideImageCards(CardRegistry.INSTANCE.CARDS).thenRun(() -> { });
+    }
+
+    public Map<String, ImageCard> getMapReferences(List<Card> cards, List<ImageCard> imageCards) {
+        var result = new HashMap<String, ImageCard>();
+        for (int i = 0; i < imageCards.size(); i++) {
+            Card card = cards.get(i);
+            result.put(card.pictureId(), imageCards.get(i));
+        }
+        return result;
     }
 
     public List<Card> stochasticCards(int max, boolean unique) {

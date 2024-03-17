@@ -54,11 +54,15 @@ public class CardGridAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
+
         var card = (Card) getItem(position);
+
         if (convertView == null) {
             convertView = layoutInflater.inflate(R.layout.item_card, parent, false);
         }
-        DeckFragment.setupCardView(convertView, card, onCreateCardView, cardImages);
+
+        DeckFragment.bindCardView(convertView, card, onCreateCardView, cardImages);
+
         return convertView;
     }
 

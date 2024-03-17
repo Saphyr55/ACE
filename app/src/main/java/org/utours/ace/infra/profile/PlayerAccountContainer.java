@@ -34,9 +34,10 @@ public enum PlayerAccountContainer {
         var database = FirebaseDatabase.getInstance();
         var refs = new FirebaseDatabaseReferences(database);
 
-        this.playerAccountRepository = new FirebasePlayerAccountRepository(
-                        refs.playerAccountsReference(),
-                        new FirebasePlayerAccountMapper(new FirebaseCardMapper()));
+        var cardMapper = new FirebaseCardMapper();
+        var playerAccountMapper = new FirebasePlayerAccountMapper(cardMapper);
+
+        this.playerAccountRepository = new FirebasePlayerAccountRepository(refs.playerAccountsReference(), playerAccountMapper);
         this.imageCardDownloader = new MalImageCardDownloader(new HttpImageDownloader());
         this.playerAccountService = new PlayerAccountService(playerAccountRepository);
     }

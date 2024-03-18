@@ -95,7 +95,7 @@ public class GachaFragment extends Fragment {
     }
 
     private void onSetup() {
-        this.showcaseCards = cardService.stochasticCards(MAX_CARD_CAROUSEL, true);
+        this.showcaseCards = cardService.getCardsStochastic(MAX_CARD_CAROUSEL, true);
     }
 
     private void onPressPullDialogButton(Context context, PullConfirmationDialog dialog, int quantity) {

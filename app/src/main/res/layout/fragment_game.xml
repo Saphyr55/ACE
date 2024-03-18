@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -10,39 +8,58 @@
         android:id="@+id/layout_opponent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/layout_opponentCards"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <include layout="@layout/item_game_card"/>
-            <include layout="@layout/item_game_card"/>
-            <include layout="@layout/item_game_card"/>
-            <include layout="@layout/item_game_card"/>
-            <include layout="@layout/item_game_card"/>
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginBottom="25dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginBottom="25dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginBottom="25dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginBottom="25dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginBottom="25dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
 
         </LinearLayout>
 
     </LinearLayout>
 
     <LinearLayout
-        android:id="@+id/layout_board"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/layout_opponent">
+        android:layout_centerInParent="true"
+        android:orientation="vertical" >
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler_boardCards"
-            android:scrollbars="horizontal"
+        <include
+            layout="@layout/item_game_board"
+            android:id="@+id/layout_board"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
 
@@ -52,25 +69,48 @@
         android:id="@+id/layout_player"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
 
         <LinearLayout
             android:id="@+id/layout_playerCards"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <include layout="@layout/item_game_card"/>
-            <include layout="@layout/item_game_card"/>
-            <include layout="@layout/item_game_card"/>
-            <include layout="@layout/item_game_card"/>
-            <include layout="@layout/item_game_card"/>
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginTop="20dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginTop="20dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginTop="20dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginTop="20dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginTop="20dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
 
         </LinearLayout>
 
 
     </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</RelativeLayout>

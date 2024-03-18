@@ -8,8 +8,10 @@ public record Player(
         List<Card> hand
 ) {
 
+    public static final int HAND_CAPACITY = 5;
+
     public Player {
-        if (hand.size() > 5) {
+        if (hand.size() > HAND_CAPACITY) {
             throw new IllegalArgumentException();
         }
     }

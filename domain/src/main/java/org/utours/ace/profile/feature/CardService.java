@@ -1,14 +1,11 @@
 package org.utours.ace.profile.feature;
 
 import org.utours.ace.common.FunctionalUtils;
-import org.utours.ace.common.ProbabilityUtils;
-import org.utours.ace.common.Quantity;
 import org.utours.ace.common.annotation.DomainService;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.CardRarity;
 import org.utours.ace.profile.model.ImageCard;
 import org.utours.ace.profile.model.PlayerAccount;
-import org.utours.ace.profile.model.StarDust;
 import org.utours.ace.profile.port.ImageCardDownloader;
 import org.utours.ace.profile.port.ImageCardInstaller;
 import org.utours.ace.profile.port.ImageCardProvider;
@@ -19,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.SplittableRandom;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -109,14 +105,15 @@ public class CardService {
         return result;
     }
 
-    public List<Card> stochasticCards(int max, boolean unique) {
+    public List<Card> getCardsStochastic(Collection<Card> collection, int max, boolean unique) {
 
-        int size = CardRegistry.INSTANCE.CARDS.size();
-        if (max > size)
+        int size = collection.size();
+        if (max > size) {
             throw new IllegalArgumentException();
+        }
 
         var cards = new ArrayList<Card>();
-        var registry = List.copyOf(CardRegistry.INSTANCE.CARDS);
+        List<Card> registry = List.copyOf(collection);
 
         var random = new Random();
 
@@ -131,6 +128,10 @@ public class CardService {
         }
 
         return cards;
+    }
+
+    public List<Card> getCardsStochastic(int max, boolean unique) {
+        return getCardsStochastic(CardRegistry.INSTANCE.CARDS, max, unique);
     }
 
     public List<Card> probabilistStochasticCards(int max) {

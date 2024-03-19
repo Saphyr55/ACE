@@ -22,12 +22,11 @@
 
         </androidx.cardview.widget.CardView>
 
-            <androidx.appcompat.widget.AppCompatToggleButton
-            android:id="@+id/customize_profile"
+            <Button
+            android:id="@+id/btnCustomize_profile"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textOff="@string/Customize"
-            android:textOn="@string/save"
+            android:text="@string/Customize"
             android:layout_gravity="center"
             android:layout_marginLeft="50dp"/>
 
@@ -43,7 +42,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="5dp"
-                android:text="@string/level" />
+                android:text="@string/level"
+                android:id="@+id/tvLevel"/>
 
             <TextView
                 android:id="@+id/text_level"
@@ -52,7 +52,7 @@
                 android:gravity="end"
                 android:layout_marginStart="30dp"
                 android:layout_marginEnd="30dp"
-                android:text="@string/unknown"/>
+                android:text="@string/unknown" />
 
         </LinearLayout>
 
@@ -65,7 +65,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="5dp"
-            android:text="@string/UUID" />
+            android:text="@string/UID" />
 
         <TextView
             android:id="@+id/text_uuid"

@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.utours.ace.R;
+import org.utours.ace.profile.CardGridAdapter;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.Card;

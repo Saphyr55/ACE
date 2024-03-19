@@ -60,5 +60,11 @@
     <string name="find_a_party">Find a party</string>
     <string name="five">5</string>
     <string name="game">Game</string>
-
+    <string name="Customize">Customize Profile</string>
+    <string name="save">save</string>
+    <string name="Username">Username</string>
+    <string name="level">Level</string>
+    <string name="UID">UID</string>
+    <string name="choose_your_card">Choose your card</string>
+    <string name="change_your_description">Change your description :</string>
 </resources>

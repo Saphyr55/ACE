@@ -21,6 +21,7 @@ import com.google.android.material.carousel.MultiBrowseCarouselStrategy;
 import org.utours.ace.R;
 import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.dialog.NotEnoughTicketDialog;
+import org.utours.ace.profile.dialog.PullConfirmationDialog;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.GachaService;
 import org.utours.ace.profile.model.Card;

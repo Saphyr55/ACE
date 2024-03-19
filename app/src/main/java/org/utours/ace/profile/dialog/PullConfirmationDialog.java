@@ -1,4 +1,4 @@
-package org.utours.ace.profile.gacha;
+package org.utours.ace.profile.dialog;
 
 import android.app.Dialog;
 import android.content.Context;

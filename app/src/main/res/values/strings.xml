@@ -57,5 +57,10 @@
     <string name="go_to_the_shop">Go to the shop</string>
     <string name="back">Back</string>
     <string name="you_have_not_enough_ticket">You have not enough ticket.</string>
+    <string name="Customize">Customize Profile</string>
+    <string name="save">save</string>
+    <string name="Username">Username</string>
+    <string name="level">Level</string>
+    <string name="UUID">UUID</string>
 
 </resources>

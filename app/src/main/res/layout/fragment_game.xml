@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:id="@+id/layout_opponent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/layout_opponentCards"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginBottom="25dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginBottom="25dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginBottom="25dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginBottom="25dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginBottom="25dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical" >
+
+        <include
+            layout="@layout/item_game_board"
+            android:id="@+id/layout_board"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout_player"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:id="@+id/layout_playerCards"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginTop="20dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginTop="20dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginTop="20dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginTop="20dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+            <include
+                layout="@layout/item_game_card"
+                android:layout_marginTop="20dp"
+                android:layout_width="@dimen/game_card_width"
+                android:layout_height="@dimen/game_card_height" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</RelativeLayout>

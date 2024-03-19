@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 public record Deck(
-        Set<Card> cards // Immutable set.
+        Set<Card> cards
 ) {
 
     public static final int MAX_SLOT = 20;

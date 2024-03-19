@@ -53,6 +53,8 @@ dependencies {
     // AndroidX
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.recyclerview:recyclerview-selection:1.1.0")
     implementation("androidx.preference:preference:1.2.1")
     implementation("androidx.activity:activity:1.8.2")
 

@@ -1,24 +1,23 @@
 package org.utours.ace.profile.feature;
 
 import org.utours.ace.common.FunctionalUtils;
-import org.utours.ace.common.ProbabilityUtils;
-import org.utours.ace.common.Quantity;
 import org.utours.ace.common.annotation.DomainService;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.CardRarity;
 import org.utours.ace.profile.model.ImageCard;
 import org.utours.ace.profile.model.PlayerAccount;
-import org.utours.ace.profile.model.StarDust;
 import org.utours.ace.profile.port.ImageCardDownloader;
 import org.utours.ace.profile.port.ImageCardInstaller;
 import org.utours.ace.profile.port.ImageCardProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
-import java.util.SplittableRandom;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -98,28 +97,51 @@ public class CardService {
         return provideImageCards(CardRegistry.INSTANCE.CARDS).thenRun(() -> { });
     }
 
-    public List<Card> stochasticCards(int max, boolean unique) {
+    public Map<String, ImageCard> getMapReferences(List<Card> cards, List<ImageCard> imageCards) {
+        var result = new HashMap<String, ImageCard>();
+        for (int i = 0; i < imageCards.size(); i++) {
+            Card card = cards.get(i);
+            result.put(card.pictureId(), imageCards.get(i));
+        }
+        return result;
+    }
 
-        int size = CardRegistry.INSTANCE.CARDS.size();
-        if (max > size)
-            throw new IllegalStateException();
+    public List<Card> getCardsStochastic(Collection<Card> collection, int max, boolean unique) {
+
+        int size = collection.size();
+        if (max > size) {
+            throw new IllegalArgumentException();
+        }
 
         var cards = new ArrayList<Card>();
-        var registry = List.copyOf(CardRegistry.INSTANCE.CARDS);
+        List<Card> registry = List.copyOf(collection);
 
         var random = new Random();
 
-        while (cards.size() != max) {
-            int j = random.nextInt(size - 1);
+        Consumer<Integer> fillCards = s -> {
+            int j = random.nextInt(s);
             var card = registry.get(j);
             if (!unique) {
                 cards.add(card);
             } else if (!cards.contains(card)) {
                 cards.add(card);
             }
+        };
+
+        if (max == 1) {
+            fillCards.accept(max);
+            return cards;
+        }
+
+        while (cards.size() != max) {
+            fillCards.accept(size - 1);
         }
 
         return cards;
+    }
+
+    public List<Card> getCardsStochastic(int max, boolean unique) {
+        return getCardsStochastic(CardRegistry.INSTANCE.CARDS, max, unique);
     }
 
     public List<Card> probabilistStochasticCards(int max) {

@@ -14,7 +14,7 @@ public record PlayerAccount(
         Quantity<Ticket> ticketQuantity,
         Quantity<StarDust> starDustQuantity,
         Deck deck,
-        Set<Card> cards // Immutable set.
+        Set<Card> cards
 ) {
 
 

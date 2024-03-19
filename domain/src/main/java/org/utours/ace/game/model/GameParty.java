@@ -8,16 +8,35 @@ import java.util.List;
 public record GameParty(
         Player player,
         Player opponent,
+        Player currentPlayer,
         Board playerBoard,
         Board opponentBoard,
         int numberTurn
 ) {
 
+    public GameParty incrementNumberTurn() {
+        return GameParty.Builder.of(this)
+                .withNumberTurn(numberTurn + 1)
+                .build();
+    }
+
+    public GameParty nextTurn() {
+
+        var gameParty = incrementNumberTurn();
+        Player newCurrentPlayer = gameParty.isPlayerTurn()
+                ? gameParty.opponent()
+                : gameParty.player();
+
+        return GameParty.Builder.of(gameParty)
+                .withCurrentPlayer(newCurrentPlayer)
+                .build();
+    }
+
     public GameParty emplacePlayerCardInBoard(Card card) {
 
         List<Card> cards = new ArrayList<>(player.hand());
         cards.remove(card);
-        Player newPlayer = new Player(List.copyOf(cards));
+        Player newPlayer = new Player(player.playerID(), List.copyOf(cards));
 
         cards = new ArrayList<>(playerBoard.cards());
         cards.add(card);
@@ -29,15 +48,26 @@ public record GameParty(
                 .build();
     }
 
+    public boolean isPlayerTurn() {
+        return isCurrentPlayer(player());
+    }
+
+    public boolean isOpponentTurn() {
+        return isCurrentPlayer(opponent());
+    }
+
+    private boolean isCurrentPlayer(Player player) {
+        return player.playerID().equals(currentPlayer().playerID());
+    }
+
     public static class Builder {
 
-        private Player player = new Player(List.of());;
-        private Player opponent = new Player(List.of());
+        private Player player;
+        private Player opponent;
+        private Player currentPlayer;
         private Board playerBoard = new Board();
         private Board opponentBoard = new Board();
         private int numberTurn = 0;
-
-        private Builder() { }
 
         public static Builder newInstance() {
             return new Builder();
@@ -47,10 +77,13 @@ public record GameParty(
             return newInstance()
                     .withPlayerBoard(gameParty.playerBoard)
                     .withOpponentBoard(gameParty.opponentBoard)
+                    .withCurrentPlayer(gameParty.currentPlayer)
                     .withOpponent(gameParty.opponent)
                     .withPlayer(gameParty.player)
                     .withNumberTurn(gameParty.numberTurn);
         }
+
+
 
         public Builder withNumberTurn(int numberTurn) {
             this.numberTurn = numberTurn;
@@ -77,10 +110,16 @@ public record GameParty(
             return this;
         }
 
+        public Builder withCurrentPlayer(Player currentPlayer) {
+            this.currentPlayer = currentPlayer;
+            return this;
+        }
+
         public GameParty build() {
             return new GameParty(
                     player,
                     opponent,
+                    currentPlayer,
                     playerBoard,
                     opponentBoard,
                     numberTurn

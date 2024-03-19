@@ -5,6 +5,7 @@ import org.utours.ace.profile.model.Card;
 import java.util.List;
 
 public record Player(
+        String playerID,
         List<Card> hand
 ) {
 

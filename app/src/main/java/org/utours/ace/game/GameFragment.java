@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 
@@ -14,6 +13,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import org.utours.ace.R;
+import org.utours.ace.game.feature.GameService;
+import org.utours.ace.game.feature.PlayingTurn;
+import org.utours.ace.game.impl.BotGamePlayingTurn;
+import org.utours.ace.game.impl.PlayerOnPressedViewBoard;
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Player;
 import org.utours.ace.profile.NavigationActivity;
@@ -23,22 +26,25 @@ import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.Deck;
 import org.utours.ace.profile.model.ImageCard;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class GameFragment extends Fragment {
 
     private NavigationActivity navigationActivity;
-    private CardService cardService;
     private PlayerAccountService playerAccountService;
+    private CardService cardService;
     private Map<String, ImageCard> imageCardsReferences;
     private View selectedCardView;
     private Map<View, Card> playerCardViews;
     private Map<View, Card> opponentCardView;
     private GameParty gameParty;
-
+    private GameService gameService;
+    private PlayingTurn playingTurn;
+    private OnPressedViewBoard onPressedViewBoard;
 
     public GameFragment() { }
 
@@ -49,13 +55,18 @@ public class GameFragment extends Fragment {
         Deck deck = playerAccountService.currentPlayerAccount().deck();
         List<Card> cards = cardService.getCardsStochastic(deck.cards(), Player.HAND_CAPACITY, false);
 
+        Player player = new Player("1", List.copyOf(cards));
+        Player opponent = new Player("2", List.copyOf(cards));
+
         GameFragment gameFragment = new GameFragment();
         gameFragment.cardService = cardService;
         gameFragment.navigationActivity = navigationActivity;
         gameFragment.playerAccountService = playerAccountService;
+        gameFragment.gameService = new GameService(cardService);
         gameFragment.gameParty = GameParty.Builder.newInstance()
-                .withPlayer(new Player(List.copyOf(cards)))
-                .withOpponent(new Player(List.copyOf(cards)))
+                .withPlayer(player)
+                .withOpponent(opponent)
+                .withCurrentPlayer(player)
                 .build();
 
         return gameFragment;
@@ -79,59 +90,50 @@ public class GameFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view,
-                              @Nullable Bundle savedInstanceState) {
-
-        LinearLayout playerCardsLayout = view.findViewById(R.id.layout_playerCards);
-        LinearLayout opponentCardsLayout = view.findViewById(R.id.layout_opponentCards);
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         LinearLayout boardLayout = view.findViewById(R.id.layout_board);
 
-        bindFrontPlayerCards(boardLayout);
+        // Player
+        LinearLayout playerCardsLayout = view.findViewById(R.id.layout_playerCards);
+        GridLayout playerBoardLayout = boardLayout.findViewById(R.id.layout_playerBoard);
+        setOnClickBindCardView(playerBoardLayout);
+        playerCardViews = bindCardsLayout(gameParty.player(), playerCardsLayout);
 
-        playerCardViews = bindCardsLayout(playerCardsLayout);
-        opponentCardView = bindCardsLayout(opponentCardsLayout);
+        // Opponent
+        LinearLayout opponentCardsLayout = view.findViewById(R.id.layout_opponentCards);
+        GridLayout opponentBoardLayout = boardLayout.findViewById(R.id.layout_opponentBoard);
+        opponentCardView = bindCardsLayout(gameParty.opponent(), opponentCardsLayout);
 
+        // Binding animation card.
         playerCardViews.forEach((v, card) -> v.setOnClickListener(this::bindAnimationCard));
+
+        // Bot playing turn
+        playingTurn = new BotGamePlayingTurn(
+                gameService,
+                opponentCardView,
+                opponentBoardLayout,
+                this::getImageCardByCard);
+
+        // On pressed board to place a card.
+        onPressedViewBoard = new PlayerOnPressedViewBoard(
+                gameService,
+                playerCardViews,
+                playingTurn,
+                this::getImageCardByCard);
     }
 
-    private void bindFrontPlayerCards(LinearLayout boardLayout) {
-        GridLayout playerBoardLayout = boardLayout.findViewById(R.id.layout_playerBoard);
-        int size = playerBoardLayout.getChildCount();
-        for (int i = 0; i < size; i++) {
-            View view = playerBoardLayout.getChildAt(i);
-            view.setOnClickListener(this::onPressedEmptyCardBoard);
-        }
+    private void setOnClickBindCardView(GridLayout layout) {
+        IntStream.range(0, layout.getChildCount())
+                .forEach(i -> layout.getChildAt(i).setOnClickListener(this::onPressedEmptyCardBoard));
     }
 
     private void onPressedEmptyCardBoard(View v) {
-        View emptyView = v.findViewById(R.id.view_emptyGameBoardCard);
-        if (checkCanPutCard(emptyView)) {
-
-            FrameLayout frameLayout = v.findViewById(R.id.layout_gameBoardCard);
-            PlayerCardView playerCardView = new PlayerCardView(frameLayout);
-
-            Card card = playerCardViews.remove(selectedCardView);
-            assert card != null;
-
-            gameParty = gameParty.emplacePlayerCardInBoard(card);
-
-            selectedCardView.setVisibility(View.GONE);
-            emptyView.setVisibility(View.GONE);
-            frameLayout.setVisibility(View.VISIBLE);
-
-            ImageCard imageCard = imageCardsReferences.get(card.pictureId());
-            assert imageCard != null;
-
-            playerCardView.bind(card, imageCard);
-
-            selectedCardView = null;
+        if (gameParty.isPlayerTurn()) {
+            gameParty = onPressedViewBoard.onPressed(gameParty, selectedCardView, v);
         }
-    }
-
-    private boolean checkCanPutCard(View v) {
-        return !playerCardViews.isEmpty()
-                && selectedCardView != null
-                && v.getVisibility() == View.VISIBLE;
+        if (gameParty.isOpponentTurn()) {
+            gameParty = gameService.botTurn(playingTurn, gameParty);
+        }
     }
 
     private void provideImages() {
@@ -141,41 +143,46 @@ public class GameFragment extends Fragment {
     }
 
     private void setImageCardsReferences(List<ImageCard> imageCards) {
-        imageCardsReferences = cardService.getMapReferences(gameParty.player().hand(), imageCards);
+        List<Card> hand = gameParty.player().hand();
+        imageCardsReferences = cardService.getMapReferences(hand, imageCards);
     }
 
     private void bindAnimationCard(View view) {
         if (selectedCardView == view || selectedCardView != null) {
-            ObjectAnimator animation = ObjectAnimator.ofFloat(
-                    selectedCardView, "translationY", 0);
-            animation.setDuration(200);
-            animation.start();
+            startDefaultObjectAnimatorTransY(selectedCardView, 0.0f);
         }
         if (selectedCardView != view) {
-            ObjectAnimator animation = ObjectAnimator.ofFloat(
-                    view, "translationY", -50.f);
-            animation.setDuration(200);
-            animation.start();
+            startDefaultObjectAnimatorTransY(view, -50.0f);
             selectedCardView = view;
         } else {
             selectedCardView = null;
         }
     }
 
-    private Map<View, Card> bindCardsLayout(LinearLayout layout) {
-        Map<View, Card> views = new HashMap<>();
-        for (int i = 0; i < layout.getChildCount(); i++) {
+    private Map<View, Card> bindCardsLayout(Player player, LinearLayout layout) {
+        return IntStream.range(0, layout.getChildCount())
+                .mapToObj(i -> bindCardLayout(player, layout, i))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
 
-            View view = layout.getChildAt(i);
-            Card card = gameParty.player().hand().get(i);
-            ImageCard imageCard = imageCardsReferences.get(card.pictureId());
-            PlayerCardView playerCardView = new PlayerCardView(view);
+    private Map.Entry<View, Card> bindCardLayout(Player player, LinearLayout layout, int index) {
+        Card card = player.hand().get(index);
+        View view = layout.getChildAt(index);
+        PlayerCardView playerCardView = new PlayerCardView(view);
+        playerCardView.bind(card, getImageCardByCard(card));
+        return Map.entry(view, card);
+    }
 
-            assert imageCard != null;
-            views.put(view, card);
-            playerCardView.bind(card, imageCard);
-        }
-        return views;
+    private void startDefaultObjectAnimatorTransY(View view, float value) {
+        ObjectAnimator animation = ObjectAnimator.ofFloat(view, "translationY", value);
+        animation.setDuration(200);
+        animation.start();
+    }
+
+    private ImageCard getImageCardByCard(Card card) {
+        ImageCard imageCard = imageCardsReferences.get(card.pictureId());
+        assert imageCard != null;
+        return imageCard;
     }
 
 }

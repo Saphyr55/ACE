@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -117,14 +118,23 @@ public class CardService {
 
         var random = new Random();
 
-        while (cards.size() != max) {
-            int j = random.nextInt(size - 1);
+        Consumer<Integer> fillCards = s -> {
+            int j = random.nextInt(s);
             var card = registry.get(j);
             if (!unique) {
                 cards.add(card);
             } else if (!cards.contains(card)) {
                 cards.add(card);
             }
+        };
+
+        if (max == 1) {
+            fillCards.accept(max);
+            return cards;
+        }
+
+        while (cards.size() != max) {
+            fillCards.accept(size - 1);
         }
 
         return cards;

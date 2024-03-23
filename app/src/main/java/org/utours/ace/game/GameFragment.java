@@ -13,10 +13,13 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import org.utours.ace.R;
+import org.utours.ace.common.Selectable;
+import org.utours.ace.game.use_case.PlayerOnPressCardViewBoard;
 import org.utours.ace.game.feature.GameService;
-import org.utours.ace.game.feature.PlayingTurn;
-import org.utours.ace.game.impl.BotGamePlayingTurn;
-import org.utours.ace.game.impl.PlayerOnPressedViewBoard;
+import org.utours.ace.game.port.PlayingTurn;
+import org.utours.ace.game.use_case.BotGamePlayingTurn;
+import org.utours.ace.game.use_case.CardViewSelectable;
+import org.utours.ace.game.use_case.EmplaceCardOnBoardProxy;
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Player;
 import org.utours.ace.profile.NavigationActivity;
@@ -38,13 +41,13 @@ public class GameFragment extends Fragment {
     private PlayerAccountService playerAccountService;
     private CardService cardService;
     private Map<String, ImageCard> imageCardsReferences;
-    private View selectedCardView;
-    private Map<View, Card> playerCardViews;
-    private Map<View, Card> opponentCardView;
+    private Selectable<View> selectedEmptyCardView;
+    private Selectable<View> selectedCardView;
     private GameParty gameParty;
     private GameService gameService;
     private PlayingTurn playingTurn;
-    private OnPressedViewBoard onPressedViewBoard;
+    private OnPressViewBoard onPressEmptyViewBoard;
+    private OnPressViewBoard onPressViewBoard;
 
     public GameFragment() { }
 
@@ -53,7 +56,7 @@ public class GameFragment extends Fragment {
                                            PlayerAccountService playerAccountService) {
 
         Deck deck = playerAccountService.currentPlayerAccount().deck();
-        List<Card> cards = cardService.getCardsStochastic(deck.cards(), Player.HAND_CAPACITY, false);
+        List<Card> cards = cardService.getCardsStochastic(deck.cards(), Player.HAND_CAPACITY, true);
 
         Player player = new Player("1", List.copyOf(cards));
         Player opponent = new Player("2", List.copyOf(cards));
@@ -91,45 +94,73 @@ public class GameFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
+        selectedCardView = new CardViewSelectable(
+                v -> startRotation(v, 20.0f),
+                v -> startRotation(v, 0.0f)
+        );
+
+        selectedEmptyCardView = new CardViewSelectable(
+                v -> startDefaultObjectAnimatorTransY(v, -50.0f),
+                v -> startDefaultObjectAnimatorTransY(v, 0.0f)
+        );
+
         LinearLayout boardLayout = view.findViewById(R.id.layout_board);
 
         // Player
         LinearLayout playerCardsLayout = view.findViewById(R.id.layout_playerCards);
         GridLayout playerBoardLayout = boardLayout.findViewById(R.id.layout_playerBoard);
         setOnClickBindCardView(playerBoardLayout);
-        playerCardViews = bindCardsLayout(gameParty.player(), playerCardsLayout);
+        var playerCardViews = mapCardsLayout(gameParty.player(), playerCardsLayout);
 
         // Opponent
         LinearLayout opponentCardsLayout = view.findViewById(R.id.layout_opponentCards);
         GridLayout opponentBoardLayout = boardLayout.findViewById(R.id.layout_opponentBoard);
-        opponentCardView = bindCardsLayout(gameParty.opponent(), opponentCardsLayout);
+        var opponentCardView = mapCardsLayout(gameParty.opponent(), opponentCardsLayout);
 
         // Binding animation card.
-        playerCardViews.forEach((v, card) -> v.setOnClickListener(this::bindAnimationCard));
+        playerCardViews.forEach((v, card) -> v.setOnClickListener(selectedEmptyCardView::bind));
 
         // Bot playing turn
-        playingTurn = new BotGamePlayingTurn(
-                gameService,
+        playingTurn = new BotGamePlayingTurn(gameService,
                 opponentCardView,
+                playerCardViews,
                 opponentBoardLayout,
                 this::getImageCardByCard);
 
-        // On pressed board to place a card.
-        onPressedViewBoard = new PlayerOnPressedViewBoard(
-                gameService,
+        onPressViewBoard = new PlayerOnPressCardViewBoard(
                 playerCardViews,
-                playingTurn,
+                opponentCardView,
+                this::getImageCardByCard
+        );
+
+        // On pressed board to place a card.
+        onPressEmptyViewBoard = new EmplaceCardOnBoardProxy(gameService,
+                playerCardViews,
+                opponentCardView,
                 this::getImageCardByCard);
     }
 
     private void setOnClickBindCardView(GridLayout layout) {
         IntStream.range(0, layout.getChildCount())
-                .forEach(i -> layout.getChildAt(i).setOnClickListener(this::onPressedEmptyCardBoard));
+                .forEach(i -> {
+                    var child = layout.getChildAt(i);
+                    child.setOnClickListener(this::onPressedEmptyCardBoard);
+                });
+    }
+
+    private void onPressedCardBoard(View v) {
+        if (gameParty.isPlayerTurn()) {
+            gameParty = onPressViewBoard.onPress(gameParty, selectedCardView.getValue(), v);
+        }
+        if (gameParty.isOpponentTurn()) {
+            gameParty = gameService.botTurn(playingTurn, gameParty);
+        }
     }
 
     private void onPressedEmptyCardBoard(View v) {
         if (gameParty.isPlayerTurn()) {
-            gameParty = onPressedViewBoard.onPressed(gameParty, selectedCardView, v);
+            gameParty = onPressEmptyViewBoard.onPress(gameParty, selectedEmptyCardView.getValue(), v);
         }
         if (gameParty.isOpponentTurn()) {
             gameParty = gameService.botTurn(playingTurn, gameParty);
@@ -147,19 +178,7 @@ public class GameFragment extends Fragment {
         imageCardsReferences = cardService.getMapReferences(hand, imageCards);
     }
 
-    private void bindAnimationCard(View view) {
-        if (selectedCardView == view || selectedCardView != null) {
-            startDefaultObjectAnimatorTransY(selectedCardView, 0.0f);
-        }
-        if (selectedCardView != view) {
-            startDefaultObjectAnimatorTransY(view, -50.0f);
-            selectedCardView = view;
-        } else {
-            selectedCardView = null;
-        }
-    }
-
-    private Map<View, Card> bindCardsLayout(Player player, LinearLayout layout) {
+    private Map<View, Card> mapCardsLayout(Player player, LinearLayout layout) {
         return IntStream.range(0, layout.getChildCount())
                 .mapToObj(i -> bindCardLayout(player, layout, i))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
@@ -179,10 +198,18 @@ public class GameFragment extends Fragment {
         animation.start();
     }
 
+    private void startRotation(View view, float value) {
+        ObjectAnimator animation = ObjectAnimator.ofFloat(view, "rotation", value);
+        animation.setDuration(200);
+        animation.start();
+    }
+
     private ImageCard getImageCardByCard(Card card) {
         ImageCard imageCard = imageCardsReferences.get(card.pictureId());
         assert imageCard != null;
         return imageCard;
     }
+
+
 
 }

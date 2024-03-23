@@ -6,7 +6,7 @@
     android:layout_marginEnd="15dp" >
 
     <include
-        android:id="@+id/layout_gameBoardCard"
+        android:id="@+id/view_gameBoardCard"
         layout="@layout/item_game_card"
         android:visibility="gone" />
 

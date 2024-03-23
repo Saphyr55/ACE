@@ -15,7 +15,7 @@ public record GameParty(
 ) {
 
     public GameParty incrementNumberTurn() {
-        return GameParty.Builder.of(this)
+        return GameParty.Builder.copyOf(this)
                 .withNumberTurn(numberTurn + 1)
                 .build();
     }
@@ -27,24 +27,8 @@ public record GameParty(
                 ? gameParty.opponent()
                 : gameParty.player();
 
-        return GameParty.Builder.of(gameParty)
+        return GameParty.Builder.copyOf(gameParty)
                 .withCurrentPlayer(newCurrentPlayer)
-                .build();
-    }
-
-    public GameParty emplacePlayerCardInBoard(Card card) {
-
-        List<Card> cards = new ArrayList<>(player.hand());
-        cards.remove(card);
-        Player newPlayer = new Player(player.playerID(), List.copyOf(cards));
-
-        cards = new ArrayList<>(playerBoard.cards());
-        cards.add(card);
-        Board newPlayerBoard = new Board(List.copyOf(cards));
-
-        return GameParty.Builder.of(this)
-                .withPlayer(newPlayer)
-                .withPlayerBoard(newPlayerBoard)
                 .build();
     }
 
@@ -73,7 +57,7 @@ public record GameParty(
             return new Builder();
         }
 
-        public static Builder of(GameParty gameParty) {
+        public static Builder copyOf(GameParty gameParty) {
             return newInstance()
                     .withPlayerBoard(gameParty.playerBoard)
                     .withOpponentBoard(gameParty.opponentBoard)

@@ -106,7 +106,7 @@ public class CardService {
         return result;
     }
 
-    public List<Card> getCardsStochastic(Collection<Card> collection, int max, boolean unique) {
+    public List<Card> getCardsStochastic(Collection<Card> collection, int max, boolean isUnique) {
 
         int size = collection.size();
         if (max > size) {
@@ -121,7 +121,7 @@ public class CardService {
         Consumer<Integer> fillCards = s -> {
             int j = random.nextInt(s);
             var card = registry.get(j);
-            if (!unique) {
+            if (!isUnique) {
                 cards.add(card);
             } else if (!cards.contains(card)) {
                 cards.add(card);

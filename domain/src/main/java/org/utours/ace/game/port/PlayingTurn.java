@@ -1,4 +1,4 @@
-package org.utours.ace.game.feature;
+package org.utours.ace.game.port;
 
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.profile.model.Card;

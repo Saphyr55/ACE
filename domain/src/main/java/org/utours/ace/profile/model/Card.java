@@ -1,5 +1,7 @@
 package org.utours.ace.profile.model;
 
+import java.util.function.BiConsumer;
+
 public record Card(
         String id,
         String name,
@@ -50,8 +52,8 @@ public record Card(
             return new Builder();
         }
 
-        public static Card copy(Card card) {
-            return newBuilder(card).build();
+        public static Builder copyOf(Card card) {
+            return newBuilder(card);
         }
 
         public Builder withAttackPoint(Integer attackPoint) {
@@ -93,7 +95,6 @@ public record Card(
             this.classCoin = classCoin;
             return this;
         }
-
 
         public Card build() {
             return new Card(

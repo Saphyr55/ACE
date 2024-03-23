@@ -6,12 +6,12 @@
     android:layout_marginEnd="15dp" >
 
     <include
-        android:id="@+id/view_gameBoardCard"
+        android:id="@+id/view_cardSlot"
         layout="@layout/item_game_card"
         android:visibility="gone" />
 
     <View
-        android:id="@+id/view_emptyGameBoardCard"
+        android:id="@+id/view_emptySlot"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="2dp"

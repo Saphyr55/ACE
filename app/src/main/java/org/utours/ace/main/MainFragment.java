@@ -1,6 +1,5 @@
 package org.utours.ace.main;
 
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -19,43 +18,36 @@ import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
 
-import java.util.concurrent.CompletableFuture;
-
 public class MainFragment extends Fragment {
 
 
-    private NavigationActivity navigationActivity;
+    private NavigationActivity navActivity;
 
     private MainFragment() { }
 
     public static MainFragment newInstance(NavigationActivity navigationActivity) {
         MainFragment mainFragment = new MainFragment();
-        mainFragment.navigationActivity = navigationActivity;
+        mainFragment.navActivity = navigationActivity;
         return mainFragment;
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater,
-                             ViewGroup container,
-                             Bundle savedInstanceState) {
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_main, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
         TextView textView = view.findViewById(R.id.text_findParty);
-
-        textView.setOnClickListener(v -> onFindPartyTextPressed());
+        textView.setOnClickListener(v -> onPressFindParty());
     }
 
-    void onFindPartyTextPressed() {
-        CardService cardService = PlayerAccountContainer.INSTANCE.getCardService(navigationActivity);
+    private void onPressFindParty() {
+        CardService cardService = PlayerAccountContainer.INSTANCE.getCardService(navActivity);
         PlayerAccountService playerAccountService = PlayerAccountContainer.INSTANCE.getService();
-        GameFragment gameFragment = GameFragment.newInstance(navigationActivity, cardService, playerAccountService);
-
-        gameFragment.setup().thenRun(() -> navigationActivity.fullyReplaceFragment(gameFragment));
+        GameFragment gameFragment = GameFragment.newInstance(navActivity, cardService, playerAccountService);
+        navActivity.fullyReplaceFragment(new WaitFragment());
+        gameFragment.setup().thenRun(() -> navActivity.fullyReplaceFragment(gameFragment));
     }
 
 

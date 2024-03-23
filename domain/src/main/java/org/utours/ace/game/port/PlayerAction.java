@@ -7,4 +7,8 @@ public interface PlayerAction {
 
     GameParty apply(GameParty gameParty);
 
+    static PlayerAction noAction() {
+        return gameParty -> gameParty;
+    }
+
 }

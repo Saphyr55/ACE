@@ -14,6 +14,8 @@ public record GameParty(
         int numberTurn
 ) {
 
+    public static int MAX_SLOT = 8;
+
     public GameParty incrementNumberTurn() {
         return GameParty.Builder.copyOf(this)
                 .withNumberTurn(numberTurn + 1)

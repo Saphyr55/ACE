@@ -118,7 +118,9 @@ public class CardService {
 
         var random = new Random();
 
-        Consumer<Integer> fillCards = s -> {
+        int s = max == 1 ? max : size;
+
+        while (cards.size() != max) {
             int j = random.nextInt(s);
             var card = registry.get(j);
             if (!isUnique) {
@@ -126,15 +128,6 @@ public class CardService {
             } else if (!cards.contains(card)) {
                 cards.add(card);
             }
-        };
-
-        if (max == 1) {
-            fillCards.accept(max);
-            return cards;
-        }
-
-        while (cards.size() != max) {
-            fillCards.accept(size - 1);
         }
 
         return cards;

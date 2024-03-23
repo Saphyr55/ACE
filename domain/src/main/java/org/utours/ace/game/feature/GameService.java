@@ -3,12 +3,11 @@ package org.utours.ace.game.feature;
 
 import org.utours.ace.common.annotation.DomainService;
 import org.utours.ace.game.model.GameParty;
-import org.utours.ace.game.port.PlayingTurn;
+import org.utours.ace.game.port.PlayerAction;
 import org.utours.ace.profile.feature.CardService;
 
 @DomainService
 public class GameService {
-
 
     private final CardService cardService;
 
@@ -16,20 +15,20 @@ public class GameService {
         this.cardService = cardService;
     }
 
-    public GameParty botTurn(PlayingTurn playingTurn, GameParty gameParty) {
+    public GameParty botAction(PlayerAction playerAction, GameParty gameParty) {
 
         var botGameParty = GameParty.Builder.copyOf(gameParty)
                 .withOpponent(gameParty.player())
                 .withPlayer(gameParty.opponent())
                 .build();
 
-        var hand = botGameParty.player().hand();
+        var hand = botGameParty.currentPlayer().hand();
         var cardSingleton = cardService.getCardsStochastic(hand, 1, false);
         var card = cardSingleton.stream()
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
 
-        playingTurn.onTurn(botGameParty, card);
+        playerAction.apply(botGameParty);
 
         // botGameParty = botGameParty.emplacePlayerCardInBoard(card);
         botGameParty = botGameParty.nextTurn();

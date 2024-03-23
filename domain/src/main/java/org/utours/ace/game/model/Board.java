@@ -1,15 +1,19 @@
 package org.utours.ace.game.model;
 
-import org.utours.ace.profile.model.Card;
-
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public record Board(
-        List<Card> cards
+        List<Slot> cards
 ) {
 
+    public static int MAX_SLOT = 8;
+
     public Board() {
-        this(List.of());
+        this(IntStream.range(0, MAX_SLOT)
+                .mapToObj(operand -> new Slot.SEmpty())
+                .collect(Collectors.toList()));
     }
 
 }

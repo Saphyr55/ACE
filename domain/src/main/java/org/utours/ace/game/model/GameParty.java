@@ -3,6 +3,7 @@ package org.utours.ace.game.model;
 import org.utours.ace.game.port.PlayerAction;
 
 public record GameParty(
+        String uid,
         Player player,
         Player opponent,
         Player currentPlayer,
@@ -54,6 +55,7 @@ public record GameParty(
 
     public static class Builder {
 
+        private String uid;
         private Player player;
         private Player opponent;
         private Player currentPlayer;
@@ -68,6 +70,7 @@ public record GameParty(
 
         public static Builder copyOf(GameParty gameParty) {
             return of()
+                    .withUid(gameParty.uid)
                     .withPlayerBoard(gameParty.playerBoard)
                     .withOpponentBoard(gameParty.opponentBoard)
                     .withCurrentPlayer(gameParty.currentPlayer)
@@ -75,6 +78,11 @@ public record GameParty(
                     .withPlayer(gameParty.player)
                     .withWaiting(gameParty.isWaiting)
                     .withNumberTurn(gameParty.numberTurn);
+        }
+
+        public Builder withUid(String uid) {
+            this.uid = uid;
+            return this;
         }
 
         public Builder withWaiting(boolean waiting) {
@@ -113,7 +121,12 @@ public record GameParty(
         }
 
         public GameParty build() {
+
+            if (currentPlayer == null)
+                currentPlayer = player;
+
             return new GameParty(
+                    uid,
                     player,
                     opponent,
                     currentPlayer,

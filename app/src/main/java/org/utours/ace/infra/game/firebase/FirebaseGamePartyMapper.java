@@ -6,6 +6,7 @@ import org.utours.ace.game.model.Slot;
 import org.utours.ace.infra.profile.firebase.FirebaseCardMapper;
 
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class FirebaseGamePartyMapper {
 
@@ -19,22 +20,53 @@ public class FirebaseGamePartyMapper {
 
     GameParty map(FirebaseGameParty fgp) {
         return GameParty.Builder.of()
+                .withUid(fgp.getUid())
+                .withCurrentPlayer(playerMapper.map(fgp.getCurrentPlayer()))
                 .withPlayer(playerMapper.map(fgp.getFirstPlayer()))
+                .withPlayerBoard(mapBoard(fgp.getFirstPlayerBoard()))
                 .withOpponent(playerMapper.map(fgp.getSecondPlayer()))
                 .withOpponentBoard(mapBoard(fgp.getSecondPlayerBoard()))
-                .withPlayerBoard(mapBoard(fgp.getFirstPlayerBoard()))
                 .withNumberTurn(fgp.getNumberTurn())
                 .withWaiting(fgp.getWaiting())
                 .build();
     }
 
+    FirebaseGameParty map(GameParty gp) {
+        FirebaseGameParty fgp = new FirebaseGameParty();
+        fgp.setUid(gp.uid());
+        fgp.setNumberTurn(gp.numberTurn());
+        fgp.setSecondPlayer(playerMapper.map(gp.opponent()));
+        fgp.setFirstPlayer(playerMapper.map(gp.player()));
+        fgp.setCurrentPlayer(playerMapper.map(gp.currentPlayer()));
+        fgp.setFirstPlayerBoard(mapBoard(gp.playerBoard()));
+        fgp.setSecondPlayerBoard(mapBoard(gp.opponentBoard()));
+        return fgp;
+    }
+
+
     Board mapBoard(FirebaseBoard board) {
-        return new Board(board.getBoard().stream().map(firebaseSlot -> {
-            if (firebaseSlot.getCard() == null) {
-                return new Slot.SEmpty();
-            }
-            return new Slot.SCard(cardMapper.map(firebaseSlot.getCard()));
-        }).collect(Collectors.toList()));
+        return new Board(IntStream.range(0, 8)
+                .mapToObj(i -> {
+                    var fbSlot = board.getBoard().get(i);
+                    if (fbSlot == null || fbSlot.getCard() == null)
+                        return new Slot.SEmpty();
+                    return new Slot.SCard(cardMapper.map(fbSlot.getCard()));
+                }).collect(Collectors.toList()));
+    }
+
+    FirebaseBoard mapBoard(Board board) {
+        FirebaseBoard firebaseBoard = new FirebaseBoard();
+        firebaseBoard.setBoard(IntStream.range(0, 8)
+                .mapToObj(i -> {
+                    FirebaseSlot firebaseSlot = new FirebaseSlot();
+                    var slot = board.slots().get(i);
+                    if (slot instanceof Slot.SCard sCard) {
+                        firebaseSlot.setEmpty(false);
+                        firebaseSlot.setCard(cardMapper.map(sCard.card()));
+                    }
+                    return firebaseSlot;
+                }).collect(Collectors.toList()));
+        return firebaseBoard;
     }
 
 }

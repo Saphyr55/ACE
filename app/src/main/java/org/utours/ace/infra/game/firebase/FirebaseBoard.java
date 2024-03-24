@@ -12,7 +12,7 @@ import java.util.stream.IntStream;
 public class FirebaseBoard {
 
     private List<FirebaseSlot> board = IntStream.range(0, 8)
-            .mapToObj(operand -> (FirebaseSlot) null)
+            .mapToObj(operand -> new FirebaseSlot())
             .collect(Collectors.toList());
 
     public List<FirebaseSlot> getBoard() {

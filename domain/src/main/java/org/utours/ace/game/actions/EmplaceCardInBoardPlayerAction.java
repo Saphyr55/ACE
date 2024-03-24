@@ -26,7 +26,7 @@ public class EmplaceCardInBoardPlayerAction implements PlayerAction {
 
         Player player = gameParty.player();
         List<Card> hand = new ArrayList<>(player.hand());
-        List<Slot> board = new ArrayList<>(gameParty.playerBoard().cards());
+        List<Slot> board = new ArrayList<>(gameParty.playerBoard().slots());
 
         if (board.get(slotPosition) instanceof Slot.SEmpty) {
 

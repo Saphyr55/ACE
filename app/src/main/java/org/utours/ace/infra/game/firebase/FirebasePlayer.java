@@ -4,6 +4,7 @@ import org.utours.ace.common.annotation.Bean;
 import org.utours.ace.infra.common.firebase.annotation.FirebaseModel;
 import org.utours.ace.infra.profile.firebase.FirebaseCard;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Bean
@@ -11,9 +12,8 @@ import java.util.List;
 public class FirebasePlayer {
 
     private String playerID;
-
-    private List<FirebaseCard> hand = List.of();
-
+    private List<FirebaseCard> hand = new ArrayList<>();
+    private List<FirebaseCard> deck = new ArrayList<>();
 
     public String getPlayerID() {
         return playerID;
@@ -29,5 +29,13 @@ public class FirebasePlayer {
 
     public void setHand(List<FirebaseCard> hand) {
         this.hand = hand;
+    }
+
+    public List<FirebaseCard> getDeck() {
+        return deck;
+    }
+
+    public void setDeck(List<FirebaseCard> deck) {
+        this.deck = deck;
     }
 }

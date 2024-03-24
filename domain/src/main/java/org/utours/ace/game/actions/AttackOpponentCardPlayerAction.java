@@ -2,7 +2,6 @@ package org.utours.ace.game.actions;
 
 import org.utours.ace.game.model.Board;
 import org.utours.ace.game.model.GameParty;
-import org.utours.ace.game.model.Player;
 import org.utours.ace.game.model.Slot;
 import org.utours.ace.game.port.PlayerAction;
 import org.utours.ace.profile.model.Card;
@@ -25,8 +24,8 @@ public class AttackOpponentCardPlayerAction implements PlayerAction  {
         Board playerBoard = gameParty.playerBoard();
         Board opponentBoard = gameParty.opponentBoard();
 
-        Slot playerSlot = playerBoard.cards().get(playerCardPos);
-        Slot opponentSlot = opponentBoard.cards().get(opponentCardPos);
+        Slot playerSlot = playerBoard.slots().get(playerCardPos);
+        Slot opponentSlot = opponentBoard.slots().get(opponentCardPos);
 
         if (playerSlot instanceof Slot.SEmpty || opponentSlot instanceof Slot.SEmpty)
             return gameParty;
@@ -56,10 +55,10 @@ public class AttackOpponentCardPlayerAction implements PlayerAction  {
                 ? new Slot.SEmpty()
                 : new Slot.SCard(opponentCard);
 
-        gameParty.playerBoard().cards()
+        gameParty.playerBoard().slots()
                 .set(playerCardPos, newPlayerSlot);
 
-        gameParty.opponentBoard().cards()
+        gameParty.opponentBoard().slots()
                 .set(opponentCardPos, newOpponentSlot);
 
         return GameParty.Builder

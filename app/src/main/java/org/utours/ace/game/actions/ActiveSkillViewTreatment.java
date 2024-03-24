@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.View;
 
 import org.utours.ace.common.Selectable;
-import org.utours.ace.common.notify.Observable;
 import org.utours.ace.game.dialog.ConfirmSkillDialog;
 import org.utours.ace.game.feature.GameService;
 import org.utours.ace.game.model.GameParty;
@@ -19,6 +18,7 @@ import java.util.function.Function;
 
 public class ActiveSkillViewTreatment implements PlayerAction {
 
+    private final AttackOpponentCardViewTreatment attackPlayerAction;
     private final Context context;
     private final GameService gameService;
     private final List<View> playerBoard;
@@ -28,7 +28,6 @@ public class ActiveSkillViewTreatment implements PlayerAction {
     private final Selectable<Integer> fromPos;
     private final Selectable<Integer> toPos;
     private final boolean isOpponent;
-    private final AttackOpponentCardViewTreatment attackPlayerAction;
 
     public ActiveSkillViewTreatment(Context context,
                                     GameService gameService,
@@ -62,10 +61,10 @@ public class ActiveSkillViewTreatment implements PlayerAction {
                 : playerBoard.get(toPos.getValue());
 
         Slot slotTo = isOpponent
-                ? gameParty.opponentBoard().cards().get(toPos.getValue())
-                : gameParty.playerBoard().cards().get(toPos.getValue());
+                ? gameParty.opponentBoard().slots().get(toPos.getValue())
+                : gameParty.playerBoard().slots().get(toPos.getValue());
 
-        Slot slotFrom = gameParty.playerBoard().cards().get(fromPos.getValue());
+        Slot slotFrom = gameParty.playerBoard().slots().get(fromPos.getValue());
 
         return process(gameParty, slotFrom, slotTo);
     }

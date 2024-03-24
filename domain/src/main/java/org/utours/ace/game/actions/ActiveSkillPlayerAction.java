@@ -18,8 +18,8 @@ public class ActiveSkillPlayerAction implements PlayerAction {
 
     @Override
     public GameParty apply(GameParty gameParty) {
-        Slot slotFrom = gameParty.playerBoard().cards().get(slotFromPos);
-        Slot slotTo = gameParty.playerBoard().cards().get(slotToPos);
+        Slot slotFrom = gameParty.playerBoard().slots().get(slotFromPos);
+        Slot slotTo = gameParty.playerBoard().slots().get(slotToPos);
         return skillAction.apply(gameParty, slotFrom, slotTo);
     }
 

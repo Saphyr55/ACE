@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public record Board(
-        List<Slot> cards
+        List<Slot> slots
 ) {
 
     public static int MAX_SLOT = 8;

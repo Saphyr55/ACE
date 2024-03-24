@@ -7,11 +7,10 @@ import org.utours.ace.infra.common.firebase.annotation.FirebaseModel;
 @FirebaseModel
 public class FirebaseGameParty {
 
-    public static final String WAITING_REF = "waiting";
-
     private String uid;
     private FirebasePlayer firstPlayer;
     private FirebasePlayer secondPlayer;
+    private FirebasePlayer currentPlayer;
     private FirebaseBoard firstPlayerBoard = new FirebaseBoard();
     private FirebaseBoard secondPlayerBoard = new FirebaseBoard();
     private int numberTurn = 0;
@@ -31,6 +30,14 @@ public class FirebaseGameParty {
 
     public void setFirstPlayer(FirebasePlayer firstPlayer) {
         this.firstPlayer = firstPlayer;
+    }
+
+    public FirebasePlayer getCurrentPlayer() {
+        return currentPlayer;
+    }
+
+    public void setCurrentPlayer(FirebasePlayer currentPlayer) {
+        this.currentPlayer = currentPlayer;
     }
 
     public FirebasePlayer getSecondPlayer() {

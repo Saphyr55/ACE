@@ -7,7 +7,8 @@ public class FirebaseDatabaseReferences {
 
     public static final String PLAYER_ACCOUNTS_REF = "player_accounts";
     public static final String GAME_PARTIES_REF = "game_parties";
-    public static final String GAME_PARTIES_WAITING_REF = "waiting";
+    public static final String GAME_PARTIES_WAITING_REF = "game_parties_waiting";
+
     private final FirebaseDatabase database;
 
     public FirebaseDatabaseReferences(FirebaseDatabase database) {
@@ -22,5 +23,8 @@ public class FirebaseDatabaseReferences {
         return database.getReference(GAME_PARTIES_REF);
     }
 
+    public DatabaseReference waitingGamePartiesReference() {
+        return database.getReference(GAME_PARTIES_WAITING_REF);
+    }
 
 }

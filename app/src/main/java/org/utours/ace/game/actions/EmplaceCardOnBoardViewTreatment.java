@@ -3,9 +3,7 @@ package org.utours.ace.game.actions;
 import android.view.View;
 
 import org.utours.ace.R;
-import org.utours.ace.common.notify.Observable;
 import org.utours.ace.game.CardViewBinding;
-import org.utours.ace.game.feature.GameService;
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.port.PlayerAction;
 import org.utours.ace.profile.model.Card;
@@ -62,11 +60,11 @@ public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
         var frameLayout = view.findViewById(R.id.view_cardSlot);
         var playerCardView = new CardViewBinding(frameLayout);
 
+        playerCardView.bind(card, imagesRefs.apply(card));
+
         cardView.setVisibility(View.GONE);
         emptyView.setVisibility(View.GONE);
         frameLayout.setVisibility(View.VISIBLE);
-
-        playerCardView.bind(card, imagesRefs.apply(card));
     }
 
     private boolean checkCanPutCard(GameParty gameParty, View emptyView) {

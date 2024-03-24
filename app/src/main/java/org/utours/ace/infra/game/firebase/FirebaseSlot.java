@@ -8,7 +8,8 @@ import org.utours.ace.infra.profile.firebase.FirebaseCard;
 @FirebaseModel
 public class FirebaseSlot {
 
-    private FirebaseCard card;
+    private FirebaseCard card = null;
+    private boolean empty = true;
 
     public FirebaseCard getCard() {
         return card;
@@ -18,5 +19,13 @@ public class FirebaseSlot {
         this.card = card;
     }
 
+
+    public boolean getEmpty() {
+        return empty;
+    }
+
+    public void setEmpty(boolean empty) {
+        this.empty = empty;
+    }
 
 }

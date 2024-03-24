@@ -1,22 +1,22 @@
 package org.utours.ace.game.base;
 
 import android.animation.ObjectAnimator;
-import android.content.Context;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 
-import org.utours.ace.R;
 import org.utours.ace.common.Selectable;
+import org.utours.ace.game.model.GameParty;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class SlotCardSelectable implements Selectable<Integer> {
 
     private final CardSelectable<Integer> wrapped;
+    private final Supplier<GameParty> gamePartySupplier;
     private final List<View> playerBoard;
 
-    public SlotCardSelectable(List<View> playerBoard) {
+    public SlotCardSelectable(Supplier<GameParty> gamePartySupplier, List<View> playerBoard) {
+        this.gamePartySupplier = gamePartySupplier;
         this.playerBoard = playerBoard;
         this.wrapped = new CardSelectable<>(this::startAnimation, this::stopAnimation);
     }
@@ -45,7 +45,6 @@ public class SlotCardSelectable implements Selectable<Integer> {
     public boolean isSelect() {
         return wrapped.isSelect();
     }
-
 
     private void startAnimation(Integer i) {
         animate(playerBoard.get(i), 20);

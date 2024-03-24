@@ -1,9 +1,10 @@
-package org.utours.ace.game.use_case;
+package org.utours.ace.game.actions;
 
 import android.view.View;
 
 import org.utours.ace.R;
-import org.utours.ace.game.PlayerCardView;
+import org.utours.ace.common.notify.Observable;
+import org.utours.ace.game.CardViewBinding;
 import org.utours.ace.game.feature.GameService;
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.port.PlayerAction;
@@ -52,14 +53,14 @@ public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
 
         viewTreatmentOnPressedEmptyCardBoard(card, cardView, slotView);
 
-        return gameParty;
+        return gameParty.addPlayerAction(this);
     }
 
     private void viewTreatmentOnPressedEmptyCardBoard(Card card, View cardView, View view) {
 
         var emptyView = view.findViewById(R.id.view_emptySlot);
         var frameLayout = view.findViewById(R.id.view_cardSlot);
-        var playerCardView = new PlayerCardView(frameLayout);
+        var playerCardView = new CardViewBinding(frameLayout);
 
         cardView.setVisibility(View.GONE);
         emptyView.setVisibility(View.GONE);

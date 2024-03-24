@@ -6,7 +6,7 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import org.utours.ace.infra.common.http.HttpImageDownloader;
 import org.utours.ace.infra.profile.firebase.FirebaseCardMapper;
-import org.utours.ace.infra.profile.firebase.FirebaseDatabaseReferences;
+import org.utours.ace.infra.common.firebase.FirebaseDatabaseReferences;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountMapper;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountRepository;
 import org.utours.ace.infra.profile.mal.MalImageCardDownloader;
@@ -18,8 +18,6 @@ import org.utours.ace.profile.feature.GachaService;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.port.ImageCardDownloader;
 import org.utours.ace.profile.port.PlayerAccountRepository;
-
-import java.util.HashMap;
 
 public enum PlayerAccountContainer {
     INSTANCE;

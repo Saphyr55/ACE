@@ -60,5 +60,9 @@
     <string name="find_a_party">Find a party</string>
     <string name="five">5</string>
     <string name="game">Game</string>
+    <string name="target">Target</string>
+    <string name="attack">Attack</string>
+    <string name="activate_skill">Activate Skill</string>
+    <string name="player">Player</string>
 
 </resources>

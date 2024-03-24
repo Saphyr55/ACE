@@ -2,17 +2,33 @@ package org.utours.ace.game.feature;
 
 
 import org.utours.ace.common.annotation.DomainService;
+import org.utours.ace.common.notify.Property;
 import org.utours.ace.game.model.GameParty;
+import org.utours.ace.game.model.Slot;
 import org.utours.ace.game.port.PlayerAction;
+import org.utours.ace.game.port.SkillAction;
+import org.utours.ace.game.skills.PriestSkillAction;
 import org.utours.ace.profile.feature.CardService;
+import org.utours.ace.profile.model.Card;
 
 @DomainService
 public class GameService {
-
+    
     private final CardService cardService;
 
     public GameService(CardService cardService) {
         this.cardService = cardService;
+    }
+
+    public SkillAction getSkillAction(Card card) {
+        return switch (card.classCoin().type()) {
+            case EMPTY -> SkillAction.nothing();
+            case PRIEST -> new PriestSkillAction();
+            case PALADIN -> SkillAction.nothing();
+            case SHAMAN -> SkillAction.nothing();
+            case MAGE -> SkillAction.nothing();
+            case WARRIOR -> SkillAction.nothing();
+        };
     }
 
     public GameParty botAction(PlayerAction playerAction, GameParty gameParty) {

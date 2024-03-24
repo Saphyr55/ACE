@@ -1,4 +1,4 @@
-package org.utours.ace.game.use_case;
+package org.utours.ace.game.actions;
 
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Slot;
@@ -20,7 +20,7 @@ public class ActiveSkillPlayerAction implements PlayerAction {
     public GameParty apply(GameParty gameParty) {
         Slot slotFrom = gameParty.playerBoard().cards().get(slotFromPos);
         Slot slotTo = gameParty.playerBoard().cards().get(slotToPos);
-        return skillAction.process(gameParty, slotFrom, slotTo);
+        return skillAction.apply(gameParty, slotFrom, slotTo);
     }
 
 }

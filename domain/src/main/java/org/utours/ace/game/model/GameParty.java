@@ -1,9 +1,6 @@
 package org.utours.ace.game.model;
 
-import org.utours.ace.profile.model.Card;
-
-import java.util.ArrayList;
-import java.util.List;
+import org.utours.ace.game.port.PlayerAction;
 
 public record GameParty(
         Player player,
@@ -11,10 +8,19 @@ public record GameParty(
         Player currentPlayer,
         Board playerBoard,
         Board opponentBoard,
-        int numberTurn
+        int numberTurn,
+        boolean isWaiting
 ) {
 
     public static int MAX_SLOT = 8;
+
+    public GameParty addPlayerAction(PlayerAction playerAction) {
+        player().actions().add(playerAction);
+        if (player().actions().size() == 3) {
+            return nextTurn();
+        }
+        return GameParty.Builder.copyOf(this).build();
+    }
 
     public GameParty incrementNumberTurn() {
         return GameParty.Builder.copyOf(this)
@@ -54,22 +60,27 @@ public record GameParty(
         private Board playerBoard = new Board();
         private Board opponentBoard = new Board();
         private int numberTurn = 0;
+        private boolean isWaiting = true;
 
-        public static Builder newInstance() {
+        public static Builder of() {
             return new Builder();
         }
 
         public static Builder copyOf(GameParty gameParty) {
-            return newInstance()
+            return of()
                     .withPlayerBoard(gameParty.playerBoard)
                     .withOpponentBoard(gameParty.opponentBoard)
                     .withCurrentPlayer(gameParty.currentPlayer)
                     .withOpponent(gameParty.opponent)
                     .withPlayer(gameParty.player)
+                    .withWaiting(gameParty.isWaiting)
                     .withNumberTurn(gameParty.numberTurn);
         }
 
-
+        public Builder withWaiting(boolean waiting) {
+            isWaiting = waiting;
+            return this;
+        }
 
         public Builder withNumberTurn(int numberTurn) {
             this.numberTurn = numberTurn;
@@ -108,7 +119,8 @@ public record GameParty(
                     currentPlayer,
                     playerBoard,
                     opponentBoard,
-                    numberTurn
+                    numberTurn,
+                    isWaiting
             );
         }
 

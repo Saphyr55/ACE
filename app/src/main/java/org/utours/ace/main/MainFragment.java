@@ -43,10 +43,10 @@ public class MainFragment extends Fragment {
     }
 
     private void onPressFindParty() {
+        navActivity.fullyReplaceFragment(new WaitFragment());
         CardService cardService = PlayerAccountContainer.INSTANCE.getCardService(navActivity);
         PlayerAccountService playerAccountService = PlayerAccountContainer.INSTANCE.getService();
         GameFragment gameFragment = GameFragment.newInstance(navActivity, cardService, playerAccountService);
-        navActivity.fullyReplaceFragment(new WaitFragment());
         gameFragment.setup().thenRun(() -> navActivity.fullyReplaceFragment(gameFragment));
     }
 

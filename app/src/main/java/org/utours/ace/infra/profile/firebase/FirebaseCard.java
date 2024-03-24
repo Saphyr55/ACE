@@ -6,7 +6,7 @@ import org.utours.ace.profile.model.ClassCoin;
 
 @Bean
 @FirebaseModel
-class FirebaseCard {
+public class FirebaseCard {
 
     private String id;
     private String name;

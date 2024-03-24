@@ -4,9 +4,12 @@ import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.CardRarity;
 import org.utours.ace.profile.model.ClassCoin;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class FirebaseCardMapper {
 
-    Card map(FirebaseCard card) {
+    public Card map(FirebaseCard card) {
         return Card.Builder.newBuilder()
                 .withId(card.getId())
                 .withName(card.getName())
@@ -19,7 +22,7 @@ public class FirebaseCardMapper {
                 .build();
     }
 
-    FirebaseCard map(Card card) {
+    public FirebaseCard map(Card card) {
         FirebaseCard firebaseCard = new FirebaseCard();
         firebaseCard.setId(card.id());
         firebaseCard.setAttackPoint(card.attackPoint());
@@ -32,5 +35,15 @@ public class FirebaseCardMapper {
         return firebaseCard;
     }
 
+    public List<Card> mapFs(List<FirebaseCard> cards) {
+        return cards.stream()
+                .map(this::map)
+                .collect(Collectors.toList());
+    }
 
+    public List<FirebaseCard> map(List<Card> cards) {
+        return cards.stream()
+                .map(this::map)
+                .collect(Collectors.toList());
+    }
 }

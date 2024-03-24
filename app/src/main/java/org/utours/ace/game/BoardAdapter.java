@@ -46,15 +46,15 @@ public class BoardAdapter extends RecyclerView.Adapter<BoardAdapter.CardViewHold
 
     public static class CardViewHolder extends RecyclerView.ViewHolder {
 
-        private final PlayerCardView playerCardView;
+        private final CardViewBinding cardViewBinding;
 
         public CardViewHolder(@NonNull View itemView) {
             super(itemView);
-            playerCardView = new PlayerCardView(itemView);
+            cardViewBinding = new CardViewBinding(itemView);
         }
 
         public void bind(Card card, ImageCard imageCard) {
-            playerCardView.bind(card, imageCard);
+            cardViewBinding.bind(card, imageCard);
         }
 
     }

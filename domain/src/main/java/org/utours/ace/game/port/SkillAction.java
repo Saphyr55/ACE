@@ -6,6 +6,10 @@ import org.utours.ace.game.model.Slot;
 @FunctionalInterface
 public interface SkillAction {
 
-    GameParty process(GameParty gameParty, Slot slotFrom, Slot slotTo);
+    GameParty apply(GameParty gameParty, Slot slotFrom, Slot slotTo);
+
+    static SkillAction nothing() {
+        return (gameParty, slotFrom, slotTo) -> gameParty;
+    }
 
 }

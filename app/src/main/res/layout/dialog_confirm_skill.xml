@@ -20,12 +20,13 @@
             android:orientation="vertical">
 
             <TextView
-                android:text="You"
+                android:text="@string/player"
                 android:textColor="@color/mana"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
             <include
+                android:id="@+id/layout_cardFrom"
                 android:layout_margin="20dp"
                 layout="@layout/item_game_card"
                 android:layout_height="200dp"
@@ -41,12 +42,13 @@
             android:orientation="vertical">
 
             <TextView
-                android:text="Opponent"
+                android:text="@string/target"
                 android:textColor="@color/lifePoint"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
             <include
+                android:id="@+id/layout_cardTo"
                 android:layout_margin="20dp"
                 layout="@layout/item_game_card"
                 android:layout_height="200dp"
@@ -65,17 +67,20 @@
         android:background="@color/black" />
 
     <Button
-        android:text="Attack"
+        android:id="@+id/btn_attack"
+        android:text="@string/attack"
         android:layout_width="170dp"
         android:layout_height="wrap_content" />
 
     <Button
-        android:text="Activate Skill"
+        android:id="@+id/btn_activateSkill"
+        android:text="@string/activate_skill"
         android:layout_width="170dp"
         android:layout_height="wrap_content" />
 
     <Button
-        android:text="Cancel"
+        android:id="@+id/btn_cancel"
+        android:text="@string/cancel"
         android:layout_width="170dp"
         android:layout_height="wrap_content" />
 

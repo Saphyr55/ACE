@@ -1,5 +1,6 @@
 package org.utours.ace.game.actions;
 
+import org.utours.ace.game.model.Board;
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Slot;
 import org.utours.ace.game.port.PlayerAction;
@@ -18,8 +19,9 @@ public class ActiveSkillPlayerAction implements PlayerAction {
 
     @Override
     public GameParty apply(GameParty gameParty) {
-        Slot slotFrom = gameParty.playerBoard().slots().get(slotFromPos);
-        Slot slotTo = gameParty.playerBoard().slots().get(slotToPos);
+        Board board = gameParty.currentPlayerBoard();
+        Slot slotFrom = board.slots().get(slotFromPos);
+        Slot slotTo = board.slots().get(slotToPos);
         return skillAction.apply(gameParty, slotFrom, slotTo);
     }
 

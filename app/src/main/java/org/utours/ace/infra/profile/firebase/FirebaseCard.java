@@ -16,6 +16,7 @@ public class FirebaseCard {
     private Integer manaPoint;
     private String rarity;
     private String classCoin = ClassCoin.Type.EMPTY.name();
+    private boolean empty = false;
 
     public FirebaseCard() {
 
@@ -83,5 +84,13 @@ public class FirebaseCard {
 
     public void setClassCoin(String classCoin) {
         this.classCoin = classCoin;
+    }
+
+    public boolean getEmpty() {
+        return empty;
+    }
+
+    public void setEmpty(boolean empty) {
+        this.empty = empty;
     }
 }

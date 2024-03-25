@@ -4,11 +4,11 @@ import org.utours.ace.game.port.PlayerAction;
 
 public record GameParty(
         String uid,
-        Player player,
-        Player opponent,
-        Player currentPlayer,
-        Board playerBoard,
-        Board opponentBoard,
+        String currentPlayerUID,
+        Player firstPlayer,
+        Player secondPlayer,
+        Board firstPlayerBoard,
+        Board secondPlayerBoard,
         int numberTurn,
         boolean isWaiting
 ) {
@@ -16,51 +16,60 @@ public record GameParty(
     public static int MAX_SLOT = 8;
 
     public GameParty addPlayerAction(PlayerAction playerAction) {
-        player().actions().add(playerAction);
-        if (player().actions().size() == 3) {
-            return nextTurn();
-        }
+        currentPlayer().actions().add(playerAction);
         return GameParty.Builder.copyOf(this).build();
     }
 
-    public GameParty incrementNumberTurn() {
+    public GameParty nextTurn() {
+        currentPlayer().actions().clear();
         return GameParty.Builder.copyOf(this)
                 .withNumberTurn(numberTurn + 1)
+                .withCurrentPlayerUID(opponentPlayer().playerID())
                 .build();
     }
 
-    public GameParty nextTurn() {
-
-        var gameParty = incrementNumberTurn();
-        Player newCurrentPlayer = gameParty.isPlayerTurn()
-                ? gameParty.opponent()
-                : gameParty.player();
-
-        return GameParty.Builder.copyOf(gameParty)
-                .withCurrentPlayer(newCurrentPlayer)
-                .build();
+    public boolean isCurrentPlayer(Player player) {
+        return player.playerID().equals(currentPlayerUID);
     }
 
-    public boolean isPlayerTurn() {
-        return isCurrentPlayer(player());
+    public Player currentPlayer() {
+        return isCurrentPlayer(secondPlayer)
+                ? secondPlayer
+                : firstPlayer;
     }
 
-    public boolean isOpponentTurn() {
-        return isCurrentPlayer(opponent());
+    public Board currentPlayerBoard() {
+        return isCurrentPlayer(secondPlayer)
+                ? secondPlayerBoard
+                : firstPlayerBoard;
     }
 
-    private boolean isCurrentPlayer(Player player) {
-        return player.playerID().equals(currentPlayer().playerID());
+    public Board opponentPlayerBoard() {
+        return isCurrentPlayer(secondPlayer)
+                ? firstPlayerBoard
+                : secondPlayerBoard;
+    }
+
+    public Player opponentPlayer() {
+        return isCurrentPlayer(secondPlayer)
+                ? firstPlayer
+                : secondPlayer;
+    }
+
+    public Player oppositePlayerOf(Player player) {
+        return player.playerID().equals(firstPlayer.playerID())
+                ? secondPlayer
+                : firstPlayer;
     }
 
     public static class Builder {
 
         private String uid;
-        private Player player;
-        private Player opponent;
-        private Player currentPlayer;
-        private Board playerBoard = new Board();
-        private Board opponentBoard = new Board();
+        private String currentPlayerUID;
+        private Player firstPlayer;
+        private Player secondPlayer;
+        private Board firstPlayerBoard = new Board();
+        private Board secondPlayerBoard = new Board();
         private int numberTurn = 0;
         private boolean isWaiting = true;
 
@@ -71,11 +80,11 @@ public record GameParty(
         public static Builder copyOf(GameParty gameParty) {
             return of()
                     .withUid(gameParty.uid)
-                    .withPlayerBoard(gameParty.playerBoard)
-                    .withOpponentBoard(gameParty.opponentBoard)
-                    .withCurrentPlayer(gameParty.currentPlayer)
-                    .withOpponent(gameParty.opponent)
-                    .withPlayer(gameParty.player)
+                    .withFirstPlayerBoard(gameParty.firstPlayerBoard)
+                    .withOpponentBoard(gameParty.secondPlayerBoard)
+                    .withCurrentPlayerUID(gameParty.currentPlayerUID)
+                    .withOpponent(gameParty.secondPlayer)
+                    .withFirstPlayer(gameParty.firstPlayer)
                     .withWaiting(gameParty.isWaiting)
                     .withNumberTurn(gameParty.numberTurn);
         }
@@ -96,42 +105,60 @@ public record GameParty(
         }
 
         public Builder withOpponent(Player opponent) {
-            this.opponent = opponent;
+            this.secondPlayer = opponent;
             return this;
         }
 
         public Builder withOpponentBoard(Board opponentBoard) {
-            this.opponentBoard = opponentBoard;
+            this.secondPlayerBoard = opponentBoard;
             return this;
         }
 
-        public Builder withPlayer(Player player) {
-            this.player = player;
+        public Builder withFirstPlayer(Player player) {
+            this.firstPlayer = player;
             return this;
         }
 
-        public Builder withPlayerBoard(Board playerBoard) {
-            this.playerBoard = playerBoard;
+        public Builder withFirstPlayerBoard(Board playerBoard) {
+            this.firstPlayerBoard = playerBoard;
             return this;
         }
 
-        public Builder withCurrentPlayer(Player currentPlayer) {
-            this.currentPlayer = currentPlayer;
+        public Builder withCurrentPlayerUID(String currentPlayerUID) {
+            this.currentPlayerUID = currentPlayerUID;
+            return this;
+        }
+
+        public Builder withCurrentPlayer(Player player) {
+            if (currentPlayerUID.equals(firstPlayer.playerID())) {
+                firstPlayer = player;
+            } else {
+                secondPlayer = player;
+            }
+            return this;
+        }
+
+        public Builder withCurrentPlayerBoard(Board board) {
+            if (currentPlayerUID.equals(firstPlayer.playerID())) {
+                firstPlayerBoard = board;
+            } else {
+                secondPlayerBoard = board;
+            }
             return this;
         }
 
         public GameParty build() {
 
-            if (currentPlayer == null)
-                currentPlayer = player;
+            if (currentPlayerUID == null)
+                currentPlayerUID = firstPlayer.playerID();
 
             return new GameParty(
                     uid,
-                    player,
-                    opponent,
-                    currentPlayer,
-                    playerBoard,
-                    opponentBoard,
+                    currentPlayerUID,
+                    firstPlayer,
+                    secondPlayer,
+                    firstPlayerBoard,
+                    secondPlayerBoard,
                     numberTurn,
                     isWaiting
             );

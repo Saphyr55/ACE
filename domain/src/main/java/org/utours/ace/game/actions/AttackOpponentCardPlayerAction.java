@@ -21,8 +21,8 @@ public class AttackOpponentCardPlayerAction implements PlayerAction  {
     @Override
     public GameParty apply(GameParty gameParty) {
 
-        Board playerBoard = gameParty.playerBoard();
-        Board opponentBoard = gameParty.opponentBoard();
+        Board playerBoard = gameParty.currentPlayerBoard();
+        Board opponentBoard = gameParty.opponentPlayerBoard();
 
         Slot playerSlot = playerBoard.slots().get(playerCardPos);
         Slot opponentSlot = opponentBoard.slots().get(opponentCardPos);
@@ -55,15 +55,10 @@ public class AttackOpponentCardPlayerAction implements PlayerAction  {
                 ? new Slot.SEmpty()
                 : new Slot.SCard(opponentCard);
 
-        gameParty.playerBoard().slots()
-                .set(playerCardPos, newPlayerSlot);
+        playerBoard.slots().set(playerCardPos, newPlayerSlot);
+        opponentBoard.slots().set(opponentCardPos, newOpponentSlot);
 
-        gameParty.opponentBoard().slots()
-                .set(opponentCardPos, newOpponentSlot);
-
-        return GameParty.Builder
-                .copyOf(gameParty)
-                .build();
+        return GameParty.Builder.copyOf(gameParty).build();
     }
 
 

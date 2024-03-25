@@ -48,7 +48,9 @@ public class FirebaseGamePartyFinder implements GamePartyFinder {
     }
 
     @Override
-    public CompletableFuture<GameParty> join(PlayerAccount playerAccount, Consumer<GameParty> onUpdate) {
+    public CompletableFuture<GameParty> join(PlayerAccount playerAccount,
+                                             Consumer<Player> playerConsumer,
+                                             Consumer<GameParty> onUpdate) {
 
         var gamePartyFuture = new CompletableFuture<GameParty>();
         var wUidPaFuture = new CompletableFuture<Map.Entry<String, String>>();
@@ -78,6 +80,7 @@ public class FirebaseGamePartyFinder implements GamePartyFinder {
                         public void onDataChange(@NonNull DataSnapshot snapshot) {
                             var fgp = snapshot.child(uid).getValue(FirebaseGameParty.class);
                             if (fgp != null) {
+                                playerConsumer.accept(playerMapper.map(fgp.getSecondPlayer()));
                                 addOnUpdate(uid, onUpdate);
                                 var gp = gamePartyMapper.map(fgp);
                                 gamePartyFuture.complete(gp);
@@ -108,12 +111,16 @@ public class FirebaseGamePartyFinder implements GamePartyFinder {
             return playerAccountRepository.getByUID(wUidPa);
         }).thenAccept(pa -> {
 
-            var player = playerMapper.map(mapAccount(playerAccount));
+            var pp = mapAccount(pa.orElseThrow(RuntimeException::new));
+            var fFirstPlayer = playerMapper.map(pp);
+            var fSecondPlayer = playerMapper.map(mapAccount(playerAccount));
             FirebaseGameParty firebaseGameParty = new FirebaseGameParty();
             firebaseGameParty.setUid(partyUid.get());
-            firebaseGameParty.setCurrentPlayer(player);
-            firebaseGameParty.setFirstPlayer(player);
-            firebaseGameParty.setSecondPlayer(playerMapper.map(mapAccount(pa.orElseThrow(RuntimeException::new))));
+            firebaseGameParty.setCurrentPlayerUID(fFirstPlayer.getPlayerID());
+            firebaseGameParty.setFirstPlayer(fFirstPlayer);
+            firebaseGameParty.setSecondPlayer(fSecondPlayer);
+
+            playerConsumer.accept(pp);
 
             waitingGamePartiesRef.child(partyUid.get()).removeValue();
 

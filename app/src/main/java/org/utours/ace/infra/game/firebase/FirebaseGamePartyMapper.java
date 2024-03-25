@@ -21,9 +21,9 @@ public class FirebaseGamePartyMapper {
     GameParty map(FirebaseGameParty fgp) {
         return GameParty.Builder.of()
                 .withUid(fgp.getUid())
-                .withCurrentPlayer(playerMapper.map(fgp.getCurrentPlayer()))
-                .withPlayer(playerMapper.map(fgp.getFirstPlayer()))
-                .withPlayerBoard(mapBoard(fgp.getFirstPlayerBoard()))
+                .withCurrentPlayerUID(fgp.getCurrentPlayerUID())
+                .withFirstPlayer(playerMapper.map(fgp.getFirstPlayer()))
+                .withFirstPlayerBoard(mapBoard(fgp.getFirstPlayerBoard()))
                 .withOpponent(playerMapper.map(fgp.getSecondPlayer()))
                 .withOpponentBoard(mapBoard(fgp.getSecondPlayerBoard()))
                 .withNumberTurn(fgp.getNumberTurn())
@@ -35,11 +35,11 @@ public class FirebaseGamePartyMapper {
         FirebaseGameParty fgp = new FirebaseGameParty();
         fgp.setUid(gp.uid());
         fgp.setNumberTurn(gp.numberTurn());
-        fgp.setSecondPlayer(playerMapper.map(gp.opponent()));
-        fgp.setFirstPlayer(playerMapper.map(gp.player()));
-        fgp.setCurrentPlayer(playerMapper.map(gp.currentPlayer()));
-        fgp.setFirstPlayerBoard(mapBoard(gp.playerBoard()));
-        fgp.setSecondPlayerBoard(mapBoard(gp.opponentBoard()));
+        fgp.setSecondPlayer(playerMapper.map(gp.secondPlayer()));
+        fgp.setFirstPlayer(playerMapper.map(gp.firstPlayer()));
+        fgp.setCurrentPlayerUID(gp.currentPlayerUID());
+        fgp.setFirstPlayerBoard(mapBoard(gp.firstPlayerBoard()));
+        fgp.setSecondPlayerBoard(mapBoard(gp.secondPlayerBoard()));
         return fgp;
     }
 

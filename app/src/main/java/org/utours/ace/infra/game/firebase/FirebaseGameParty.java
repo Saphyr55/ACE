@@ -8,9 +8,9 @@ import org.utours.ace.infra.common.firebase.annotation.FirebaseModel;
 public class FirebaseGameParty {
 
     private String uid;
+    private String currentPlayerUID;
     private FirebasePlayer firstPlayer;
     private FirebasePlayer secondPlayer;
-    private FirebasePlayer currentPlayer;
     private FirebaseBoard firstPlayerBoard = new FirebaseBoard();
     private FirebaseBoard secondPlayerBoard = new FirebaseBoard();
     private int numberTurn = 0;
@@ -32,12 +32,12 @@ public class FirebaseGameParty {
         this.firstPlayer = firstPlayer;
     }
 
-    public FirebasePlayer getCurrentPlayer() {
-        return currentPlayer;
+    public String getCurrentPlayerUID() {
+        return currentPlayerUID;
     }
 
-    public void setCurrentPlayer(FirebasePlayer currentPlayer) {
-        this.currentPlayer = currentPlayer;
+    public void setCurrentPlayerUID(String currentPlayerUID) {
+        this.currentPlayerUID = currentPlayerUID;
     }
 
     public FirebasePlayer getSecondPlayer() {

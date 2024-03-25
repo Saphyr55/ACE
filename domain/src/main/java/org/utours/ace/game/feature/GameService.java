@@ -2,9 +2,7 @@ package org.utours.ace.game.feature;
 
 
 import org.utours.ace.common.annotation.DomainService;
-import org.utours.ace.common.notify.Property;
 import org.utours.ace.game.model.GameParty;
-import org.utours.ace.game.model.Slot;
 import org.utours.ace.game.port.PlayerAction;
 import org.utours.ace.game.port.SkillAction;
 import org.utours.ace.game.skills.PriestSkillAction;
@@ -32,10 +30,10 @@ public class GameService {
     }
 
     public GameParty botAction(PlayerAction playerAction, GameParty gameParty) {
-
+        /*
         var botGameParty = GameParty.Builder.copyOf(gameParty)
-                .withOpponent(gameParty.player())
-                .withPlayer(gameParty.opponent())
+                .withOpponent(gameParty.firstPlayer())
+                .withFirstPlayer(gameParty.secondPlayer())
                 .build();
 
         var hand = botGameParty.currentPlayer().hand();
@@ -50,9 +48,11 @@ public class GameService {
         botGameParty = botGameParty.nextTurn();
 
         return GameParty.Builder.copyOf(botGameParty)
-                .withPlayer(botGameParty.opponent())
-                .withOpponent(botGameParty.player())
+                .withFirstPlayer(botGameParty.secondPlayer())
+                .withOpponent(botGameParty.firstPlayer())
                 .build();
+         */
+        return gameParty;
     }
 
 

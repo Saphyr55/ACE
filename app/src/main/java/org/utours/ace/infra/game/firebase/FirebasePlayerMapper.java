@@ -1,12 +1,15 @@
 package org.utours.ace.infra.game.firebase;
 
 import org.utours.ace.game.model.Player;
+import org.utours.ace.game.port.PlayerAction;
 import org.utours.ace.infra.profile.firebase.FirebaseCardMapper;
 import org.utours.ace.profile.model.Deck;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class FirebasePlayerMapper {
 
@@ -19,7 +22,9 @@ public class FirebasePlayerMapper {
     public Player map(FirebasePlayer firebasePlayer) {
         return Player.Builder.of()
                 .withPlayerID(firebasePlayer.getPlayerID())
-                .withActions(new ArrayList<>())
+                .withActions(IntStream.range(0, firebasePlayer.getNumberAction())
+                        .mapToObj(value -> PlayerAction.noAction())
+                        .collect(Collectors.toList()))
                 .withHand(cardMapper.mapFs(firebasePlayer.getHand()))
                 .withDeck(new Deck(Set.copyOf(cardMapper.mapFs(firebasePlayer.getDeck()))))
                 .build();
@@ -30,6 +35,7 @@ public class FirebasePlayerMapper {
         firebasePlayer.setPlayerID(player.playerID());
         firebasePlayer.setHand(cardMapper.map(player.hand()));
         firebasePlayer.setDeck(cardMapper.map(List.copyOf(player.deck().cards())));
+        firebasePlayer.setNumberAction(player.actions().size());
         return firebasePlayer;
     }
 

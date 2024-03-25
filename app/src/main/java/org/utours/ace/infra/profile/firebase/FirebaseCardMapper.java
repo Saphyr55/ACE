@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 public class FirebaseCardMapper {
 
     public Card map(FirebaseCard card) {
+        if (card.getEmpty()) return null;
         return Card.Builder.newBuilder()
                 .withId(card.getId())
                 .withName(card.getName())
@@ -24,6 +25,10 @@ public class FirebaseCardMapper {
 
     public FirebaseCard map(Card card) {
         FirebaseCard firebaseCard = new FirebaseCard();
+        if (card == null) {
+            firebaseCard.setEmpty(true);
+            return firebaseCard;
+        }
         firebaseCard.setId(card.id());
         firebaseCard.setAttackPoint(card.attackPoint());
         firebaseCard.setLifePoint(card.lifePoint());

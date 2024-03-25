@@ -14,6 +14,7 @@ public class FirebasePlayer {
     private String playerID;
     private List<FirebaseCard> hand = new ArrayList<>();
     private List<FirebaseCard> deck = new ArrayList<>();
+    private int numberAction = 0;
 
     public String getPlayerID() {
         return playerID;
@@ -37,5 +38,13 @@ public class FirebasePlayer {
 
     public void setDeck(List<FirebaseCard> deck) {
         this.deck = deck;
+    }
+
+    public int getNumberAction() {
+        return numberAction;
+    }
+
+    public void setNumberAction(int numberAction) {
+        this.numberAction = numberAction;
     }
 }

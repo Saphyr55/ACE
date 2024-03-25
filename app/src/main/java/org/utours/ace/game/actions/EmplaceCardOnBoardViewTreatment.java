@@ -5,6 +5,7 @@ import android.view.View;
 import org.utours.ace.R;
 import org.utours.ace.game.CardViewBinding;
 import org.utours.ace.game.model.GameParty;
+import org.utours.ace.game.model.Player;
 import org.utours.ace.game.port.PlayerAction;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
@@ -20,13 +21,16 @@ public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
     private final Function<Card, ImageCard> imagesRefs;
     private final int cardPosition;
     private final int slotPosition;
+    private final Player player;
 
-    public EmplaceCardOnBoardViewTreatment(List<View> playerCardViews,
+    public EmplaceCardOnBoardViewTreatment(Player player,
+                                           List<View> playerCardViews,
                                            List<View> playerSlotViews,
                                            Function<Card, ImageCard> imagesRefs,
                                            int cardPosition,
                                            int slotPosition) {
 
+        this.player = player;
         this.playerAction = new EmplaceCardInBoardPlayerAction(cardPosition, slotPosition);
         this.playerCardViews = playerCardViews;
         this.slotViews = playerSlotViews;
@@ -37,8 +41,6 @@ public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
 
     @Override
     public GameParty apply(GameParty gameParty) {
-
-        gameParty = playerAction.apply(gameParty);
 
         var hand = gameParty.currentPlayer().hand();
         var card = hand.get(cardPosition);
@@ -51,7 +53,11 @@ public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
 
         viewTreatmentOnPressedEmptyCardBoard(card, cardView, slotView);
 
-        return gameParty.addPlayerAction(this);
+        gameParty = playerAction.apply(gameParty);
+
+        gameParty = gameParty.addPlayerAction(playerAction);
+
+        return gameParty;
     }
 
     private void viewTreatmentOnPressedEmptyCardBoard(Card card, View cardView, View view) {
@@ -69,7 +75,7 @@ public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
 
     private boolean checkCanPutCard(GameParty gameParty, View emptyView) {
         return !playerCardViews.isEmpty()
-                && gameParty.isPlayerTurn()
+                && gameParty.isCurrentPlayer(player)
                 && emptyView.getVisibility() == View.VISIBLE;
     }
 

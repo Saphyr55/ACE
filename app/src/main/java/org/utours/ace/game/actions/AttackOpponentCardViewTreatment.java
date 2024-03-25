@@ -51,8 +51,8 @@ public class AttackOpponentCardViewTreatment implements PlayerAction {
 
     private void applyViewTreatment(GameParty gameParty, View playerSlotView, View opponentSlotView) {
 
-        Slot opponentSlot = gameParty.opponentBoard().slots().get(opponentSlotPos);
-        Slot playerSlot = gameParty.opponentBoard().slots().get(playerSlotPos);
+        Slot opponentSlot = gameParty.opponentPlayerBoard().slots().get(opponentSlotPos);
+        Slot playerSlot = gameParty.currentPlayerBoard().slots().get(playerSlotPos);
 
         View playerEmptyView = playerSlotView.findViewById(R.id.view_emptySlot);
         View playerFrameLayout = playerSlotView.findViewById(R.id.view_cardSlot);

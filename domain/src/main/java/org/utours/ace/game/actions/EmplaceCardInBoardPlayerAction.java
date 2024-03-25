@@ -24,22 +24,24 @@ public class EmplaceCardInBoardPlayerAction implements PlayerAction {
     @Override
     public GameParty apply(GameParty gameParty) {
 
-        Player player = gameParty.player();
+        Player player = gameParty.currentPlayer();
         List<Card> hand = new ArrayList<>(player.hand());
-        List<Slot> board = new ArrayList<>(gameParty.playerBoard().slots());
+        List<Slot> board = new ArrayList<>(gameParty.currentPlayerBoard().slots());
 
         if (board.get(slotPosition) instanceof Slot.SEmpty) {
 
-            Card card = hand.remove(cardPosition);
-            Player newPlayer = Player.Builder.copyOf(player).build();
+            Card card = hand.set(cardPosition, null);
+            Player newPlayer = Player.Builder.copyOf(player)
+                    .withHand(hand)
+                    .build();
 
             board.set(slotPosition, new Slot.SCard(card));
 
             Board newPlayerBoard = new Board(List.copyOf(board));
 
             return GameParty.Builder.copyOf(gameParty)
-                    .withPlayer(newPlayer)
-                    .withPlayerBoard(newPlayerBoard)
+                    .withCurrentPlayer(newPlayer)
+                    .withCurrentPlayerBoard(newPlayerBoard)
                     .build();
         }
 

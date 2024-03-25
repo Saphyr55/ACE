@@ -56,15 +56,14 @@ public class ActiveSkillViewTreatment implements PlayerAction {
     @Override
     public GameParty apply(GameParty gameParty) {
 
-        View view = isOpponent
-                ? opponentBoard.get(toPos.getValue())
-                : playerBoard.get(toPos.getValue());
-
         Slot slotTo = isOpponent
-                ? gameParty.opponentBoard().slots().get(toPos.getValue())
-                : gameParty.playerBoard().slots().get(toPos.getValue());
+                ? gameParty.opponentPlayerBoard()
+                .slots().get(toPos.getValue())
+                : gameParty.currentPlayerBoard()
+                .slots().get(toPos.getValue());
 
-        Slot slotFrom = gameParty.playerBoard().slots().get(fromPos.getValue());
+        Slot slotFrom = gameParty.currentPlayerBoard()
+                .slots().get(fromPos.getValue());
 
         return process(gameParty, slotFrom, slotTo);
     }

@@ -39,14 +39,14 @@ public class AttackOpponentCardViewTreatment implements PlayerAction {
     @Override
     public GameParty apply(GameParty gameParty) {
 
-        GameParty newGameParty = playerAction.apply(gameParty);
-
         View playerSlotView = playerSlotViews.get(playerSlotPos);
         View opponentSlotView = opponentSlotViews.get(opponentSlotPos);
 
-        applyViewTreatment(newGameParty, playerSlotView, opponentSlotView);
+        gameParty = playerAction.apply(gameParty);
 
-        return newGameParty.addPlayerAction(this);
+        applyViewTreatment(gameParty, playerSlotView, opponentSlotView);
+
+        return gameParty.addPlayerAction(playerAction);
     }
 
     private void applyViewTreatment(GameParty gameParty, View playerSlotView, View opponentSlotView) {
@@ -76,14 +76,12 @@ public class AttackOpponentCardViewTreatment implements PlayerAction {
 
         if (playerSlot instanceof Slot.SCard playerSCard) {
             Card playerCard = playerSCard.card();
-
             CardViewBinding cardViewBinding = new CardViewBinding(playerFrameLayout);
             cardViewBinding.bind(playerCard, imagesRefs.apply(playerCard));
         }
 
         if (opponentSlot instanceof Slot.SCard opponentSCard) {
             Card card = opponentSCard.card();
-
             CardViewBinding cardViewBinding = new CardViewBinding(opponentFrameLayout);
             cardViewBinding.bind(card, imagesRefs.apply(card));
         }

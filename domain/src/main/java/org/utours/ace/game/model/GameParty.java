@@ -21,7 +21,6 @@ public record GameParty(
     }
 
     public GameParty nextTurn() {
-        currentPlayer().actions().clear();
         return GameParty.Builder.copyOf(this)
                 .withNumberTurn(numberTurn + 1)
                 .withCurrentPlayerUID(opponentPlayer().playerID())

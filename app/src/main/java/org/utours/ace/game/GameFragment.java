@@ -16,6 +16,7 @@ import org.utours.ace.R;
 import org.utours.ace.common.Selectable;
 import org.utours.ace.game.actions.ActiveSkillViewTreatment;
 import org.utours.ace.game.actions.EmplaceCardOnBoardViewTreatment;
+import org.utours.ace.game.actions.EmptyPlayerAction;
 import org.utours.ace.game.base.CardSelectable;
 import org.utours.ace.game.base.SlotCardSelectable;
 import org.utours.ace.game.feature.GameService;
@@ -50,7 +51,7 @@ public class GameFragment extends Fragment {
     private GamePartyFinder gamePartyFinder;
     private Map<String, ImageCard> imageCardsReferences;
     private Selectable<Integer> firstSelectedCardSlotView;
-    private Selectable<Integer> secondSelectedCardSlotView;
+    private SlotCardSelectable secondSelectedCardSlotView;
     private Selectable<Integer> selectedEmptySlotView;
     private Selectable<Integer> selectedHandCardView;
     private GameParty gameParty;
@@ -92,8 +93,8 @@ public class GameFragment extends Fragment {
                         startDefaultObjectAnimatorTransY(playerCardViews.get(i), -50.0f);
                     },
                     i -> startDefaultObjectAnimatorTransY(playerCardViews.get(i), 0.0f));
-            secondSelectedCardSlotView = new SlotCardSelectable(() -> gameParty, playerBoard);
-            firstSelectedCardSlotView = new SlotCardSelectable(() -> gameParty, playerBoard);
+            secondSelectedCardSlotView = new SlotCardSelectable(playerBoard, opponentBoard, false);
+            firstSelectedCardSlotView = new SlotCardSelectable(playerBoard, opponentBoard, false);
             selectedEmptySlotView = new CardSelectable<>();
             return CompletableFuture.completedFuture(null);
         });
@@ -115,7 +116,7 @@ public class GameFragment extends Fragment {
         // Player.
         LinearLayout playerCardsLayout = view.findViewById(R.id.layout_playerCards);
         GridLayout playerBoardLayout = boardLayout.findViewById(R.id.layout_playerBoard);
-        fillBoard(playerBoard, playerBoardLayout, false);
+        fillPlayerBoard(playerBoardLayout);
         playerCardViews = mapCardsLayout(player, playerCardsLayout);
 
         // Binding animation card.
@@ -125,21 +126,45 @@ public class GameFragment extends Fragment {
         // Opponent.
         LinearLayout opponentCardsLayout = view.findViewById(R.id.layout_opponentCards);
         GridLayout opponentBoardLayout = boardLayout.findViewById(R.id.layout_opponentBoard);
-        fillBoard(opponentBoard, opponentBoardLayout, true);
+        fillOpponentBoard(opponentBoardLayout);
         opponentCardViews = mapCardsLayout(gameParty.oppositePlayerOf(player), opponentCardsLayout);
     }
 
-    private void fillBoard(List<View> board, GridLayout layout, boolean isOpposite) {
+    private void fillPlayerBoard(GridLayout layout) {
         IntStream.range(0, layout.getChildCount()).forEach(i -> {
-            var newI = i;
-            if (isOpposite) newI = i < 4 ? i + 4 : i - 4;
-            View child = layout.getChildAt(newI);
+            View child = layout.getChildAt(i);
             child.setOnClickListener(this::onPressPlayerSlot);
-            board.add(child);
+            playerBoard.add(child);
         });
     }
 
+    private void fillOpponentBoard(GridLayout layout) {
+        IntStream.range(0, layout.getChildCount()).forEach(i -> {
+            int newI = reverseIndexOpponentBoard(i);
+            View child = layout.getChildAt(newI);
+            child.setOnClickListener(this::onPressOpponentSlot);
+            opponentBoard.add(child);
+        });
+    }
+
+    private void onPressOpponentSlot(View view) {
+
+        if (!gameParty.isCurrentPlayer(player) && !firstSelectedCardSlotView.isSelect())
+            return;
+
+        View emptySlotView = view.findViewById(R.id.view_emptySlot);
+        int index = reverseIndexOpponentBoard(opponentBoard.indexOf(view));
+
+        if (emptySlotView.getVisibility() == View.GONE) {
+            isSelectedCardOpponent = true;
+            selectCardToActivateSkill(index);
+            gameParty = onPressSlot(gameParty);
+        }
+
+    }
+
     private void onPressPlayerSlot(View view) {
+
         if (gameParty.isCurrentPlayer(player)) {
 
             View emptySlotView = view.findViewById(R.id.view_emptySlot);
@@ -152,19 +177,32 @@ public class GameFragment extends Fragment {
                 selectCardToActivateSkill(index);
             }
 
-            PlayerAction playerAction = determinePlayerAction();
-
-            gameParty = playerAction.apply(gameParty);
-            if (gameParty.currentPlayer().actions().size() % 3 == 0) {
-                gameParty = sendRefresh(gameParty);
-                gameParty = gameParty.nextTurn();
-            }
-
-            selectedEmptySlotView.unselect();
-            selectedHandCardView.unselect();
-
-            gameParty = sendRefresh(gameParty);
+            gameParty = onPressSlot(gameParty);
         }
+
+    }
+
+    private GameParty onPressSlot(GameParty gameParty) {
+
+        PlayerAction playerAction = determinePlayerAction();
+
+        gameParty = playerAction.apply(gameParty);
+
+        var actions = gameParty.currentPlayer().actions();
+        if (!(playerAction instanceof EmptyPlayerAction)
+                && actions.size() % 3 == 0 && !actions.isEmpty()) {
+            gameParty = sendRefresh(gameParty);
+            gameParty = gameParty.nextTurn();
+        }
+
+        selectedEmptySlotView.unselect();
+        selectedHandCardView.unselect();
+
+        return sendRefresh(gameParty);
+    }
+
+    private int reverseIndexOpponentBoard(int index) {
+        return index < 4 ? index + 4 : index - 4;
     }
 
     private PlayerAction determinePlayerAction() {
@@ -186,7 +224,9 @@ public class GameFragment extends Fragment {
             return new ActiveSkillViewTreatment(
                     navigationActivity, gameService, playerBoard, opponentBoard,
                     this::getImageCardByCard, getGamePartyUpdater(),
-                    fromPos, toPos, isSelectedCardOpponent);
+                    fromPos, toPos,
+                    this::reverseIndexOpponentBoard,
+                    isSelectedCardOpponent);
         }
 
         return PlayerAction.noAction();
@@ -196,6 +236,9 @@ public class GameFragment extends Fragment {
         if (!firstSelectedCardSlotView.isSelect()) {
             firstSelectedCardSlotView.select(index);
         } else if (!firstSelectedCardSlotView.getValue().equals(index)) {
+            secondSelectedCardSlotView.setOpponent(isSelectedCardOpponent);
+            if (isSelectedCardOpponent)
+                index = reverseIndexOpponentBoard(index);
             secondSelectedCardSlotView.select(index);
         } else {
             secondSelectedCardSlotView.unselect();

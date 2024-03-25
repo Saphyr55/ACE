@@ -58,7 +58,10 @@ public class AttackOpponentCardPlayerAction implements PlayerAction  {
         playerBoard.slots().set(playerCardPos, newPlayerSlot);
         opponentBoard.slots().set(opponentCardPos, newOpponentSlot);
 
-        return GameParty.Builder.copyOf(gameParty).build();
+        return GameParty.Builder.copyOf(gameParty)
+                .withCurrentPlayerBoard(playerBoard)
+                .withOpponentBoard(opponentBoard)
+                .build();
     }
 
 

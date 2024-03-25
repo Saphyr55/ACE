@@ -6,6 +6,7 @@ import android.view.View;
 import org.utours.ace.common.Selectable;
 import org.utours.ace.game.dialog.ConfirmSkillDialog;
 import org.utours.ace.game.feature.GameService;
+import org.utours.ace.game.model.Board;
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Slot;
 import org.utours.ace.game.port.GamePartyUpdater;
@@ -27,7 +28,8 @@ public class ActiveSkillViewTreatment implements PlayerAction {
     private final GamePartyUpdater partyUpdater;
     private final Selectable<Integer> fromPos;
     private final Selectable<Integer> toPos;
-    private final boolean isOpponent;
+    private final boolean isOpponentSlotSelected;
+    private final Function<Integer, Integer> reverseFunction;
 
     public ActiveSkillViewTreatment(Context context,
                                     GameService gameService,
@@ -37,6 +39,7 @@ public class ActiveSkillViewTreatment implements PlayerAction {
                                     GamePartyUpdater partyUpdater,
                                     Selectable<Integer> fromPos,
                                     Selectable<Integer> toPos,
+                                    Function<Integer, Integer> reverseFunction,
                                     boolean isToOpponent) {
 
         this.context = context;
@@ -47,7 +50,8 @@ public class ActiveSkillViewTreatment implements PlayerAction {
         this.partyUpdater = partyUpdater;
         this.fromPos = fromPos;
         this.toPos = toPos;
-        this.isOpponent = isToOpponent;
+        this.reverseFunction = reverseFunction;
+        this.isOpponentSlotSelected = isToOpponent;
         this.attackPlayerAction = new AttackOpponentCardViewTreatment(
                 playerBoard, opponentBoard, imageRefs,
                 fromPos.getValue(), toPos.getValue());
@@ -56,14 +60,14 @@ public class ActiveSkillViewTreatment implements PlayerAction {
     @Override
     public GameParty apply(GameParty gameParty) {
 
-        Slot slotTo = isOpponent
-                ? gameParty.opponentPlayerBoard()
-                .slots().get(toPos.getValue())
-                : gameParty.currentPlayerBoard()
-                .slots().get(toPos.getValue());
+        Board opponentBoard = gameParty.opponentPlayerBoard();
+        Board playerBoard = gameParty.currentPlayerBoard();
 
-        Slot slotFrom = gameParty.currentPlayerBoard()
-                .slots().get(fromPos.getValue());
+        Slot slotTo = isOpponentSlotSelected
+                ? opponentBoard.slots().get(toPos.getValue())
+                : playerBoard.slots().get(toPos.getValue());
+
+        Slot slotFrom = playerBoard.slots().get(fromPos.getValue());
 
         return process(gameParty, slotFrom, slotTo);
     }
@@ -85,9 +89,9 @@ public class ActiveSkillViewTreatment implements PlayerAction {
                 dialog.dismiss();
             });
 
-            if (isOpponent) {
+            if (isOpponentSlotSelected) {
                 dialog.onAttackButton(() -> {
-                    partyUpdater.update(attackPlayerAction::apply);
+                    partyUpdater.update(gp -> attackPlayerAction.apply(gameParty));
                     dialog.dismiss();
                 });
             } else {

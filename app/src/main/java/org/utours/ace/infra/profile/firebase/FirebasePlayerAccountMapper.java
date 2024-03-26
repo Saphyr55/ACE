@@ -67,7 +67,7 @@ public class FirebasePlayerAccountMapper {
 
         firebasePlayerAccount.setDeck(playerAccount.deck()
                 .cards().stream()
-                .map(Card::id)
+                .map(Card::uid)
                 .collect(Collectors.toList()));
 
         return firebasePlayerAccount;
@@ -82,7 +82,7 @@ public class FirebasePlayerAccountMapper {
         for (int i = 0; i < ids.size(); i++) {
             for (int j = 0; j < allCard.size(); j++) {
                 var card = allCard.get(j);
-                if (card.id().equals(idsList.get(i))) {
+                if (card.uid().equals(idsList.get(i))) {
                     cards.add(card);
                 }
             }

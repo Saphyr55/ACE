@@ -29,7 +29,7 @@ public class FirebaseCardMapper {
             firebaseCard.setEmpty(true);
             return firebaseCard;
         }
-        firebaseCard.setId(card.id());
+        firebaseCard.setId(card.uid());
         firebaseCard.setAttackPoint(card.attackPoint());
         firebaseCard.setLifePoint(card.lifePoint());
         firebaseCard.setManaPoint(card.manaPoint());

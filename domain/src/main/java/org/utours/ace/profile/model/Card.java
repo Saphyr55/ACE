@@ -1,9 +1,7 @@
 package org.utours.ace.profile.model;
 
-import java.util.function.BiConsumer;
-
 public record Card(
-        String id,
+        String uid,
         String name,
         String pictureId,
         Integer lifePoint,
@@ -39,7 +37,7 @@ public record Card(
 
         public static Builder newBuilder(Card card) {
             return newBuilder()
-                    .withId(card.id)
+                    .withId(card.uid)
                     .withName(card.name)
                     .withAttackPoint(card.attackPoint)
                     .withLifePoint(card.lifePoint)

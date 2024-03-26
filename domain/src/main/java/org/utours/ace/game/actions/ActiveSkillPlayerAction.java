@@ -26,16 +26,7 @@ public class ActiveSkillPlayerAction implements PlayerAction {
 
     @Override
     public GameParty apply(GameParty gameParty) {
-
-        Board playerBoard = gameParty.currentPlayerBoard();
-        Board opponentBoard = gameParty.opponentPlayerBoard();
-
-        Slot slotFrom = playerBoard.slots().get(slotFromPos);
-        Slot slotTo = playerBoard.slots().get(slotToPos);
-        if (isOpponent)
-            slotTo = opponentBoard.slots().get(slotToPos);
-
-        return skillAction.apply(gameParty, slotFrom, slotTo);
+        return skillAction.apply(gameParty, slotFromPos, slotToPos, isOpponent);
     }
 
 }

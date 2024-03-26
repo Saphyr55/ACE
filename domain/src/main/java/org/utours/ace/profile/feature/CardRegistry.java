@@ -6,7 +6,9 @@ import org.utours.ace.profile.model.CardRarity;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public enum CardRegistry {
@@ -127,9 +129,20 @@ public enum CardRegistry {
     public Supplier<Card> register(Supplier<Card> cardSupplier) {
         var card = cardSupplier.get();
         CARDS.add(card);
-        IMAGE_REFERENCES.put(card.id(), card.pictureId());
+        IMAGE_REFERENCES.put(card.uid(), card.pictureId());
         return cardSupplier;
     }
 
+    public Optional<Card> fromUID(String uid) {
+        for (Card card : CARDS) {
+            if (card.uid().equals(uid))
+                return Optional.of(card);
+        }
+        return Optional.empty();
+    }
+
+    public <T> Optional<T> fromUID(String uid, Function<Card, T> function) {
+        throw new RuntimeException("Not implemented yet");
+    }
 
 }

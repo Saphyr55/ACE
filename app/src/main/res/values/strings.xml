@@ -65,5 +65,9 @@
     <string name="activate_skill">Activate Skill</string>
     <string name="player">Player</string>
     <string name="end">End</string>
+    <string name="_class">Class</string>
+    <string name="info">Info</string>
+    <string name="select">Select</string>
+    <string name="no_description">No description</string>
 
 </resources>

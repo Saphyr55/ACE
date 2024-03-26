@@ -23,6 +23,12 @@ public record Card(
                 new ClassCoin(ClassCoin.Type.EMPTY));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        return uid.equals(((Card)o).uid);
+    }
+
     public static class Builder {
         private String id;
         private String name;

@@ -1,5 +1,6 @@
 package org.utours.ace.profile.deck;
 
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -7,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatToggleButton;
 import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
@@ -14,12 +16,15 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.utours.ace.R;
+import org.utours.ace.profile.NavigationActivity;
+import org.utours.ace.profile.dialog.SelectClassCoinDialog;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.Card;
@@ -49,28 +54,26 @@ public class DeckFragment extends Fragment {
     private TextView attackPointText;
     private TextView manaPointText;
     private TextView lifePointText;
-
+    private Button classButton;
+    private Button informationButton;
+    private Context context;
 
     public static DeckFragment newInstance(CardService cardService,
-                                           PlayerAccountService playerAccountService) {
-
+                                           PlayerAccountService playerAccountService,
+                                           NavigationActivity navigationActivity) {
         DeckFragment deckFragment = new DeckFragment();
-
+        deckFragment.context = navigationActivity;
         deckFragment.cardService = cardService;
         deckFragment.playerAccountService = playerAccountService;
-
         deckFragment.setDefaultCardViewBackground = (cardView) -> {
             var theme = deckFragment.viewFragment.getContext().getTheme();
             cardView.setBackgroundColor(deckFragment.getResources().getColor(R.color.white, theme));
         };
-
         deckFragment.setSelectedBackgroundColor = (cardView) -> {
             int color = Color.rgb(255, 187, 156);
             cardView.setBackgroundColor(color);
         };
-
         deckFragment.cardImages = new HashMap<>();
-
         return deckFragment;
     }
 
@@ -90,6 +93,7 @@ public class DeckFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         viewFragment = view;
+
         AppCompatToggleButton deckToggleButton = viewFragment.findViewById(R.id.toggle_deck);
         gridView = viewFragment.findViewById(R.id.grid_cards);
         attackPointText = viewFragment.findViewById(R.id.text_attackPoint);
@@ -98,11 +102,16 @@ public class DeckFragment extends Fragment {
 
         deckToggleButton.setOnCheckedChangeListener(this::onToggleDeck);
         var playerAccount = playerAccountService.currentPlayerAccount();
-        cardGridAdapter = new CardGridAdapter(
-                getContext(),
+        cardGridAdapter = new CardGridAdapter(getContext(),
                 cardService.sortedByRarity(playerAccount.cards()),
                 cardImages,
                 this::onCreateCardViewCardsMode);
+
+        classButton = viewFragment.findViewById(R.id.btn_class);
+        informationButton = viewFragment.findViewById(R.id.btn_information);
+        classButton.setEnabled(false);
+        informationButton.setEnabled(false);
+        classButton.setOnClickListener(v -> onClickClassButton());
 
         setup().thenRun(() -> {
             gridView.setAdapter(cardGridAdapter);
@@ -126,6 +135,9 @@ public class DeckFragment extends Fragment {
     }
 
     private void onCreateCardViewDeckMode(CardView cardView, Card card) {
+
+        classButton.setEnabled(false);
+        informationButton.setEnabled(false);
 
         var playerAccount = playerAccountService.currentPlayerAccount();
         var selectedCardIsInDeck = playerAccount.deck().cards().contains(card);
@@ -151,6 +163,10 @@ public class DeckFragment extends Fragment {
         setDefaultCardViewBackground.accept(cardView);
         cardView.setOnClickListener(v -> {
 
+            boolean isEnabled = cardSelected == null;
+            classButton.setEnabled(isEnabled);
+            informationButton.setEnabled(isEnabled);
+
             if (cardSelected == null) {
                 cardSelected = card;
                 cardViewSelected = cardView;
@@ -159,6 +175,7 @@ public class DeckFragment extends Fragment {
                 return;
             }
 
+            isEnabled = !card.equals(cardSelected);
             if (card.equals(cardSelected)) {
                 cardSelected = null;
                 cardViewSelected = null;
@@ -169,6 +186,9 @@ public class DeckFragment extends Fragment {
                 cardViewSelected = cardView;
                 setSelectedBackgroundColor.accept(cardViewSelected);
             }
+
+            classButton.setEnabled(isEnabled);
+            informationButton.setEnabled(isEnabled);
 
             setupCardDetailsOnSelect(cardSelected);
         });
@@ -229,6 +249,13 @@ public class DeckFragment extends Fragment {
     private void setImageCardReferences(List<ImageCard> imageCards) {
         var cards = List.copyOf(playerAccountService.currentPlayerAccount().cards());
         cardImages = cardService.getMapReferences(cards, imageCards);
+    }
+
+    private void onClickClassButton() {
+        if (cardSelected != null) {
+            var dialog = new SelectClassCoinDialog(context, playerAccountService, cardSelected);
+            dialog.show();
+        }
     }
 
 }

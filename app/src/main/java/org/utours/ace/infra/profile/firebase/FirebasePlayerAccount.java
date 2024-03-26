@@ -2,11 +2,13 @@ package org.utours.ace.infra.profile.firebase;
 
 import org.utours.ace.common.annotation.Bean;
 import org.utours.ace.infra.common.firebase.annotation.FirebaseModel;
+import org.utours.ace.profile.model.ClassCoin;
 import org.utours.ace.profile.model.PlayerAccount;
 import org.utours.ace.profile.model.StarDust;
 import org.utours.ace.profile.model.Ticket;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Bean
 @FirebaseModel
@@ -21,6 +23,10 @@ class FirebasePlayerAccount {
     private Integer ticketQuantity = Ticket.ZERO;
     private List<FirebaseCard> cards = List.of();
     private List<String> deck = List.of();
+    private List<String> classCoins = PlayerAccount.DEFAULT_CLASS_COINS.stream()
+            .map(ClassCoin::type)
+            .map(ClassCoin.Type::name)
+            .collect(Collectors.toList());
 
     public FirebasePlayerAccount() { }
 
@@ -107,6 +113,16 @@ class FirebasePlayerAccount {
     public void setTicketQuantity(Integer ticketQuantity) {
         if (ticketQuantity != null) {
             this.ticketQuantity = ticketQuantity;
+        }
+    }
+
+    public List<String> getClassCoins() {
+        return classCoins;
+    }
+
+    public void setClassCoins(List<String> classCoins) {
+        if (classCoins != null) {
+            this.classCoins = classCoins;
         }
     }
 

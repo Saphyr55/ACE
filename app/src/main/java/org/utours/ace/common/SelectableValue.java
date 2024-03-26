@@ -1,24 +1,20 @@
-package org.utours.ace.game.base;
-
-import android.view.View;
-
-import org.utours.ace.common.Selectable;
+package org.utours.ace.common;
 
 import java.util.function.Consumer;
 
-public class CardSelectable<T> implements Selectable<T> {
+public class SelectableValue<T> implements Selectable<T> {
 
     private T value;
     private final Consumer<T> onSelect;
     private final Consumer<T> onUnselect;
 
-    public CardSelectable() {
+    public SelectableValue() {
         value = null;
         this.onSelect = t -> { };
         this.onUnselect = onSelect;
     }
 
-    public CardSelectable(Consumer<T> onSelect, Consumer<T> onUnselect) {
+    public SelectableValue(Consumer<T> onSelect, Consumer<T> onUnselect) {
         value = null;
         this.onSelect = onSelect;
         this.onUnselect = onUnselect;

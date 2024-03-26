@@ -79,7 +79,7 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private void onSuccessRegistration(AuthAccount account) {
-        var playerAccountBuild = PlayerAccount.Builder.of(account.uid(), account.email());
+        var playerAccountBuild = PlayerAccount.Builder.copyOf(account.uid(), account.email());
         playerAccountRepository.store(playerAccountBuild.build());
         redirectToConnectionActivity();
     }

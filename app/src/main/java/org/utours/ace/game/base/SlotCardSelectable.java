@@ -4,13 +4,13 @@ import android.animation.ObjectAnimator;
 import android.view.View;
 
 import org.utours.ace.common.Selectable;
+import org.utours.ace.common.SelectableValue;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class SlotCardSelectable implements Selectable<Integer> {
 
-    private final CardSelectable<Integer> wrapped;
+    private final SelectableValue<Integer> wrapped;
     private final List<View> playerBoard;
     private final List<View> opponentBoard;
     private boolean isOpponent;
@@ -22,7 +22,7 @@ public class SlotCardSelectable implements Selectable<Integer> {
         this.playerBoard = playerBoard;
         this.opponentBoard = opponentBoard;
         this.isOpponent = isOpponent;
-        this.wrapped = new CardSelectable<>(this::startAnimation, this::stopAnimation);
+        this.wrapped = new SelectableValue<>(this::startAnimation, this::stopAnimation);
     }
 
     @Override

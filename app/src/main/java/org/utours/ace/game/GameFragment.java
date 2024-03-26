@@ -17,7 +17,7 @@ import org.utours.ace.R;
 import org.utours.ace.common.Selectable;
 import org.utours.ace.game.actions.ActiveSkillViewTreatment;
 import org.utours.ace.game.actions.EmplaceCardOnBoardViewTreatment;
-import org.utours.ace.game.base.CardSelectable;
+import org.utours.ace.common.SelectableValue;
 import org.utours.ace.game.base.SlotCardSelectable;
 import org.utours.ace.game.feature.GameService;
 import org.utours.ace.game.model.Board;
@@ -87,7 +87,7 @@ public class GameFragment extends Fragment {
         var cpa = playerAccountService.currentPlayerAccount();
         return gamePartyFinder.join(cpa, this::setPlayer, this::refresh).thenCompose(gp -> {
             gameParty = gp;
-            selectedHandCardView = new CardSelectable<>(
+            selectedHandCardView = new SelectableValue<>(
                     i -> {
                         secondSelectedCardSlotView.unselect();
                         firstSelectedCardSlotView.unselect();
@@ -96,7 +96,7 @@ public class GameFragment extends Fragment {
                     i -> startDefaultObjectAnimatorTransY(playerCardViews.get(i), 0.0f));
             secondSelectedCardSlotView = new SlotCardSelectable(playerBoard, opponentBoard, false);
             firstSelectedCardSlotView = new SlotCardSelectable(playerBoard, opponentBoard, false);
-            selectedEmptySlotView = new CardSelectable<>();
+            selectedEmptySlotView = new SelectableValue<>();
             return CompletableFuture.completedFuture(null);
         });
     }

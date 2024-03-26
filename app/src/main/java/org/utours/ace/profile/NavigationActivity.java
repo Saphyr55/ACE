@@ -35,7 +35,6 @@ import java.util.function.Consumer;
 public class NavigationActivity extends AppCompatActivity {
 
     private static final String TAG = NavigationActivity.class.getName();
-
     private ActivityNavigationBinding binding;
     private MainFragment mainFragment;
     private ProfileFragment profileFragment;
@@ -61,7 +60,7 @@ public class NavigationActivity extends AppCompatActivity {
 
         mainFragment = MainFragment.newInstance(this);
         profileFragment = new ProfileFragment();
-        deckFragment = DeckFragment.newInstance(cardService, playerAccountService);
+        deckFragment = DeckFragment.newInstance(cardService, playerAccountService, this);
         gachaFragment = new GachaFragment(cardService, gachaService, this);
         shopFragment = new ShopFragment();
 

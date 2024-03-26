@@ -11,8 +11,8 @@ public class AttackOpponentCardPlayerAction implements PlayerAction  {
     private final int opponentCardPos;
     private final int playerCardPos;
 
-    public AttackOpponentCardPlayerAction(int opponentCardPos,
-                                          int playerCardPos) {
+    public AttackOpponentCardPlayerAction(int playerCardPos,
+                                          int opponentCardPos) {
 
         this.opponentCardPos = opponentCardPos;
         this.playerCardPos = playerCardPos;
@@ -28,7 +28,7 @@ public class AttackOpponentCardPlayerAction implements PlayerAction  {
         Slot opponentSlot = opponentBoard.slots().get(opponentCardPos);
 
         if (playerSlot instanceof Slot.SEmpty || opponentSlot instanceof Slot.SEmpty)
-            return gameParty;
+            throw new RuntimeException();
 
         Card playerCard = ((Slot.SCard) playerSlot).card();
         Card opponentCard = ((Slot.SCard) opponentSlot).card();
@@ -43,7 +43,7 @@ public class AttackOpponentCardPlayerAction implements PlayerAction  {
                 .withLifePoint(newPlayerCardLifePoint)
                 .build();
 
-        opponentCard = Card.Builder.copyOf(playerCard)
+        opponentCard = Card.Builder.copyOf(opponentCard)
                 .withLifePoint(newOpponentCardLifePoint)
                 .build();
 

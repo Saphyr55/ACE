@@ -1,4 +1,4 @@
-package org.utours.ace.game.skills;
+package org.utours.ace.game.skill;
 
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Slot;

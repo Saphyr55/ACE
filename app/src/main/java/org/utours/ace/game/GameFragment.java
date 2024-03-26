@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 
@@ -16,7 +17,6 @@ import org.utours.ace.R;
 import org.utours.ace.common.Selectable;
 import org.utours.ace.game.actions.ActiveSkillViewTreatment;
 import org.utours.ace.game.actions.EmplaceCardOnBoardViewTreatment;
-import org.utours.ace.game.actions.EmptyPlayerAction;
 import org.utours.ace.game.base.CardSelectable;
 import org.utours.ace.game.base.SlotCardSelectable;
 import org.utours.ace.game.feature.GameService;
@@ -60,6 +60,7 @@ public class GameFragment extends Fragment {
     private List<View> opponentCardViews;
     private List<View> playerBoard;
     private List<View> opponentBoard;
+    private Button endButton;
     private boolean isSelectedCardOpponent = false;
 
     public static GameFragment newInstance(NavigationActivity navigationActivity,
@@ -128,6 +129,15 @@ public class GameFragment extends Fragment {
         GridLayout opponentBoardLayout = boardLayout.findViewById(R.id.layout_opponentBoard);
         fillOpponentBoard(opponentBoardLayout);
         opponentCardViews = mapCardsLayout(gameParty.oppositePlayerOf(player), opponentCardsLayout);
+
+        endButton = view.findViewById(R.id.btn_end);
+        endButton.setOnClickListener(v -> {
+            gameParty = gameParty.nextTurn();
+            gameParty = sendRefresh(gameParty);
+        });
+        if (!gameParty.isCurrentPlayer(player)) {
+            endButton.setEnabled(false);
+        }
     }
 
     private void fillPlayerBoard(GridLayout layout) {
@@ -164,7 +174,6 @@ public class GameFragment extends Fragment {
     }
 
     private void onPressPlayerSlot(View view) {
-
         if (gameParty.isCurrentPlayer(player)) {
 
             View emptySlotView = view.findViewById(R.id.view_emptySlot);
@@ -179,7 +188,6 @@ public class GameFragment extends Fragment {
 
             gameParty = onPressSlot(gameParty);
         }
-
     }
 
     private GameParty onPressSlot(GameParty gameParty) {
@@ -187,13 +195,6 @@ public class GameFragment extends Fragment {
         PlayerAction playerAction = determinePlayerAction();
 
         gameParty = playerAction.apply(gameParty);
-
-        var actions = gameParty.currentPlayer().actions();
-        if (!(playerAction instanceof EmptyPlayerAction)
-                && actions.size() % 3 == 0 && !actions.isEmpty()) {
-            gameParty = sendRefresh(gameParty);
-            gameParty = gameParty.nextTurn();
-        }
 
         selectedEmptySlotView.unselect();
         selectedHandCardView.unselect();
@@ -213,8 +214,13 @@ public class GameFragment extends Fragment {
             int slotPos = selectedEmptySlotView.getValue();
 
             return new EmplaceCardOnBoardViewTreatment(
-                    player, playerCardViews, playerBoard,
-                    this::getImageCardByCard, cardPos, slotPos);
+                    player,
+                    this::sendRefresh,
+                    playerCardViews,
+                    playerBoard,
+                    this::getImageCardByCard,
+                    cardPos,
+                    slotPos);
 
         } else if (firstSelectedCardSlotView.isSelect() && secondSelectedCardSlotView.isSelect()) {
 
@@ -222,24 +228,35 @@ public class GameFragment extends Fragment {
             var toPos = secondSelectedCardSlotView;
 
             return new ActiveSkillViewTreatment(
-                    navigationActivity, gameService, playerBoard, opponentBoard,
-                    this::getImageCardByCard, getGamePartyUpdater(),
+                    navigationActivity,
+                    this::sendRefresh,
+                    gameService,
+                    playerBoard,
+                    opponentBoard,
+                    this::getImageCardByCard,
+                    getGamePartyUpdater(),
                     fromPos, toPos,
                     this::reverseIndexOpponentBoard,
-                    isSelectedCardOpponent);
+                    isSelectedCardOpponent
+            );
         }
 
         return PlayerAction.noAction();
     }
 
     private void selectCardToActivateSkill(int index) {
+
         if (!firstSelectedCardSlotView.isSelect()) {
             firstSelectedCardSlotView.select(index);
-        } else if (!firstSelectedCardSlotView.getValue().equals(index)) {
+
+        } else if (!firstSelectedCardSlotView.getValue().equals(index) ||
+                (isSelectedCardOpponent && !firstSelectedCardSlotView.getValue()
+                        .equals(reverseIndexOpponentBoard(index)))) {
+
+            if (isSelectedCardOpponent) index = reverseIndexOpponentBoard(index);
             secondSelectedCardSlotView.setOpponent(isSelectedCardOpponent);
-            if (isSelectedCardOpponent)
-                index = reverseIndexOpponentBoard(index);
             secondSelectedCardSlotView.select(index);
+
         } else {
             secondSelectedCardSlotView.unselect();
             firstSelectedCardSlotView.unselect();
@@ -289,16 +306,19 @@ public class GameFragment extends Fragment {
     }
 
     public GamePartyUpdater getGamePartyUpdater() {
-        return mapper -> gameParty = mapper.map(gameParty);
+        return mapper -> refresh(mapper.map(gameParty));
     }
 
     private void refresh(GameParty gp) {
         gameParty = gp;
         if (!gameParty.isCurrentPlayer(player) && playerCardViews != null) {
+            endButton.setEnabled(false);
             refreshBoard(gameParty.currentPlayerBoard(), opponentBoard);
             refreshBoard(gameParty.opponentPlayerBoard(), playerBoard);
             refreshHand(gameParty.currentPlayer(), opponentCardViews);
             refreshHand(gameParty.opponentPlayer(), playerCardViews);
+        } else if (endButton != null) {
+            endButton.setEnabled(true);
         }
     }
 

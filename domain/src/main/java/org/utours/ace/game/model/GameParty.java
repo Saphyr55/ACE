@@ -1,5 +1,6 @@
 package org.utours.ace.game.model;
 
+import org.utours.ace.game.port.GamePartyMapper;
 import org.utours.ace.game.port.PlayerAction;
 
 public record GameParty(
@@ -15,12 +16,25 @@ public record GameParty(
 
     public static int MAX_SLOT = 8;
 
-    public GameParty addPlayerAction(PlayerAction playerAction) {
-        currentPlayer().actions().add(playerAction);
-        return GameParty.Builder.copyOf(this).build();
+    public GameParty addPlayerAction(PlayerAction playerAction, GamePartyMapper gamePartyMapper) {
+        var gameParty = this;
+        gameParty.currentPlayer().actions().add(playerAction);
+        var actions = gameParty.currentPlayer().actions();
+        if (actions.size() % 3 == 0 && !actions.isEmpty()) {
+            gameParty = gamePartyMapper.map(gameParty);
+            gameParty = gameParty.nextTurn();
+            gameParty = gamePartyMapper.map(gameParty);
+        }
+        return GameParty.Builder.copyOf(gameParty).build();
     }
 
     public GameParty nextTurn() {
+        var actions = currentPlayer().actions();
+        if (actions.size() % 3 != 0) {
+            for (int i = 0; i < actions.size() % 3; i++) {
+                actions.add(PlayerAction.noAction());
+            }
+        }
         return GameParty.Builder.copyOf(this)
                 .withNumberTurn(numberTurn + 1)
                 .withCurrentPlayerUID(opponentPlayer().playerID())
@@ -79,11 +93,11 @@ public record GameParty(
         public static Builder copyOf(GameParty gameParty) {
             return of()
                     .withUid(gameParty.uid)
-                    .withFirstPlayerBoard(gameParty.firstPlayerBoard)
-                    .withOpponentBoard(gameParty.secondPlayerBoard)
                     .withCurrentPlayerUID(gameParty.currentPlayerUID)
-                    .withOpponent(gameParty.secondPlayer)
-                    .withFirstPlayer(gameParty.firstPlayer)
+                    .withFirstPlayer(Player.Builder.copyOf(gameParty.firstPlayer).build())
+                    .withFirstPlayerBoard(gameParty.firstPlayerBoard)
+                    .withSecondPlayer(gameParty.secondPlayer)
+                    .withSecondPlayerBoard(gameParty.secondPlayerBoard)
                     .withWaiting(gameParty.isWaiting)
                     .withNumberTurn(gameParty.numberTurn);
         }
@@ -103,16 +117,6 @@ public record GameParty(
             return this;
         }
 
-        public Builder withOpponent(Player opponent) {
-            this.secondPlayer = opponent;
-            return this;
-        }
-
-        public Builder withOpponentBoard(Board opponentBoard) {
-            this.secondPlayerBoard = opponentBoard;
-            return this;
-        }
-
         public Builder withFirstPlayer(Player player) {
             this.firstPlayer = player;
             return this;
@@ -120,6 +124,16 @@ public record GameParty(
 
         public Builder withFirstPlayerBoard(Board playerBoard) {
             this.firstPlayerBoard = playerBoard;
+            return this;
+        }
+
+        public Builder withSecondPlayer(Player player) {
+            this.secondPlayer = player;
+            return this;
+        }
+
+        public Builder withSecondPlayerBoard(Board playerBoard) {
+            this.secondPlayerBoard = playerBoard;
             return this;
         }
 
@@ -139,6 +153,24 @@ public record GameParty(
 
         public Builder withCurrentPlayerBoard(Board board) {
             if (currentPlayerUID.equals(firstPlayer.playerID())) {
+                firstPlayerBoard = board;
+            } else {
+                secondPlayerBoard = board;
+            }
+            return this;
+        }
+
+        public Builder withOpponent(Player opponent) {
+            if (!currentPlayerUID.equals(firstPlayer.playerID())) {
+                firstPlayer = opponent;
+            } else {
+                secondPlayer = opponent;
+            }
+            return this;
+        }
+
+        public Builder withOpponentBoard(Board board) {
+            if (!currentPlayerUID.equals(firstPlayer.playerID())) {
                 firstPlayerBoard = board;
             } else {
                 secondPlayerBoard = board;

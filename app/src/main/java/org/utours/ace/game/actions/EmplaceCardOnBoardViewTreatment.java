@@ -6,6 +6,7 @@ import org.utours.ace.R;
 import org.utours.ace.game.CardViewBinding;
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Player;
+import org.utours.ace.game.port.GamePartyMapper;
 import org.utours.ace.game.port.PlayerAction;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
@@ -22,8 +23,10 @@ public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
     private final int cardPosition;
     private final int slotPosition;
     private final Player player;
+    private final GamePartyMapper refresh;
 
     public EmplaceCardOnBoardViewTreatment(Player player,
+                                           GamePartyMapper refresh,
                                            List<View> playerCardViews,
                                            List<View> playerSlotViews,
                                            Function<Card, ImageCard> imagesRefs,
@@ -31,6 +34,7 @@ public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
                                            int slotPosition) {
 
         this.player = player;
+        this.refresh = refresh;
         this.playerAction = new EmplaceCardInBoardPlayerAction(cardPosition, slotPosition);
         this.playerCardViews = playerCardViews;
         this.slotViews = playerSlotViews;
@@ -55,7 +59,7 @@ public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
 
         gameParty = playerAction.apply(gameParty);
 
-        gameParty = gameParty.addPlayerAction(playerAction);
+        gameParty = gameParty.addPlayerAction(playerAction, refresh);
 
         return gameParty;
     }

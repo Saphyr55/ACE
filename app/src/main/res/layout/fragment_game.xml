@@ -51,19 +51,35 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+    <RelativeLayout
         android:layout_centerInParent="true"
-        android:orientation="vertical" >
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-        <include
-            layout="@layout/item_game_board"
-            android:id="@+id/layout_board"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical" >
 
-    </LinearLayout>
+            <include
+                layout="@layout/item_game_board"
+                android:id="@+id/layout_board"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btn_end"
+            android:layout_marginTop="400dp"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="@string/end"/>
+
+    </RelativeLayout>
+
 
     <LinearLayout
         android:id="@+id/layout_player"

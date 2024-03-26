@@ -6,6 +6,7 @@ import org.utours.ace.R;
 import org.utours.ace.game.CardViewBinding;
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Slot;
+import org.utours.ace.game.port.GamePartyMapper;
 import org.utours.ace.game.port.PlayerAction;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
@@ -20,17 +21,20 @@ public class AttackOpponentCardViewTreatment implements PlayerAction {
     private final List<View> opponentSlotViews;
     private final Function<Card, ImageCard> imagesRefs;
     private final int opponentSlotPos;
+    private final GamePartyMapper refresh;
     private final int playerSlotPos;
 
     public AttackOpponentCardViewTreatment(List<View> playerSlotViews,
                                            List<View> opponentSlotViews,
                                            Function<Card, ImageCard> imagesRefs,
+                                           GamePartyMapper refresh,
                                            int cardFromPos,
                                            int cardToPos) {
 
         this.playerSlotViews = playerSlotViews;
         this.opponentSlotViews = opponentSlotViews;
         this.imagesRefs = imagesRefs;
+        this.refresh = refresh;
         this.playerSlotPos = cardFromPos;
         this.opponentSlotPos = cardToPos;
         this.playerAction = new AttackOpponentCardPlayerAction(cardFromPos, cardToPos);
@@ -46,13 +50,13 @@ public class AttackOpponentCardViewTreatment implements PlayerAction {
 
         applyViewTreatment(gameParty, playerSlotView, opponentSlotView);
 
-        return gameParty.addPlayerAction(playerAction);
+        return gameParty.addPlayerAction(playerAction, refresh);
     }
 
     private void applyViewTreatment(GameParty gameParty, View playerSlotView, View opponentSlotView) {
 
-        Slot opponentSlot = gameParty.opponentPlayerBoard().slots().get(opponentSlotPos);
         Slot playerSlot = gameParty.currentPlayerBoard().slots().get(playerSlotPos);
+        Slot opponentSlot = gameParty.opponentPlayerBoard().slots().get(opponentSlotPos);
 
         View playerEmptyView = playerSlotView.findViewById(R.id.view_emptySlot);
         View playerFrameLayout = playerSlotView.findViewById(R.id.view_cardSlot);

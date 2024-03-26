@@ -41,8 +41,6 @@ public record Player(
                     .withActions(player.actions);
         }
 
-
-
         public Builder withActions(List<PlayerAction> actions) {
             this.actions = actions;
             return this;

@@ -64,5 +64,6 @@
     <string name="attack">Attack</string>
     <string name="activate_skill">Activate Skill</string>
     <string name="player">Player</string>
+    <string name="end">End</string>
 
 </resources>

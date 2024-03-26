@@ -2,10 +2,11 @@ package org.utours.ace.game.feature;
 
 
 import org.utours.ace.common.annotation.DomainService;
+import org.utours.ace.game.actions.EmptyPlayerAction;
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.port.PlayerAction;
 import org.utours.ace.game.port.SkillAction;
-import org.utours.ace.game.skills.PriestSkillAction;
+import org.utours.ace.game.skill.PriestSkillAction;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.model.Card;
 
@@ -55,6 +56,13 @@ public class GameService {
         return gameParty;
     }
 
+    public boolean isCurrentPlayerCannotPlay(GameParty gameParty, PlayerAction playerAction) {
+        return !(playerAction instanceof EmptyPlayerAction)
+                && isCurrentPlayerCannotPlay(gameParty);
+    }
 
-
+    public boolean isCurrentPlayerCannotPlay(GameParty gameParty) {
+        var actions = gameParty.currentPlayer().actions();
+        return actions.size() % 3 == 0 && !actions.isEmpty();
+    }
 }

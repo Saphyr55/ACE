@@ -3,12 +3,15 @@ package org.utours.ace.game.actions;
 import android.content.Context;
 import android.view.View;
 
+import androidx.annotation.NonNull;
+
 import org.utours.ace.common.Selectable;
 import org.utours.ace.game.dialog.ConfirmSkillDialog;
 import org.utours.ace.game.feature.GameService;
 import org.utours.ace.game.model.Board;
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Slot;
+import org.utours.ace.game.port.GamePartyMapper;
 import org.utours.ace.game.port.GamePartyUpdater;
 import org.utours.ace.game.port.PlayerAction;
 import org.utours.ace.profile.model.Card;
@@ -21,6 +24,7 @@ public class ActiveSkillViewTreatment implements PlayerAction {
 
     private final AttackOpponentCardViewTreatment attackPlayerAction;
     private final Context context;
+    private final GamePartyMapper refresh;
     private final GameService gameService;
     private final List<View> playerBoard;
     private final List<View> opponentBoard;
@@ -32,6 +36,7 @@ public class ActiveSkillViewTreatment implements PlayerAction {
     private final Function<Integer, Integer> reverseFunction;
 
     public ActiveSkillViewTreatment(Context context,
+                                    GamePartyMapper refresh,
                                     GameService gameService,
                                     List<View> playerBoard,
                                     List<View> opponentBoard,
@@ -43,6 +48,7 @@ public class ActiveSkillViewTreatment implements PlayerAction {
                                     boolean isToOpponent) {
 
         this.context = context;
+        this.refresh = refresh;
         this.gameService = gameService;
         this.playerBoard = playerBoard;
         this.opponentBoard = opponentBoard;
@@ -53,7 +59,7 @@ public class ActiveSkillViewTreatment implements PlayerAction {
         this.reverseFunction = reverseFunction;
         this.isOpponentSlotSelected = isToOpponent;
         this.attackPlayerAction = new AttackOpponentCardViewTreatment(
-                playerBoard, opponentBoard, imageRefs,
+                playerBoard, opponentBoard, imageRefs, refresh,
                 fromPos.getValue(), toPos.getValue());
     }
 
@@ -63,13 +69,15 @@ public class ActiveSkillViewTreatment implements PlayerAction {
         Board opponentBoard = gameParty.opponentPlayerBoard();
         Board playerBoard = gameParty.currentPlayerBoard();
 
+        Slot slotFrom = playerBoard.slots().get(fromPos.getValue());
+
         Slot slotTo = isOpponentSlotSelected
                 ? opponentBoard.slots().get(toPos.getValue())
                 : playerBoard.slots().get(toPos.getValue());
 
-        Slot slotFrom = playerBoard.slots().get(fromPos.getValue());
+        gameParty = process(gameParty, slotFrom, slotTo);
 
-        return process(gameParty, slotFrom, slotTo);
+        return gameParty;
     }
 
     private GameParty process(GameParty gameParty, Slot slotFrom, Slot slotTo) {
@@ -81,30 +89,52 @@ public class ActiveSkillViewTreatment implements PlayerAction {
             dialog.setCardTo(cardTo.card(), imageRefs.apply(cardTo.card()));
             dialog.setCardFrom(cardFrom.card(), imageRefs.apply(cardFrom.card()));
 
+            int posFrom = fromPos.getValue();
+            int posTo = toPos.getValue();
+
             dialog.onActivateSkillButton(() -> {
-                partyUpdater.update(gp -> gameService
-                        .getSkillAction(cardFrom.card())
-                        .apply(gameParty, cardFrom, cardTo)
-                        .addPlayerAction(this));
+                partyUpdater.update(gp -> activeSkill(gameParty, cardFrom, posFrom, posTo));
+                fromPos.unselect();
+                toPos.unselect();
                 dialog.dismiss();
             });
 
             if (isOpponentSlotSelected) {
                 dialog.onAttackButton(() -> {
                     partyUpdater.update(gp -> attackPlayerAction.apply(gameParty));
+                    fromPos.unselect();
+                    toPos.unselect();
                     dialog.dismiss();
                 });
             } else {
                 dialog.getAttackButton().setEnabled(false);
             }
 
-            dialog.onCancelButton(dialog::dismiss);
+            dialog.onCancelButton(() -> {
+                fromPos.unselect();
+                toPos.unselect();
+                dialog.dismiss();
+            });
 
             dialog.show();
 
-            fromPos.unselect();
-            toPos.unselect();
         }
+
+        return gameParty;
+    }
+
+    @NonNull
+    private GameParty activeSkill(GameParty gameParty, Slot.SCard cardFrom, int fromPos, int toPos) {
+
+        PlayerAction activeSkillPlayerAction = new ActiveSkillPlayerAction(
+                gameService.getSkillAction(cardFrom.card()),
+                fromPos,
+                toPos,
+                isOpponentSlotSelected);
+
+        gameParty = activeSkillPlayerAction
+                .apply(gameParty)
+                .addPlayerAction(activeSkillPlayerAction, refresh);
 
         return gameParty;
     }

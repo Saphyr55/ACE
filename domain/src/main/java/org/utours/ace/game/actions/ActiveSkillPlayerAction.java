@@ -8,20 +8,33 @@ import org.utours.ace.game.port.SkillAction;
 
 public class ActiveSkillPlayerAction implements PlayerAction {
 
-    private SkillAction skillAction;
+    private final SkillAction skillAction;
     private final int slotFromPos;
     private final int slotToPos;
+    private final boolean isOpponent;
 
-    public ActiveSkillPlayerAction(SkillAction skillAction, int slotFromPos, int slotToPos) {
+    public ActiveSkillPlayerAction(SkillAction skillAction,
+                                   int slotFromPos,
+                                   int slotToPos,
+                                   boolean isOpponent) {
+
+        this.skillAction = skillAction;
         this.slotFromPos = slotFromPos;
         this.slotToPos = slotToPos;
+        this.isOpponent = isOpponent;
     }
 
     @Override
     public GameParty apply(GameParty gameParty) {
-        Board board = gameParty.currentPlayerBoard();
-        Slot slotFrom = board.slots().get(slotFromPos);
-        Slot slotTo = board.slots().get(slotToPos);
+
+        Board playerBoard = gameParty.currentPlayerBoard();
+        Board opponentBoard = gameParty.opponentPlayerBoard();
+
+        Slot slotFrom = playerBoard.slots().get(slotFromPos);
+        Slot slotTo = playerBoard.slots().get(slotToPos);
+        if (isOpponent)
+            slotTo = opponentBoard.slots().get(slotToPos);
+
         return skillAction.apply(gameParty, slotFrom, slotTo);
     }
 

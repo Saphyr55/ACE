@@ -114,6 +114,7 @@ public class FirebaseGamePartyFinder implements GamePartyFinder {
             var pp = mapAccount(pa.orElseThrow(RuntimeException::new));
             var fFirstPlayer = playerMapper.map(pp);
             var fSecondPlayer = playerMapper.map(mapAccount(playerAccount));
+
             FirebaseGameParty firebaseGameParty = new FirebaseGameParty();
             firebaseGameParty.setUid(partyUid.get());
             firebaseGameParty.setCurrentPlayerUID(fFirstPlayer.getPlayerID());
@@ -123,12 +124,12 @@ public class FirebaseGamePartyFinder implements GamePartyFinder {
             playerConsumer.accept(pp);
 
             waitingGamePartiesRef.child(partyUid.get()).removeValue();
-
             gamePartiesRef.child(partyUid.get()).setValue(firebaseGameParty);
 
             addOnUpdate(partyUid.get(), onUpdate);
 
-            gamePartyFuture.complete(gamePartyMapper.map(firebaseGameParty));
+            var gp = gamePartyMapper.map(firebaseGameParty);
+            gamePartyFuture.complete(gp);
         });
 
         return gamePartyFuture;
@@ -144,6 +145,7 @@ public class FirebaseGamePartyFinder implements GamePartyFinder {
 
         return Player.Builder.of()
                 .withPlayerID(playerAccount.uid())
+                .withDeck(deck)
                 .withHand(cards)
                 .build();
     }

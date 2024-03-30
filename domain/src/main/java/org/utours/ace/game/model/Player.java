@@ -24,7 +24,7 @@ public record Player(
 
     public static class Builder {
 
-        private String playerID = "-1";
+        private String playerID;
         private List<Card> hand = new ArrayList<>();
         private Deck deck = new Deck(new ArrayList<>());
         private List<PlayerAction> actions = new ArrayList<>();
@@ -36,6 +36,7 @@ public record Player(
         public static Builder copyOf(Player player) {
             return of()
                     .withPlayerID(player.playerID)
+                    .withDeck(player.deck)
                     .withHand(player.hand)
                     .withActions(player.actions);
         }

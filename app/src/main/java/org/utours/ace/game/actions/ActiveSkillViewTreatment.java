@@ -12,11 +12,9 @@ import org.utours.ace.game.model.Slot;
 import org.utours.ace.game.port.GamePartyMapper;
 import org.utours.ace.game.port.GamePartyUpdater;
 import org.utours.ace.game.port.PlayerAction;
-import org.utours.ace.profile.model.Card;
-import org.utours.ace.profile.model.ImageCard;
+import org.utours.ace.profile.feature.ImageCardReference;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class ActiveSkillViewTreatment implements PlayerAction {
 
@@ -24,7 +22,7 @@ public class ActiveSkillViewTreatment implements PlayerAction {
     private final Context context;
     private final GamePartyMapper refresh;
     private final GameService gameService;
-    private final Function<Card, ImageCard> imageRefs;
+    private final ImageCardReference imageRefs;
     private final GamePartyUpdater partyUpdater;
     private final Selectable<Integer> fromPos;
     private final Selectable<Integer> toPos;
@@ -35,7 +33,7 @@ public class ActiveSkillViewTreatment implements PlayerAction {
                                     GameService gameService,
                                     List<View> playerBoard,
                                     List<View> opponentBoard,
-                                    Function<Card, ImageCard> imageRefs,
+                                    ImageCardReference imageRefs,
                                     GamePartyUpdater partyUpdater,
                                     Selectable<Integer> fromPos,
                                     Selectable<Integer> toPos,
@@ -77,8 +75,8 @@ public class ActiveSkillViewTreatment implements PlayerAction {
 
             var dialog = new ConfirmSkillDialog(context);
 
-            dialog.setCardTo(cardTo.card(), imageRefs.apply(cardTo.card()));
-            dialog.setCardFrom(cardFrom.card(), imageRefs.apply(cardFrom.card()));
+            dialog.setCardTo(cardTo.card(), imageRefs.get(cardTo.card()));
+            dialog.setCardFrom(cardFrom.card(), imageRefs.get(cardFrom.card()));
 
             int posFrom = fromPos.getValue();
             int posTo = toPos.getValue();

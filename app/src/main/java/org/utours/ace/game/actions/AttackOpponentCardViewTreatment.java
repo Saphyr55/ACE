@@ -8,25 +8,24 @@ import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Slot;
 import org.utours.ace.game.port.GamePartyMapper;
 import org.utours.ace.game.port.PlayerAction;
+import org.utours.ace.profile.feature.ImageCardReference;
 import org.utours.ace.profile.model.Card;
-import org.utours.ace.profile.model.ImageCard;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class AttackOpponentCardViewTreatment implements PlayerAction {
 
     private final AttackOpponentCardPlayerAction playerAction;
     private final List<View> playerSlotViews;
     private final List<View> opponentSlotViews;
-    private final Function<Card, ImageCard> imagesRefs;
+    private final ImageCardReference imagesRefs;
     private final int opponentSlotPos;
     private final GamePartyMapper refresh;
     private final int playerSlotPos;
 
     public AttackOpponentCardViewTreatment(List<View> playerSlotViews,
                                            List<View> opponentSlotViews,
-                                           Function<Card, ImageCard> imagesRefs,
+                                           ImageCardReference imagesRefs,
                                            GamePartyMapper refresh,
                                            int cardFromPos,
                                            int cardToPos) {
@@ -81,13 +80,13 @@ public class AttackOpponentCardViewTreatment implements PlayerAction {
         if (playerSlot instanceof Slot.SCard playerSCard) {
             Card playerCard = playerSCard.card();
             CardViewBinding cardViewBinding = new CardViewBinding(playerFrameLayout);
-            cardViewBinding.bind(playerCard, imagesRefs.apply(playerCard));
+            cardViewBinding.bind(playerCard, imagesRefs.get(playerCard));
         }
 
         if (opponentSlot instanceof Slot.SCard opponentSCard) {
             Card card = opponentSCard.card();
             CardViewBinding cardViewBinding = new CardViewBinding(opponentFrameLayout);
-            cardViewBinding.bind(card, imagesRefs.apply(card));
+            cardViewBinding.bind(card, imagesRefs.get(card));
         }
 
     }

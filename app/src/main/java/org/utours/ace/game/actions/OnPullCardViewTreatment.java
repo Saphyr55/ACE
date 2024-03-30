@@ -8,20 +8,17 @@ import org.utours.ace.profile.feature.CardService;
 
 public class OnPullCardViewTreatment implements PlayerAction {
 
-    private final GamePartyMapper gamePartyMapper;
     private final PlayerAction playerAction;
 
     public OnPullCardViewTreatment(GamePartyMapper gamePartyMapper,
                                    CardService cardService) {
 
-        this.gamePartyMapper = gamePartyMapper;
-        this.playerAction = new OnPullCardPlayerAction(cardService);
+        this.playerAction = new OnPullCardPlayerAction(cardService, gamePartyMapper);
     }
 
     @Override
     public GameParty apply(GameParty gameParty) {
         gameParty = playerAction.apply(gameParty);
-        gameParty = gamePartyMapper.map(gameParty);
         return gameParty;
     }
 

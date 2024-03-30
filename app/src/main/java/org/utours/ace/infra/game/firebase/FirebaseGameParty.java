@@ -14,7 +14,6 @@ public class FirebaseGameParty {
     private FirebaseBoard firstPlayerBoard = new FirebaseBoard();
     private FirebaseBoard secondPlayerBoard = new FirebaseBoard();
     private int numberTurn = 0;
-    private boolean waiting = true;
 
     public String getUid() {
         return uid;
@@ -70,14 +69,6 @@ public class FirebaseGameParty {
 
     public void setNumberTurn(int numberTurn) {
         this.numberTurn = numberTurn;
-    }
-
-    public boolean getWaiting() {
-        return waiting;
-    }
-
-    public void setWaiting(boolean waiting) {
-        this.waiting = waiting;
     }
 
 }

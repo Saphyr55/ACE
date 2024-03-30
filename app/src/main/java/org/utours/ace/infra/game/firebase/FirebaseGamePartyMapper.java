@@ -27,7 +27,6 @@ public class FirebaseGamePartyMapper {
                 .withSecondPlayer(playerMapper.map(fgp.getSecondPlayer()))
                 .withSecondPlayerBoard(mapBoard(fgp.getSecondPlayerBoard()))
                 .withNumberTurn(fgp.getNumberTurn())
-                .withWaiting(fgp.getWaiting())
                 .build();
     }
 

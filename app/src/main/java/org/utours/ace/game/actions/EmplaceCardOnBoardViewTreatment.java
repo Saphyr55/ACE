@@ -8,18 +8,17 @@ import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Player;
 import org.utours.ace.game.port.GamePartyMapper;
 import org.utours.ace.game.port.PlayerAction;
+import org.utours.ace.profile.feature.ImageCardReference;
 import org.utours.ace.profile.model.Card;
-import org.utours.ace.profile.model.ImageCard;
 
 import java.util.List;
-import java.util.function.Function;
 
 public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
 
     private final EmplaceCardInBoardPlayerAction playerAction;
     private final List<View> playerCardViews;
     private final List<View> slotViews;
-    private final Function<Card, ImageCard> imagesRefs;
+    private final ImageCardReference imagesRefs;
     private final int cardPosition;
     private final int slotPosition;
     private final Player player;
@@ -29,7 +28,7 @@ public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
                                            GamePartyMapper refresh,
                                            List<View> playerCardViews,
                                            List<View> playerSlotViews,
-                                           Function<Card, ImageCard> imagesRefs,
+                                           ImageCardReference imagesRefs,
                                            int cardPosition,
                                            int slotPosition) {
 
@@ -70,7 +69,7 @@ public class EmplaceCardOnBoardViewTreatment implements PlayerAction {
         var frameLayout = view.findViewById(R.id.view_cardSlot);
         var playerCardView = new CardViewBinding(frameLayout);
 
-        playerCardView.bind(card, imagesRefs.apply(card));
+        playerCardView.bind(card, imagesRefs.get(card));
 
         cardView.setVisibility(View.GONE);
         emptyView.setVisibility(View.GONE);

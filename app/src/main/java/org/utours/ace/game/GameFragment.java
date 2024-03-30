@@ -15,9 +15,9 @@ import androidx.fragment.app.Fragment;
 
 import org.utours.ace.R;
 import org.utours.ace.common.Selectable;
+import org.utours.ace.common.SelectableValue;
 import org.utours.ace.game.actions.ActiveSkillViewTreatment;
 import org.utours.ace.game.actions.EmplaceCardOnBoardViewTreatment;
-import org.utours.ace.common.SelectableValue;
 import org.utours.ace.game.actions.OnPullCardViewTreatment;
 import org.utours.ace.game.base.SlotCardSelectable;
 import org.utours.ace.game.feature.GameService;
@@ -31,13 +31,12 @@ import org.utours.ace.game.port.PlayerAction;
 import org.utours.ace.infra.game.GameContainer;
 import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.feature.CardService;
+import org.utours.ace.profile.feature.ImageCardReference;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.Card;
-import org.utours.ace.profile.model.ImageCard;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -50,7 +49,7 @@ public class GameFragment extends Fragment {
     private CardService cardService;
     private GameService gameService;
     private GamePartyFinder gamePartyFinder;
-    private Map<String, ImageCard> imageCardsReferences;
+    private ImageCardReference imageCardReference;
     private Selectable<Integer> firstSelectedCardSlotView;
     private SlotCardSelectable secondSelectedCardSlotView;
     private Selectable<Integer> selectedEmptySlotView;
@@ -70,6 +69,7 @@ public class GameFragment extends Fragment {
                                            PlayerAccountService playerAccountService) {
 
         GameFragment gameFragment = new GameFragment();
+        gameFragment.imageCardReference = ImageCardReference.create(cardService);
         gameFragment.gamePartyFinder = GameContainer.INSTANCE.getGamePartyFinder(navigationActivity);
         gameFragment.navigationActivity = navigationActivity;
         gameFragment.playerAccountService = playerAccountService;
@@ -82,7 +82,14 @@ public class GameFragment extends Fragment {
     }
 
     public CompletableFuture<Void> setup() {
-        return onSetup().thenRun(this::provideImages);
+        return onSetup().thenRun(() -> {
+            List<Card> cpCards = gameParty.currentPlayer().deck().cards();
+            List<Card> opCards = gameParty.opponentPlayer().deck().cards();
+            List<Card> cards = Stream
+                    .concat(cpCards.stream(), opCards.stream())
+                    .collect(Collectors.toList());
+            imageCardReference.provideImageCards(cards);
+        });
     }
 
     private CompletableFuture<Void> onSetup() {
@@ -113,7 +120,8 @@ public class GameFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState) {
 
         LinearLayout boardLayout = view.findViewById(R.id.layout_board);
 
@@ -168,7 +176,7 @@ public class GameFragment extends Fragment {
 
     private void onPressOpponentSlot(View view) {
 
-        if (!gameParty.isCurrentPlayer(player) && !firstSelectedCardSlotView.isSelect())
+        if (selectedHandCardView.isSelect() && !gameParty.isCurrentPlayer(player) && !firstSelectedCardSlotView.isSelect())
             return;
 
         View emptySlotView = view.findViewById(R.id.view_emptySlot);
@@ -227,7 +235,7 @@ public class GameFragment extends Fragment {
                     this::sendRefresh,
                     playerCardViews,
                     playerBoard,
-                    this::getImageCardByCard,
+                    imageCardReference,
                     cardPos,
                     slotPos);
 
@@ -242,7 +250,7 @@ public class GameFragment extends Fragment {
                     gameService,
                     playerBoard,
                     opponentBoard,
-                    this::getImageCardByCard,
+                    imageCardReference,
                     getGamePartyUpdater(),
                     fromPos, toPos,
                     isSelectedCardOpponent
@@ -271,21 +279,6 @@ public class GameFragment extends Fragment {
         }
     }
 
-    private void provideImages() {
-        cardService.provideImageCards(Stream.concat(
-                            gameParty.firstPlayer().deck().cards().stream(),
-                            gameParty.secondPlayer().deck().cards().stream())
-                        .collect(Collectors.toList()))
-                .thenAccept(this::setImageCardsReferences);
-    }
-
-    private void setImageCardsReferences(List<ImageCard> imageCards) {
-        List<Card> cards = Stream
-                .concat(gameParty.firstPlayer().deck().cards().stream(),
-                        gameParty.secondPlayer().deck().cards().stream())
-                .collect(Collectors.toList());
-        imageCardsReferences = cardService.getMapReferences(cards, imageCards);
-    }
 
     private List<View> mapCardsLayout(Player player, LinearLayout layout) {
         return IntStream.range(0, layout.getChildCount())
@@ -297,7 +290,7 @@ public class GameFragment extends Fragment {
         Card card = player.hand().get(index);
         View view = layout.getChildAt(index);
         CardViewBinding cardViewBinding = new CardViewBinding(view);
-        cardViewBinding.bind(card, getImageCardByCard(card));
+        cardViewBinding.bind(card, imageCardReference.get(card));
         return view;
     }
 
@@ -307,26 +300,26 @@ public class GameFragment extends Fragment {
         animation.start();
     }
 
-    private ImageCard getImageCardByCard(Card card) {
-        ImageCard imageCard = imageCardsReferences.get(card.pictureId());
-        assert imageCard != null;
-        return imageCard;
-    }
-
     public GamePartyUpdater getGamePartyUpdater() {
         return mapper -> refresh(mapper.map(gameParty));
     }
 
     private void refresh(GameParty gp) {
         gameParty = gp;
-        if (!gameParty.isCurrentPlayer(player) && playerCardViews != null) {
+        if (gameParty.isCurrentPlayer(player) && playerCardViews != null) {
+            endButton.setEnabled(true);
+            pullButton.setEnabled(true);
+            refreshBoard(gameParty.opponentPlayerBoard(), opponentBoard);
+            refreshBoard(gameParty.currentPlayerBoard(), playerBoard);
+            refreshHand(gameParty.opponentPlayer(), opponentCardViews);
+            refreshHand(gameParty.currentPlayer(), playerCardViews);
+        } else if (!gameParty.isCurrentPlayer(player) && playerCardViews != null) {
             endButton.setEnabled(false);
+            pullButton.setEnabled(false);
             refreshBoard(gameParty.currentPlayerBoard(), opponentBoard);
             refreshBoard(gameParty.opponentPlayerBoard(), playerBoard);
             refreshHand(gameParty.currentPlayer(), opponentCardViews);
             refreshHand(gameParty.opponentPlayer(), playerCardViews);
-        } else if (endButton != null) {
-            endButton.setEnabled(true);
         }
     }
 
@@ -337,8 +330,9 @@ public class GameFragment extends Fragment {
             if (card == null) {
                 cardView.setVisibility(View.GONE);
             } else {
+                cardView.setVisibility(View.VISIBLE);
                 CardViewBinding binding = new CardViewBinding(cardView);
-                binding.bind(card, getImageCardByCard(card));
+                binding.bind(card, imageCardReference.get(card));
             }
         }
     }
@@ -351,7 +345,7 @@ public class GameFragment extends Fragment {
             var frameLayout = view.findViewById(R.id.view_cardSlot);
             if (slot instanceof Slot.SCard sCard) {
                 CardViewBinding binding = new CardViewBinding(frameLayout);
-                binding.bind(sCard.card(), getImageCardByCard(sCard.card()));
+                binding.bind(sCard.card(), imageCardReference.get(sCard.card()));
                 emptyView.setVisibility(View.GONE);
                 frameLayout.setVisibility(View.VISIBLE);
             } else {

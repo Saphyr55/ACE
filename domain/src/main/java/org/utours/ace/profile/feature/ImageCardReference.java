@@ -19,8 +19,7 @@ public interface ImageCardReference {
     Map<String, ImageCard> getReferences();
 
     default ImageCard get(Card card) {
-        ImageCard imageCard = getReferences()
-                .get(card.pictureId());
+        ImageCard imageCard = getReferences().get(card.pictureId());
         assert imageCard != null;
         return imageCard;
     }

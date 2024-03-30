@@ -7,7 +7,6 @@ import org.utours.ace.profile.model.Deck;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -26,7 +25,7 @@ public class FirebasePlayerMapper {
                         .mapToObj(value -> PlayerAction.noAction())
                         .collect(Collectors.toList()))
                 .withHand(cardMapper.mapFs(firebasePlayer.getHand()))
-                .withDeck(new Deck(Set.copyOf(cardMapper.mapFs(firebasePlayer.getDeck()))))
+                .withDeck(new Deck(new ArrayList<>(cardMapper.mapFs(firebasePlayer.getDeck()))))
                 .build();
     }
 

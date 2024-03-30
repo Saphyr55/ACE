@@ -53,7 +53,7 @@ public record PlayerAccount(
         deck.add(card);
 
         return Builder.copyOf(this)
-                .withDeck(new Deck(Set.copyOf(deck)))
+                .withDeck(new Deck(new ArrayList<>(deck)))
                 .build();
     }
 
@@ -89,7 +89,7 @@ public record PlayerAccount(
         deck.remove(card);
 
         return Builder.copyOf(this)
-                .withDeck(new Deck(Set.copyOf(deck)))
+                .withDeck(new Deck(new ArrayList<>(deck)))
                 .build();
     }
 
@@ -101,8 +101,8 @@ public record PlayerAccount(
         private String description = DEFAULT_DESCRIPTION;
         private Quantity<Ticket> ticketQuantity = new Quantity<>(Ticket.DEFAULT_VALUE);
         private Quantity<StarDust> starDustQuantity = new Quantity<>(StarDust.DEFAULT_VALUE);
-        private Deck deck = new Deck(Set.of());
-        private Set<Card> cards = Set.of();
+        private Deck deck = new Deck(new ArrayList<>());
+        private Set<Card> cards = new HashSet<>();
         private List<ClassCoin> classCoins = DEFAULT_CLASS_COINS;
 
         private Builder(String uid, String email) {

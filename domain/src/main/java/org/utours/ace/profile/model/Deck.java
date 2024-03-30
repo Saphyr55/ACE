@@ -1,13 +1,9 @@
 package org.utours.ace.profile.model;
 
-import org.utours.ace.common.Validator;
-import org.utours.ace.profile.feature.CardRegistry;
-
-import java.util.Set;
-import java.util.function.Supplier;
+import java.util.List;
 
 public record Deck(
-        Set<Card> cards
+        List<Card> cards
 ) {
 
     public static final int MAX_SLOT = 20;

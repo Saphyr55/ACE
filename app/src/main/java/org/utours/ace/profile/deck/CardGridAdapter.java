@@ -10,6 +10,7 @@ import androidx.cardview.widget.CardView;
 
 import org.utours.ace.R;
 import org.utours.ace.common.annotation.Adapter;
+import org.utours.ace.profile.feature.ImageCardReference;
 import org.utours.ace.profile.model.ImageCard;
 import org.utours.ace.profile.model.Card;
 
@@ -23,17 +24,17 @@ public class CardGridAdapter extends BaseAdapter {
 
     private List<Card> cards;
     private final LayoutInflater layoutInflater;
-    private final Map<String, ImageCard> cardImages;
+    private final ImageCardReference imageCardReference;
     private BiConsumer<CardView, Card> onCreateCardView;
 
     public CardGridAdapter(Context context,
                            List<Card> cards,
-                           Map<String, ImageCard> cardImages,
+                           ImageCardReference imageCardReference,
                            BiConsumer<CardView, Card> onCreateCardView) {
 
         this.cards = cards;
         this.layoutInflater = LayoutInflater.from(context);
-        this.cardImages = cardImages;
+        this.imageCardReference = imageCardReference;
         this.onCreateCardView = onCreateCardView;
     }
 
@@ -61,7 +62,7 @@ public class CardGridAdapter extends BaseAdapter {
             convertView = layoutInflater.inflate(R.layout.item_card, parent, false);
         }
 
-        DeckFragment.bindCardView(convertView, card, onCreateCardView, cardImages);
+        DeckFragment.bindCardView(convertView, card, onCreateCardView, imageCardReference);
 
         return convertView;
     }

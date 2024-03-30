@@ -34,7 +34,7 @@ public class FirebasePlayerAccountMapper {
                 .map(s -> new ClassCoin(ClassCoin.Type.valueOf(s)))
                 .collect(Collectors.toList());
 
-        Deck deck = new Deck(Set.copyOf(cardsOfIds(account.getDeck())));
+        Deck deck = new Deck(List.copyOf(cardsOfIds(account.getDeck())));
         Quantity<StarDust> starDustQuantity = new Quantity<>(account.getStarDustQuantity());
         Quantity<Ticket> ticketQuantity = new Quantity<>(account.getTicketQuantity());
 

@@ -58,8 +58,8 @@ public class SelectClassCoinDialog extends Dialog {
                 new AndroidClassCoinInformation(context),
                 this::onClickClassCoin);
 
-        classCoinsRecycler.setLayoutManager(
-                new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+        classCoinsRecycler.setLayoutManager(new LinearLayoutManager(context,
+                LinearLayoutManager.VERTICAL, false));
         classCoinsRecycler.setAdapter(classCoinsAdapter);
 
         selectButton.setOnClickListener(v -> {

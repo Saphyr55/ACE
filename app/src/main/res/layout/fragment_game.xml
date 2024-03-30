@@ -71,6 +71,14 @@
         </LinearLayout>
 
         <Button
+            android:id="@+id/btn_pullCard"
+            android:layout_marginTop="310dp"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:textSize="12sp"
+            android:text="@string/pull"/>
+
+        <Button
             android:id="@+id/btn_end"
             android:layout_marginTop="400dp"
             android:layout_width="40dp"

@@ -3,8 +3,6 @@ package org.utours.ace.game.actions;
 import android.content.Context;
 import android.view.View;
 
-import androidx.annotation.NonNull;
-
 import org.utours.ace.common.Selectable;
 import org.utours.ace.game.dialog.ConfirmSkillDialog;
 import org.utours.ace.game.feature.GameService;
@@ -26,14 +24,11 @@ public class ActiveSkillViewTreatment implements PlayerAction {
     private final Context context;
     private final GamePartyMapper refresh;
     private final GameService gameService;
-    private final List<View> playerBoard;
-    private final List<View> opponentBoard;
     private final Function<Card, ImageCard> imageRefs;
     private final GamePartyUpdater partyUpdater;
     private final Selectable<Integer> fromPos;
     private final Selectable<Integer> toPos;
     private final boolean isOpponentSlotSelected;
-    private final Function<Integer, Integer> reverseFunction;
 
     public ActiveSkillViewTreatment(Context context,
                                     GamePartyMapper refresh,
@@ -44,19 +39,15 @@ public class ActiveSkillViewTreatment implements PlayerAction {
                                     GamePartyUpdater partyUpdater,
                                     Selectable<Integer> fromPos,
                                     Selectable<Integer> toPos,
-                                    Function<Integer, Integer> reverseFunction,
                                     boolean isToOpponent) {
 
         this.context = context;
         this.refresh = refresh;
         this.gameService = gameService;
-        this.playerBoard = playerBoard;
-        this.opponentBoard = opponentBoard;
         this.imageRefs = imageRefs;
         this.partyUpdater = partyUpdater;
         this.fromPos = fromPos;
         this.toPos = toPos;
-        this.reverseFunction = reverseFunction;
         this.isOpponentSlotSelected = isToOpponent;
         this.attackPlayerAction = new AttackOpponentCardViewTreatment(
                 playerBoard, opponentBoard, imageRefs, refresh,
@@ -123,7 +114,6 @@ public class ActiveSkillViewTreatment implements PlayerAction {
         return gameParty;
     }
 
-    @NonNull
     private GameParty activeSkill(GameParty gameParty, Slot.SCard cardFrom, int fromPos, int toPos) {
 
         PlayerAction activeSkillPlayerAction = new ActiveSkillPlayerAction(

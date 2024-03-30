@@ -5,17 +5,12 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import org.utours.ace.R;
-import org.utours.ace.common.EdgeManager;
 import org.utours.ace.databinding.ActivityNavigationBinding;
 import org.utours.ace.infra.profile.PlayerAccountContainer;
 import org.utours.ace.main.ErrorFragment;
@@ -28,9 +23,6 @@ import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.gacha.GachaFragment;
 import org.utours.ace.profile.profile.ProfileFragment;
 import org.utours.ace.shop.ShopFragment;
-
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 public class NavigationActivity extends AppCompatActivity {
 
@@ -49,7 +41,9 @@ public class NavigationActivity extends AppCompatActivity {
         binding = ActivityNavigationBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        replaceFragment(new WaitFragment());
+        WaitFragment waitFragment = WaitFragment.newInstance();
+
+        replaceFragment(waitFragment);
         binding.navBar.setVisibility(View.GONE);
         binding.navBarView.setBackground(null);
         binding.navBarView.setSelectedItemId(R.id.item_main);
@@ -58,7 +52,7 @@ public class NavigationActivity extends AppCompatActivity {
         CardService cardService = PlayerAccountContainer.INSTANCE.getCardService(this);
         GachaService gachaService = PlayerAccountContainer.INSTANCE.getGachaService(this);
 
-        mainFragment = MainFragment.newInstance(this);
+        mainFragment = MainFragment.newInstance(playerAccountService, cardService, this);
         profileFragment = new ProfileFragment();
         deckFragment = DeckFragment.newInstance(cardService, playerAccountService, this);
         gachaFragment = new GachaFragment(cardService, gachaService, this);

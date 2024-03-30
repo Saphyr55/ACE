@@ -18,6 +18,7 @@ import org.utours.ace.common.Selectable;
 import org.utours.ace.game.actions.ActiveSkillViewTreatment;
 import org.utours.ace.game.actions.EmplaceCardOnBoardViewTreatment;
 import org.utours.ace.common.SelectableValue;
+import org.utours.ace.game.actions.OnPullCardViewTreatment;
 import org.utours.ace.game.base.SlotCardSelectable;
 import org.utours.ace.game.feature.GameService;
 import org.utours.ace.game.model.Board;
@@ -61,6 +62,7 @@ public class GameFragment extends Fragment {
     private List<View> playerBoard;
     private List<View> opponentBoard;
     private Button endButton;
+    private Button pullButton;
     private boolean isSelectedCardOpponent = false;
 
     public static GameFragment newInstance(NavigationActivity navigationActivity,
@@ -112,6 +114,7 @@ public class GameFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+
         LinearLayout boardLayout = view.findViewById(R.id.layout_board);
 
         // Player.
@@ -135,9 +138,15 @@ public class GameFragment extends Fragment {
             gameParty = gameParty.nextTurn();
             gameParty = sendRefresh(gameParty);
         });
-        if (!gameParty.isCurrentPlayer(player)) {
-            endButton.setEnabled(false);
-        }
+
+        pullButton = view.findViewById(R.id.btn_pullCard);
+        pullButton.setOnClickListener(v -> {
+            var onPull = new OnPullCardViewTreatment(this::sendRefresh, cardService);
+            gameParty = onPull.apply(gameParty);
+        });
+
+        endButton.setEnabled(gameParty.isCurrentPlayer(player));
+        pullButton.setEnabled(gameParty.isCurrentPlayer(player));
     }
 
     private void fillPlayerBoard(GridLayout layout) {
@@ -236,7 +245,6 @@ public class GameFragment extends Fragment {
                     this::getImageCardByCard,
                     getGamePartyUpdater(),
                     fromPos, toPos,
-                    this::reverseIndexOpponentBoard,
                     isSelectedCardOpponent
             );
         }
@@ -265,16 +273,16 @@ public class GameFragment extends Fragment {
 
     private void provideImages() {
         cardService.provideImageCards(Stream.concat(
-                            gameParty.firstPlayer().hand().stream(),
-                            gameParty.secondPlayer().hand().stream())
+                            gameParty.firstPlayer().deck().cards().stream(),
+                            gameParty.secondPlayer().deck().cards().stream())
                         .collect(Collectors.toList()))
                 .thenAccept(this::setImageCardsReferences);
     }
 
     private void setImageCardsReferences(List<ImageCard> imageCards) {
         List<Card> cards = Stream
-                .concat(gameParty.firstPlayer().hand().stream(),
-                        gameParty.secondPlayer().hand().stream())
+                .concat(gameParty.firstPlayer().deck().cards().stream(),
+                        gameParty.secondPlayer().deck().cards().stream())
                 .collect(Collectors.toList());
         imageCardsReferences = cardService.getMapReferences(cards, imageCards);
     }

@@ -6,7 +6,6 @@ import org.utours.ace.profile.model.Deck;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public record Player(
         String playerID,
@@ -27,7 +26,7 @@ public record Player(
 
         private String playerID = "-1";
         private List<Card> hand = new ArrayList<>();
-        private Deck deck = new Deck(Set.of());
+        private Deck deck = new Deck(new ArrayList<>());
         private List<PlayerAction> actions = new ArrayList<>();
 
         public static Builder of() {

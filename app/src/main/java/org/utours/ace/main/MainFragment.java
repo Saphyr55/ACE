@@ -2,15 +2,14 @@ package org.utours.ace.main;
 
 import android.content.Context;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import org.utours.ace.R;
 import org.utours.ace.game.GameFragment;
@@ -28,9 +27,9 @@ public class MainFragment extends Fragment {
 
     private MainFragment() { }
 
-    public static MainFragment newInstance(NavigationActivity navigationActivity,
-                                           PlayerAccountService accountService,
-                                           CardService cardService) {
+    public static MainFragment newInstance(PlayerAccountService accountService,
+                                           CardService cardService,
+                                           NavigationActivity navigationActivity) {
 
         MainFragment mainFragment = new MainFragment();
         mainFragment.cardService = cardService;

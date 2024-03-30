@@ -10,7 +10,7 @@ import java.util.List;
 
 public class SlotCardSelectable implements Selectable<Integer> {
 
-    private final SelectableValue<Integer> wrapped;
+    private final Selectable<Integer> wrapped;
     private final List<View> playerBoard;
     private final List<View> opponentBoard;
     private boolean isOpponent;

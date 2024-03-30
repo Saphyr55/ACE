@@ -19,8 +19,7 @@ import org.utours.ace.profile.model.ClassCoin;
 import org.utours.ace.profile.model.PlayerAccount;
 
 import java.util.ArrayList;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.Optional;
 
 public class SelectClassCoinDialog extends Dialog {
 
@@ -31,18 +30,22 @@ public class SelectClassCoinDialog extends Dialog {
     private final ClassCoinsAdapter classCoinsAdapter;
     private final SelectableValue<ClassCoin> selectableValue;
     private Card selectedCard;
+    private View selectedClassCoinView;
 
     public SelectClassCoinDialog(@NonNull Context context,
                                  PlayerAccountService playerAccountService,
                                  Card selectedCard) {
 
         super(context);
+        setContentView(R.layout.dialog_select_class_coin);
+
         this.selectedCard = selectedCard;
         this.playerAccountService = playerAccountService;
         this.selectableValue = new SelectableValue<>();
         this.selectableValue.select(selectedCard.classCoin());
 
-        setContentView(R.layout.dialog_select_class_coin);
+        Optional.ofNullable(getWindow())
+                .ifPresent(window -> window.setWindowAnimations(R.style.DialogAnimations));
 
         cancelButton = findViewById(R.id.btn_cancel);
         selectButton = findViewById(R.id.btn_select);
@@ -51,10 +54,12 @@ public class SelectClassCoinDialog extends Dialog {
         var account = playerAccountService.currentPlayerAccount();
         classCoinsAdapter = new ClassCoinsAdapter(
                 new ArrayList<>(account.classCoins()),
+                selectedCard.classCoin(),
                 new AndroidClassCoinInformation(context),
                 this::onClickClassCoin);
 
-        classCoinsRecycler.setLayoutManager(new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
+        classCoinsRecycler.setLayoutManager(
+                new LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false));
         classCoinsRecycler.setAdapter(classCoinsAdapter);
 
         selectButton.setOnClickListener(v -> {
@@ -66,6 +71,11 @@ public class SelectClassCoinDialog extends Dialog {
     }
 
     private void onClickClassCoin(ClassCoin classCoin, View view) {
+        if (selectedClassCoinView != null) {
+            View arrowImage = selectedClassCoinView.findViewById(R.id.image_arrow);
+            arrowImage.setVisibility(View.GONE);
+        }
+        selectedClassCoinView = view;
         View arrowImage = view.findViewById(R.id.image_arrow);
         arrowImage.setVisibility(View.VISIBLE);
         selectableValue.select(classCoin);

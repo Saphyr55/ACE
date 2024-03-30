@@ -361,6 +361,4 @@ public class GameFragment extends Fragment {
         this.player = player;
     }
 
-
-
 }

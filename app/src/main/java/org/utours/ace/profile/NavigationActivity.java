@@ -1,10 +1,14 @@
 package org.utours.ace.profile;
 
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -17,6 +21,7 @@ import org.utours.ace.main.ErrorFragment;
 import org.utours.ace.main.MainFragment;
 import org.utours.ace.main.WaitFragment;
 import org.utours.ace.profile.deck.DeckFragment;
+import org.utours.ace.profile.dialog.CustomizeProfileDialog;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.GachaService;
 import org.utours.ace.profile.feature.PlayerAccountService;
@@ -53,7 +58,7 @@ public class NavigationActivity extends AppCompatActivity {
         GachaService gachaService = PlayerAccountContainer.INSTANCE.getGachaService(this);
 
         mainFragment = MainFragment.newInstance(playerAccountService, cardService, this);
-        profileFragment = new ProfileFragment();
+        profileFragment =ProfileFragment.newInstance(this,cardService,playerAccountService);
         deckFragment = DeckFragment.newInstance(cardService, playerAccountService, this);
         gachaFragment = new GachaFragment(cardService, gachaService, this);
         shopFragment = new ShopFragment();
@@ -62,6 +67,7 @@ public class NavigationActivity extends AppCompatActivity {
                 .downloadAndInstallAllImages()
                 .thenCompose(unused -> deckFragment.setup())
                 .thenCompose(unused -> gachaFragment.setup())
+                .thenCompose(unused -> profileFragment.setup())
                 .thenRun(this::startNavigationMain)
                 .exceptionally(this::messagingErrorFragment);
     }
@@ -135,5 +141,21 @@ public class NavigationActivity extends AppCompatActivity {
         runOnUiThread(() -> binding.navBar.setVisibility(View.GONE));
         replaceFragment(fragment);
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == CustomizeProfileDialog.REQUEST_CODE) {
+                Uri uri = data.getData();
+                Bitmap bitmap = profileFragment.loadFromUri(uri);
+                profileFragment.changeView(bitmap);
+            }
+        }
+    }
+
+
+
 
 }

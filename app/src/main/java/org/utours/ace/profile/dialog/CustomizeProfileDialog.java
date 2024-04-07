@@ -1,12 +1,12 @@
 package org.utours.ace.profile.dialog;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.ImageDecoder;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.view.View;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.GridView;
@@ -15,27 +15,28 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
 import org.utours.ace.R;
-import org.utours.ace.common.Refreshable;
-import org.utours.ace.profile.CardGridAdapter;
+import org.utours.ace.profile.deck.CardGridAdapter;
 import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.feature.CardService;
+import org.utours.ace.profile.feature.ImageCardReference;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.Card;
-import org.utours.ace.profile.model.Deck;
-import org.utours.ace.profile.model.ImageCard;
 import org.utours.ace.profile.model.PlayerAccount;
 
+import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class CustomizeProfileDialog extends Dialog {
 
-    private final Map<String, ImageCard> cardImages;
+
+    public static final int REQUEST_CODE = 1001;
+    private final ImageCardReference imageCardReference;
     private final Consumer<View> setDefaultCardViewBackground;
     private final Consumer<View> setSelectedBackgroundColor;
+    private NavigationActivity navigationActivity;
     private PlayerAccountService pAccountService;
     private CardGridAdapter cardGridAdapter;
     private Card cardSelected;
@@ -44,13 +45,13 @@ public final class CustomizeProfileDialog extends Dialog {
     public CustomizeProfileDialog(@NonNull NavigationActivity navigationActivity,
                                   PlayerAccountService playerAccountService,
                                   CardService cardService,
-                                  Map<String, ImageCard> cardImages,
+                                  ImageCardReference imageCardReference,
                                   BiConsumer<CardView,Card> refreshable) {
 
         super(navigationActivity);
-        this.cardImages = cardImages;
+        this.imageCardReference = imageCardReference;
         pAccountService = playerAccountService;
-
+        this.navigationActivity = navigationActivity;
         setContentView(R.layout.dialog_customize_profile);
 
         Optional.ofNullable(getWindow())
@@ -68,7 +69,7 @@ public final class CustomizeProfileDialog extends Dialog {
         cardGridAdapter = new CardGridAdapter(
                 getContext(),
                 List.copyOf(playerAccountService.currentPlayerAccount().cards()),
-                this.cardImages,
+                this.imageCardReference,
                 this::onCreateCardViewCardsMode);
 
         gridView.setAdapter(cardGridAdapter);
@@ -84,9 +85,9 @@ public final class CustomizeProfileDialog extends Dialog {
         };
 
         uploadButton.setOnClickListener(v -> {
-            Intent iGallery = new Intent(Intent.ACTION_PICK);
-            iGallery.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
-            navigationActivity.startActivity(iGallery);
+            Intent iGallery = new Intent(Intent.ACTION_GET_CONTENT);
+            iGallery.setType("image/*");
+            navigationActivity.startActivityForResult(iGallery, REQUEST_CODE);
         });
 
         photoButton.setOnClickListener(v -> {
@@ -96,10 +97,11 @@ public final class CustomizeProfileDialog extends Dialog {
         saveButton.setOnClickListener(v -> {
             String description = descriptionEditText.getText().toString();
             playerAccountService.setCurrentPlayerAccount(playerAccount -> {
-                return PlayerAccount.Builder.of(playerAccount)
+                return PlayerAccount.Builder.copyOf(playerAccount)
                         .withDescription(description)
                         .build();
             });
+            playerAccountService.updateCurrentPlayerAccount();
             refreshable.accept(cardViewSelected, cardSelected);
             dismiss();
         });
@@ -107,6 +109,8 @@ public final class CustomizeProfileDialog extends Dialog {
         cancelButton.setOnClickListener(v -> dismiss());
 
     }
+
+
 
     private void onCreateCardViewCardsMode(CardView cardView, Card card) {
 

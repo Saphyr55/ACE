@@ -10,6 +10,7 @@ import androidx.cardview.widget.CardView;
 
 import org.utours.ace.R;
 import org.utours.ace.common.annotation.Adapter;
+import org.utours.ace.profile.deck.DeckFragment;
 import org.utours.ace.profile.feature.ImageCardReference;
 import org.utours.ace.profile.model.ImageCard;
 import org.utours.ace.profile.model.Card;

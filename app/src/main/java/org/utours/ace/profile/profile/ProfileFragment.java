@@ -3,6 +3,8 @@ package org.utours.ace.profile.profile;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.ImageDecoder;
+import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -21,10 +23,12 @@ import org.utours.ace.R;
 import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.dialog.CustomizeProfileDialog;
 import org.utours.ace.profile.feature.CardService;
+import org.utours.ace.profile.feature.ImageCardReference;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -35,7 +39,7 @@ public class ProfileFragment extends Fragment {
     private NavigationActivity navigationActivity;
     private PlayerAccountService accountService;
     private CardService cardService;
-    private Map<String, ImageCard> cardImages;
+    private ImageCardReference imageCardReference;
     private View viewFragment;
 
     public ProfileFragment(){
@@ -47,6 +51,8 @@ public class ProfileFragment extends Fragment {
         fragment.accountService = accountService;
         fragment.cardService = cardService;
         fragment.navigationActivity = navigationActivity;
+        fragment.imageCardReference = ImageCardReference.create(cardService);
+
 
         return fragment;
     }
@@ -85,7 +91,7 @@ public class ProfileFragment extends Fragment {
 
     private void onCustomizeButton(NavigationActivity navigationActivity, TextView descriptionText) {
 
-        CustomizeProfileDialog customizeProfileDialog = new CustomizeProfileDialog(navigationActivity,accountService, cardService, cardImages, (cardView, card) -> {
+        CustomizeProfileDialog customizeProfileDialog = new CustomizeProfileDialog(navigationActivity,accountService, cardService, imageCardReference, (cardView, card) -> {
             refresh(descriptionText, cardView, card);
         });
         customizeProfileDialog.show();
@@ -101,7 +107,7 @@ public class ProfileFragment extends Fragment {
         CardView userPictureCardView = viewFragment.findViewById(R.id.profile_user_picture);
         ImageView userPictureImageview = userPictureCardView.findViewById(R.id.image_card);
 
-        ImageCard imageCard = cardImages.get(card.pictureId());
+        ImageCard imageCard = imageCardReference.get(card);
         assert imageCard != null;
         byte[] content = imageCard.content();
         Bitmap bitmap = BitmapFactory.decodeByteArray(content, 0, content.length);
@@ -110,14 +116,29 @@ public class ProfileFragment extends Fragment {
     }
 
     public CompletableFuture<Void> setup() {
-        return cardService
+        return imageCardReference
                 .provideImageCards(accountService.currentPlayerAccount().cards())
-                .thenAccept(this::setImageCardReferences);
+                .thenAccept(stringImageCardMap -> {});
     }
 
-    private void setImageCardReferences(List<ImageCard> imageCards) {
-        var cards = List.copyOf(accountService.currentPlayerAccount().cards());
-        cardImages = cardService.getMapReferences(cards, imageCards);
+    public void changeView (Bitmap bitmap){
+        CardView userPictureCardView = viewFragment.findViewById(R.id.profile_user_picture);
+        ImageView userPictureImageView = userPictureCardView.findViewById(R.id.image_card);
+        userPictureImageView.setImageBitmap(bitmap);
+
+    }
+
+    public Bitmap loadFromUri(Uri uri) {
+        Bitmap bitmap = null;
+
+        try {
+            ImageDecoder.Source source = ImageDecoder.createSource(navigationActivity.getContentResolver(), uri);
+            bitmap = ImageDecoder.decodeBitmap(source);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return bitmap;
     }
 
 }

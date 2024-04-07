@@ -1,0 +1,15 @@
+package org.utours.ace.game.port;
+
+import org.utours.ace.game.actions.EmptyPlayerAction;
+import org.utours.ace.game.model.GameParty;
+
+@FunctionalInterface
+public interface PlayerAction {
+
+    GameParty apply(GameParty gameParty);
+
+    static PlayerAction noAction() {
+        return new EmptyPlayerAction();
+    }
+
+}

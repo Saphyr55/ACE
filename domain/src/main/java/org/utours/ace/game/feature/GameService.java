@@ -2,45 +2,67 @@ package org.utours.ace.game.feature;
 
 
 import org.utours.ace.common.annotation.DomainService;
+import org.utours.ace.game.actions.EmptyPlayerAction;
 import org.utours.ace.game.model.GameParty;
-import org.utours.ace.game.model.Player;
+import org.utours.ace.game.port.PlayerAction;
+import org.utours.ace.game.port.SkillAction;
+import org.utours.ace.game.skill.PriestSkillAction;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.model.Card;
 
-import java.util.List;
-
 @DomainService
 public class GameService {
-
-
+    
     private final CardService cardService;
 
     public GameService(CardService cardService) {
         this.cardService = cardService;
     }
 
-    public GameParty botTurn(PlayingTurn playingTurn, GameParty gameParty) {
+    public SkillAction getSkillAction(Card card) {
+        return switch (card.classCoin().type()) {
+            case EMPTY -> SkillAction.nothing();
+            case PRIEST -> new PriestSkillAction();
+            case PALADIN -> SkillAction.nothing();
+            case SHAMAN -> SkillAction.nothing();
+            case MAGE -> SkillAction.nothing();
+            case WARRIOR -> SkillAction.nothing();
+        };
+    }
 
-        GameParty botGameParty = GameParty.Builder.of(gameParty)
-                .withOpponent(gameParty.player())
-                .withPlayer(gameParty.opponent())
+    public GameParty botAction(PlayerAction playerAction, GameParty gameParty) {
+        /*
+        var botGameParty = GameParty.Builder.copyOf(gameParty)
+                .withOpponent(gameParty.firstPlayer())
+                .withFirstPlayer(gameParty.secondPlayer())
                 .build();
 
-        List<Card> hand = botGameParty.player().hand();
-        List<Card> cardSingleton = cardService.getCardsStochastic(hand, 1, false);
-        Card card = cardSingleton.stream()
+        var hand = botGameParty.currentPlayer().hand();
+        var cardSingleton = cardService.getCardsStochastic(hand, 1, false);
+        var card = cardSingleton.stream()
                 .findFirst()
                 .orElseThrow(RuntimeException::new);
 
-        playingTurn.onTurn(botGameParty, card);
+        playerAction.apply(botGameParty);
 
-        botGameParty = botGameParty.emplacePlayerCardInBoard(card);
+        // botGameParty = botGameParty.emplacePlayerCardInBoard(card);
         botGameParty = botGameParty.nextTurn();
 
-        return GameParty.Builder.of(botGameParty)
-                .withPlayer(botGameParty.opponent())
-                .withOpponent(botGameParty.player())
+        return GameParty.Builder.copyOf(botGameParty)
+                .withFirstPlayer(botGameParty.secondPlayer())
+                .withOpponent(botGameParty.firstPlayer())
                 .build();
+         */
+        return gameParty;
     }
 
+    public boolean isCurrentPlayerCannotPlay(GameParty gameParty, PlayerAction playerAction) {
+        return !(playerAction instanceof EmptyPlayerAction)
+                && isCurrentPlayerCannotPlay(gameParty);
+    }
+
+    public boolean isCurrentPlayerCannotPlay(GameParty gameParty) {
+        var actions = gameParty.currentPlayer().actions();
+        return actions.size() % 3 == 0 && !actions.isEmpty();
+    }
 }

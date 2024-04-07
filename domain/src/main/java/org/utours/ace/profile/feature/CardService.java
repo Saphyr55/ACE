@@ -17,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -99,14 +98,14 @@ public class CardService {
 
     public Map<String, ImageCard> getMapReferences(List<Card> cards, List<ImageCard> imageCards) {
         var result = new HashMap<String, ImageCard>();
-        for (int i = 0; i < imageCards.size(); i++) {
+        for (int i = 0; i < cards.size(); i++) {
             Card card = cards.get(i);
             result.put(card.pictureId(), imageCards.get(i));
         }
         return result;
     }
 
-    public List<Card> getCardsStochastic(Collection<Card> collection, int max, boolean unique) {
+    public List<Card> getCardsStochastic(Collection<Card> collection, int max, boolean isUnique) {
 
         int size = collection.size();
         if (max > size) {
@@ -118,23 +117,16 @@ public class CardService {
 
         var random = new Random();
 
-        Consumer<Integer> fillCards = s -> {
+        int s = max == 1 ? max : size;
+
+        while (cards.size() != max) {
             int j = random.nextInt(s);
             var card = registry.get(j);
-            if (!unique) {
+            if (!isUnique) {
                 cards.add(card);
             } else if (!cards.contains(card)) {
                 cards.add(card);
             }
-        };
-
-        if (max == 1) {
-            fillCards.accept(max);
-            return cards;
-        }
-
-        while (cards.size() != max) {
-            fillCards.accept(size - 1);
         }
 
         return cards;

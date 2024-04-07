@@ -28,6 +28,7 @@ public class FirebasePlayerAccountRepository implements PlayerAccountRepository 
 
     @Override
     public CompletableFuture<Optional<PlayerAccount>> getByUID(String uid) {
+        assert uid != null;
 
         if (cache.containsKey(uid)) {
             var opt = Optional.ofNullable(cache.get(uid));

@@ -49,7 +49,7 @@ public final class PlayerAccountService {
                 Stream<Card> singletonCard = Set.of(card).stream();
                 Set<Card> newCards = Stream.concat(newPlayerAccountCardStream, singletonCard)
                         .collect(Collectors.toSet());
-                newPlayerAccount = PlayerAccount.Builder.of(newPlayerAccount)
+                newPlayerAccount = PlayerAccount.Builder.copyOf(newPlayerAccount)
                         .withCards(Set.copyOf(newCards))
                         .build();
             }

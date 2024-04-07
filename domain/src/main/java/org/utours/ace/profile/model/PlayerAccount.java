@@ -2,7 +2,10 @@ package org.utours.ace.profile.model;
 
 import org.utours.ace.common.Quantity;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 public record PlayerAccount(
@@ -13,6 +16,7 @@ public record PlayerAccount(
         String description,
         Quantity<Ticket> ticketQuantity,
         Quantity<StarDust> starDustQuantity,
+        List<ClassCoin> classCoins,
         Deck deck,
         Set<Card> cards
 ) {
@@ -21,18 +25,19 @@ public record PlayerAccount(
     public static final int DEFAULT_LEVEL = 1;
     public static final String DEFAULT_NAME = "Player";
     public static final String DEFAULT_DESCRIPTION = "";
+    public static final List<ClassCoin> DEFAULT_CLASS_COINS = Arrays.asList(ClassCoin.empty());
 
 
     public PlayerAccount starDustQuantity(Quantity<StarDust> quantity) {
         var newStarDust = new Quantity<StarDust>(quantity.quantity());
-        return Builder.of(this)
+        return Builder.copyOf(this)
                 .withStarDustQuantity(newStarDust)
                 .build();
     }
 
     public PlayerAccount ticketQuantity(Quantity<Ticket> quantity) {
         var newTicketQuantity = new Quantity<Ticket>(quantity.quantity());
-        return Builder.of(this)
+        return Builder.copyOf(this)
                 .withTicketQuantity(newTicketQuantity)
                 .build();
     }
@@ -47,8 +52,30 @@ public record PlayerAccount(
         var deck = new HashSet<>(deck().cards());
         deck.add(card);
 
-        return Builder.of(this)
-                .withDeck(new Deck(Set.copyOf(deck)))
+        return Builder.copyOf(this)
+                .withDeck(new Deck(new ArrayList<>(deck)))
+                .build();
+    }
+
+    public PlayerAccount replaceCardInCards(Card card) {
+
+        Card oldC = null;
+        Set<Card> cards = new HashSet<>(this.cards);
+        for (var c : cards) {
+            if (c.equals(card)) {
+                oldC = c;
+                break;
+            }
+        }
+
+        if (oldC != null) {
+            cards.remove(oldC);
+        }
+
+        cards.add(card);
+
+        return PlayerAccount.Builder.copyOf(this)
+                .withCards(cards)
                 .build();
     }
 
@@ -61,8 +88,8 @@ public record PlayerAccount(
         var deck = new HashSet<>(deck().cards());
         deck.remove(card);
 
-        return Builder.of(this)
-                .withDeck(new Deck(Set.copyOf(deck)))
+        return Builder.copyOf(this)
+                .withDeck(new Deck(new ArrayList<>(deck)))
                 .build();
     }
 
@@ -74,8 +101,9 @@ public record PlayerAccount(
         private String description = DEFAULT_DESCRIPTION;
         private Quantity<Ticket> ticketQuantity = new Quantity<>(Ticket.DEFAULT_VALUE);
         private Quantity<StarDust> starDustQuantity = new Quantity<>(StarDust.DEFAULT_VALUE);
-        private Deck deck = new Deck(Set.of());
-        private Set<Card> cards = Set.of();
+        private Deck deck = new Deck(new ArrayList<>());
+        private Set<Card> cards = new HashSet<>();
+        private List<ClassCoin> classCoins = DEFAULT_CLASS_COINS;
 
 
         private Builder(String uid, String email) {
@@ -83,12 +111,12 @@ public record PlayerAccount(
             this.email = email;
         }
 
-        public static Builder of(String uid, String email) {
+        public static Builder copyOf(String uid, String email) {
             return new Builder(uid, email);
         }
 
-        public static Builder of(PlayerAccount account) {
-            return  Builder.of(account.uid, account.email)
+        public static Builder copyOf(PlayerAccount account) {
+            return  Builder.copyOf(account.uid, account.email)
                     .withUsername(account.username)
                     .withLevel(account.level)
                     .withCards(account.cards)
@@ -123,6 +151,11 @@ public record PlayerAccount(
             return this;
         }
 
+        public Builder withClassCoins(List<ClassCoin> classCoins) {
+            this.classCoins = classCoins;
+            return this;
+        }
+
         public Builder withStarDustQuantity(Quantity<StarDust> starDustQuantity) {
             this.starDustQuantity = starDustQuantity;
             return this;
@@ -142,6 +175,7 @@ public record PlayerAccount(
                     description,
                     ticketQuantity,
                     starDustQuantity,
+                    classCoins,
                     deck,
                     cards
             );

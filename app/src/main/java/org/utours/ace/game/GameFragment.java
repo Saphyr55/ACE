@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 
@@ -13,72 +14,101 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import org.utours.ace.R;
+import org.utours.ace.common.Selectable;
+import org.utours.ace.common.SelectableValue;
+import org.utours.ace.game.actions.ActiveSkillViewTreatment;
+import org.utours.ace.game.actions.EmplaceCardOnBoardViewTreatment;
+import org.utours.ace.game.actions.OnPullCardViewTreatment;
+import org.utours.ace.game.base.SlotCardSelectable;
 import org.utours.ace.game.feature.GameService;
-import org.utours.ace.game.feature.PlayingTurn;
-import org.utours.ace.game.impl.BotGamePlayingTurn;
-import org.utours.ace.game.impl.PlayerOnPressedViewBoard;
+import org.utours.ace.game.model.Board;
 import org.utours.ace.game.model.GameParty;
 import org.utours.ace.game.model.Player;
+import org.utours.ace.game.model.Slot;
+import org.utours.ace.game.port.GamePartyFinder;
+import org.utours.ace.game.port.GamePartyUpdater;
+import org.utours.ace.game.port.PlayerAction;
+import org.utours.ace.infra.game.GameContainer;
 import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.feature.CardService;
+import org.utours.ace.profile.feature.ImageCardReference;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.Card;
-import org.utours.ace.profile.model.Deck;
-import org.utours.ace.profile.model.ImageCard;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 public class GameFragment extends Fragment {
 
     private NavigationActivity navigationActivity;
     private PlayerAccountService playerAccountService;
     private CardService cardService;
-    private Map<String, ImageCard> imageCardsReferences;
-    private View selectedCardView;
-    private Map<View, Card> playerCardViews;
-    private Map<View, Card> opponentCardView;
-    private GameParty gameParty;
     private GameService gameService;
-    private PlayingTurn playingTurn;
-    private OnPressedViewBoard onPressedViewBoard;
-
-    public GameFragment() { }
+    private GamePartyFinder gamePartyFinder;
+    private ImageCardReference imageCardReference;
+    private Selectable<Integer> firstSelectedCardSlotView;
+    private SlotCardSelectable secondSelectedCardSlotView;
+    private Selectable<Integer> selectedEmptySlotView;
+    private Selectable<Integer> selectedHandCardView;
+    private GameParty gameParty;
+    private Player player;
+    private List<View> playerCardViews;
+    private List<View> opponentCardViews;
+    private List<View> playerBoard;
+    private List<View> opponentBoard;
+    private Button endButton;
+    private Button pullButton;
+    private boolean isSelectedCardOpponent = false;
 
     public static GameFragment newInstance(NavigationActivity navigationActivity,
                                            CardService cardService,
                                            PlayerAccountService playerAccountService) {
 
-        Deck deck = playerAccountService.currentPlayerAccount().deck();
-        List<Card> cards = cardService.getCardsStochastic(deck.cards(), Player.HAND_CAPACITY, false);
-
-        Player player = new Player("1", List.copyOf(cards));
-        Player opponent = new Player("2", List.copyOf(cards));
-
         GameFragment gameFragment = new GameFragment();
-        gameFragment.cardService = cardService;
+        gameFragment.imageCardReference = ImageCardReference.create(cardService);
+        gameFragment.gamePartyFinder = GameContainer.INSTANCE.getGamePartyFinder(navigationActivity);
         gameFragment.navigationActivity = navigationActivity;
         gameFragment.playerAccountService = playerAccountService;
+        gameFragment.cardService = cardService;
         gameFragment.gameService = new GameService(cardService);
-        gameFragment.gameParty = GameParty.Builder.newInstance()
-                .withPlayer(player)
-                .withOpponent(opponent)
-                .withCurrentPlayer(player)
-                .build();
+        gameFragment.playerBoard = new ArrayList<>(GameParty.MAX_SLOT);
+        gameFragment.opponentBoard = new ArrayList<>(GameParty.MAX_SLOT);
 
         return gameFragment;
     }
 
     public CompletableFuture<Void> setup() {
-        return CompletableFuture
-                .runAsync(this::onSetup)
-                .thenRun(this::provideImages);
+        return onSetup().thenRun(() -> {
+            List<Card> cpCards = gameParty.currentPlayer().deck().cards();
+            List<Card> opCards = gameParty.opponentPlayer().deck().cards();
+            List<Card> cards = Stream
+                    .concat(cpCards.stream(), opCards.stream())
+                    .collect(Collectors.toList());
+            imageCardReference.provideImageCards(cards);
+        });
     }
 
-    private void onSetup() { }
+    private CompletableFuture<Void> onSetup() {
+        var cpa = playerAccountService.currentPlayerAccount();
+        return gamePartyFinder.join(cpa, this::setPlayer, this::refresh).thenCompose(gp -> {
+            gameParty = gp;
+            selectedHandCardView = new SelectableValue<>(
+                    i -> {
+                        secondSelectedCardSlotView.unselect();
+                        firstSelectedCardSlotView.unselect();
+                        startDefaultObjectAnimatorTransY(playerCardViews.get(i), -50.0f);
+                    },
+                    i -> startDefaultObjectAnimatorTransY(playerCardViews.get(i), 0.0f));
+            secondSelectedCardSlotView = new SlotCardSelectable(playerBoard, opponentBoard, false);
+            firstSelectedCardSlotView = new SlotCardSelectable(playerBoard, opponentBoard, false);
+            selectedEmptySlotView = new SelectableValue<>();
+            return CompletableFuture.completedFuture(null);
+        });
+    }
 
     @Nullable
     @Override
@@ -90,87 +120,178 @@ public class GameFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view,
+                              @Nullable Bundle savedInstanceState) {
+
         LinearLayout boardLayout = view.findViewById(R.id.layout_board);
 
-        // Player
+        // Player.
         LinearLayout playerCardsLayout = view.findViewById(R.id.layout_playerCards);
         GridLayout playerBoardLayout = boardLayout.findViewById(R.id.layout_playerBoard);
-        setOnClickBindCardView(playerBoardLayout);
-        playerCardViews = bindCardsLayout(gameParty.player(), playerCardsLayout);
-
-        // Opponent
-        LinearLayout opponentCardsLayout = view.findViewById(R.id.layout_opponentCards);
-        GridLayout opponentBoardLayout = boardLayout.findViewById(R.id.layout_opponentBoard);
-        opponentCardView = bindCardsLayout(gameParty.opponent(), opponentCardsLayout);
+        fillPlayerBoard(playerBoardLayout);
+        playerCardViews = mapCardsLayout(player, playerCardsLayout);
 
         // Binding animation card.
-        playerCardViews.forEach((v, card) -> v.setOnClickListener(this::bindAnimationCard));
+        playerCardViews.forEach(v -> v.setOnClickListener(unused ->
+                selectedHandCardView.bind(playerCardViews.lastIndexOf(v))));
 
-        // Bot playing turn
-        playingTurn = new BotGamePlayingTurn(
-                gameService,
-                opponentCardView,
-                opponentBoardLayout,
-                this::getImageCardByCard);
+        // Opponent.
+        LinearLayout opponentCardsLayout = view.findViewById(R.id.layout_opponentCards);
+        GridLayout opponentBoardLayout = boardLayout.findViewById(R.id.layout_opponentBoard);
+        fillOpponentBoard(opponentBoardLayout);
+        opponentCardViews = mapCardsLayout(gameParty.oppositePlayerOf(player), opponentCardsLayout);
 
-        // On pressed board to place a card.
-        onPressedViewBoard = new PlayerOnPressedViewBoard(
-                gameService,
-                playerCardViews,
-                playingTurn,
-                this::getImageCardByCard);
+        endButton = view.findViewById(R.id.btn_end);
+        endButton.setOnClickListener(v -> {
+            gameParty = gameParty.nextTurn();
+            gameParty = sendRefresh(gameParty);
+        });
+
+        pullButton = view.findViewById(R.id.btn_pullCard);
+        pullButton.setOnClickListener(v -> {
+            var onPull = new OnPullCardViewTreatment(this::sendRefresh, cardService);
+            gameParty = onPull.apply(gameParty);
+        });
+
+        endButton.setEnabled(gameParty.isCurrentPlayer(player));
+        pullButton.setEnabled(gameParty.isCurrentPlayer(player));
     }
 
-    private void setOnClickBindCardView(GridLayout layout) {
-        IntStream.range(0, layout.getChildCount())
-                .forEach(i -> layout.getChildAt(i).setOnClickListener(this::onPressedEmptyCardBoard));
+    private void fillPlayerBoard(GridLayout layout) {
+        IntStream.range(0, layout.getChildCount()).forEach(i -> {
+            View child = layout.getChildAt(i);
+            child.setOnClickListener(this::onPressPlayerSlot);
+            playerBoard.add(child);
+        });
     }
 
-    private void onPressedEmptyCardBoard(View v) {
-        if (gameParty.isPlayerTurn()) {
-            gameParty = onPressedViewBoard.onPressed(gameParty, selectedCardView, v);
+    private void fillOpponentBoard(GridLayout layout) {
+        IntStream.range(0, layout.getChildCount()).forEach(i -> {
+            int newI = reverseIndexOpponentBoard(i);
+            View child = layout.getChildAt(newI);
+            child.setOnClickListener(this::onPressOpponentSlot);
+            opponentBoard.add(child);
+        });
+    }
+
+    private void onPressOpponentSlot(View view) {
+
+        if (selectedHandCardView.isSelect() && !gameParty.isCurrentPlayer(player) && !firstSelectedCardSlotView.isSelect())
+            return;
+
+        View emptySlotView = view.findViewById(R.id.view_emptySlot);
+        int index = reverseIndexOpponentBoard(opponentBoard.indexOf(view));
+
+        if (emptySlotView.getVisibility() == View.GONE) {
+            isSelectedCardOpponent = true;
+            selectCardToActivateSkill(index);
+            gameParty = onPressSlot(gameParty);
         }
-        if (gameParty.isOpponentTurn()) {
-            gameParty = gameService.botTurn(playingTurn, gameParty);
+
+    }
+
+    private void onPressPlayerSlot(View view) {
+        if (gameParty.isCurrentPlayer(player)) {
+
+            View emptySlotView = view.findViewById(R.id.view_emptySlot);
+            int index = playerBoard.indexOf(view);
+
+            if (emptySlotView.getVisibility() == View.VISIBLE) {
+                selectedEmptySlotView.select(index);
+            } else {
+                isSelectedCardOpponent = false;
+                selectCardToActivateSkill(index);
+            }
+
+            gameParty = onPressSlot(gameParty);
         }
     }
 
-    private void provideImages() {
-        cardService
-                .provideImageCards(gameParty.player().hand())
-                .thenAccept(this::setImageCardsReferences);
+    private GameParty onPressSlot(GameParty gameParty) {
+
+        PlayerAction playerAction = determinePlayerAction();
+
+        gameParty = playerAction.apply(gameParty);
+
+        selectedEmptySlotView.unselect();
+        selectedHandCardView.unselect();
+
+        return sendRefresh(gameParty);
     }
 
-    private void setImageCardsReferences(List<ImageCard> imageCards) {
-        List<Card> hand = gameParty.player().hand();
-        imageCardsReferences = cardService.getMapReferences(hand, imageCards);
+    private int reverseIndexOpponentBoard(int index) {
+        return index < 4 ? index + 4 : index - 4;
     }
 
-    private void bindAnimationCard(View view) {
-        if (selectedCardView == view || selectedCardView != null) {
-            startDefaultObjectAnimatorTransY(selectedCardView, 0.0f);
+    private PlayerAction determinePlayerAction() {
+
+        if (selectedHandCardView.isSelect() && selectedEmptySlotView.isSelect()) {
+
+            int cardPos = selectedHandCardView.getValue();
+            int slotPos = selectedEmptySlotView.getValue();
+
+            return new EmplaceCardOnBoardViewTreatment(
+                    player,
+                    this::sendRefresh,
+                    playerCardViews,
+                    playerBoard,
+                    imageCardReference,
+                    cardPos,
+                    slotPos);
+
+        } else if (firstSelectedCardSlotView.isSelect() && secondSelectedCardSlotView.isSelect()) {
+
+            var fromPos = firstSelectedCardSlotView;
+            var toPos = secondSelectedCardSlotView;
+
+            return new ActiveSkillViewTreatment(
+                    navigationActivity,
+                    this::sendRefresh,
+                    gameService,
+                    playerBoard,
+                    opponentBoard,
+                    imageCardReference,
+                    getGamePartyUpdater(),
+                    fromPos, toPos,
+                    isSelectedCardOpponent
+            );
         }
-        if (selectedCardView != view) {
-            startDefaultObjectAnimatorTransY(view, -50.0f);
-            selectedCardView = view;
+
+        return PlayerAction.noAction();
+    }
+
+    private void selectCardToActivateSkill(int index) {
+
+        if (!firstSelectedCardSlotView.isSelect()) {
+            firstSelectedCardSlotView.select(index);
+
+        } else if (!firstSelectedCardSlotView.getValue().equals(index) ||
+                (isSelectedCardOpponent && !firstSelectedCardSlotView.getValue()
+                        .equals(reverseIndexOpponentBoard(index)))) {
+
+            if (isSelectedCardOpponent) index = reverseIndexOpponentBoard(index);
+            secondSelectedCardSlotView.setOpponent(isSelectedCardOpponent);
+            secondSelectedCardSlotView.select(index);
+
         } else {
-            selectedCardView = null;
+            secondSelectedCardSlotView.unselect();
+            firstSelectedCardSlotView.unselect();
         }
     }
 
-    private Map<View, Card> bindCardsLayout(Player player, LinearLayout layout) {
+
+    private List<View> mapCardsLayout(Player player, LinearLayout layout) {
         return IntStream.range(0, layout.getChildCount())
                 .mapToObj(i -> bindCardLayout(player, layout, i))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+                .collect(Collectors.toList());
     }
 
-    private Map.Entry<View, Card> bindCardLayout(Player player, LinearLayout layout, int index) {
+    private View bindCardLayout(Player player, LinearLayout layout, int index) {
         Card card = player.hand().get(index);
         View view = layout.getChildAt(index);
-        PlayerCardView playerCardView = new PlayerCardView(view);
-        playerCardView.bind(card, getImageCardByCard(card));
-        return Map.entry(view, card);
+        CardViewBinding cardViewBinding = new CardViewBinding(view);
+        cardViewBinding.bind(card, imageCardReference.get(card));
+        return view;
     }
 
     private void startDefaultObjectAnimatorTransY(View view, float value) {
@@ -179,10 +300,67 @@ public class GameFragment extends Fragment {
         animation.start();
     }
 
-    private ImageCard getImageCardByCard(Card card) {
-        ImageCard imageCard = imageCardsReferences.get(card.pictureId());
-        assert imageCard != null;
-        return imageCard;
+    public GamePartyUpdater getGamePartyUpdater() {
+        return mapper -> refresh(mapper.map(gameParty));
+    }
+
+    private void refresh(GameParty gp) {
+        gameParty = gp;
+        if (gameParty.isCurrentPlayer(player) && playerCardViews != null) {
+            endButton.setEnabled(true);
+            pullButton.setEnabled(true);
+            refreshBoard(gameParty.opponentPlayerBoard(), opponentBoard);
+            refreshBoard(gameParty.currentPlayerBoard(), playerBoard);
+            refreshHand(gameParty.opponentPlayer(), opponentCardViews);
+            refreshHand(gameParty.currentPlayer(), playerCardViews);
+        } else if (!gameParty.isCurrentPlayer(player) && playerCardViews != null) {
+            endButton.setEnabled(false);
+            pullButton.setEnabled(false);
+            refreshBoard(gameParty.currentPlayerBoard(), opponentBoard);
+            refreshBoard(gameParty.opponentPlayerBoard(), playerBoard);
+            refreshHand(gameParty.currentPlayer(), opponentCardViews);
+            refreshHand(gameParty.opponentPlayer(), playerCardViews);
+        }
+    }
+
+    private void refreshHand(Player player, List<View> views) {
+        for (int i = 0; i < views.size(); i++) {
+            View cardView = views.get(i);
+            Card card = player.hand().get(i);
+            if (card == null) {
+                cardView.setVisibility(View.GONE);
+            } else {
+                cardView.setVisibility(View.VISIBLE);
+                CardViewBinding binding = new CardViewBinding(cardView);
+                binding.bind(card, imageCardReference.get(card));
+            }
+        }
+    }
+
+    private void refreshBoard(Board board, List<View> views) {
+        for (int i = 0; i < board.slots().size(); i++) {
+            Slot slot = board.slots().get(i);
+            View view = views.get(i);
+            var emptyView = view.findViewById(R.id.view_emptySlot);
+            var frameLayout = view.findViewById(R.id.view_cardSlot);
+            if (slot instanceof Slot.SCard sCard) {
+                CardViewBinding binding = new CardViewBinding(frameLayout);
+                binding.bind(sCard.card(), imageCardReference.get(sCard.card()));
+                emptyView.setVisibility(View.GONE);
+                frameLayout.setVisibility(View.VISIBLE);
+            } else {
+                emptyView.setVisibility(View.VISIBLE);
+                frameLayout.setVisibility(View.GONE);
+            }
+        }
+    }
+
+    private GameParty sendRefresh(GameParty gameParty) {
+        return GameContainer.INSTANCE.getBackendGamePartyMapper().map(gameParty);
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 
 }

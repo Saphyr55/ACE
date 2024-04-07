@@ -12,7 +12,7 @@ import org.utours.ace.R;
 import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
 
-public class PlayerCardView {
+public class CardViewBinding {
 
     private final AppCompatImageView cardImageView;
     private final TextView attackPointText;
@@ -20,7 +20,7 @@ public class PlayerCardView {
     private final TextView manaPointText;
     private final TextView rarityText;
 
-    public PlayerCardView(@NonNull View itemView) {
+    public CardViewBinding(@NonNull View itemView) {
         this.cardImageView = itemView.findViewById(R.id.image_card);
         this.attackPointText = itemView.findViewById(R.id.text_attackPoint);
         this.lifePointText = itemView.findViewById(R.id.text_lifePoint);

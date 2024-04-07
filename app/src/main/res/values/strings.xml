@@ -60,13 +60,17 @@
     <string name="find_a_party">Find a party</string>
     <string name="five">5</string>
     <string name="game">Game</string>
-    <string name="Customize">Customize Profile</string>
-    <string name="save">save</string>
-    <string name="Username">Username</string>
-    <string name="level">Level</string>
-    <string name="UID">UID</string>
-    <string name="change_your_description">Change your description :</string>
-    <string name="change_your_picture">Change your picture</string>
-    <string name="upload_image">Upload image</string>
-    <string name="take_a_photo">Take a photo</string>
+    <string name="target">Target</string>
+    <string name="attack">Attack</string>
+    <string name="activate_skill">Activate Skill</string>
+    <string name="player">Player</string>
+    <string name="end">End</string>
+    <string name="_class">Class</string>
+    <string name="info">Info</string>
+    <string name="select">Select</string>
+    <string name="no_description">No description</string>
+    <string name="complete_the_deck">Complete the deck</string>
+    <string name="your_deck_is_not_complete">Your deck is not complete</string>
+    <string name="loading_dots">Loading...</string>
+
 </resources>

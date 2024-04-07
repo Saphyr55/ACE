@@ -6,7 +6,7 @@ import org.utours.ace.profile.model.ClassCoin;
 
 @Bean
 @FirebaseModel
-class FirebaseCard {
+public class FirebaseCard {
 
     private String id;
     private String name;
@@ -16,6 +16,7 @@ class FirebaseCard {
     private Integer manaPoint;
     private String rarity;
     private String classCoin = ClassCoin.Type.EMPTY.name();
+    private boolean empty = false;
 
     public FirebaseCard() {
 
@@ -83,5 +84,13 @@ class FirebaseCard {
 
     public void setClassCoin(String classCoin) {
         this.classCoin = classCoin;
+    }
+
+    public boolean getEmpty() {
+        return empty;
+    }
+
+    public void setEmpty(boolean empty) {
+        this.empty = empty;
     }
 }

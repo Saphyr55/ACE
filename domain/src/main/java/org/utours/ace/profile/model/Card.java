@@ -1,7 +1,7 @@
 package org.utours.ace.profile.model;
 
 public record Card(
-        String id,
+        String uid,
         String name,
         String pictureId,
         Integer lifePoint,
@@ -23,6 +23,12 @@ public record Card(
                 new ClassCoin(ClassCoin.Type.EMPTY));
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) return false;
+        return uid.equals(((Card)o).uid);
+    }
+
     public static class Builder {
         private String id;
         private String name;
@@ -37,7 +43,7 @@ public record Card(
 
         public static Builder newBuilder(Card card) {
             return newBuilder()
-                    .withId(card.id)
+                    .withId(card.uid)
                     .withName(card.name)
                     .withAttackPoint(card.attackPoint)
                     .withLifePoint(card.lifePoint)
@@ -50,8 +56,8 @@ public record Card(
             return new Builder();
         }
 
-        public static Card copy(Card card) {
-            return newBuilder(card).build();
+        public static Builder copyOf(Card card) {
+            return newBuilder(card);
         }
 
         public Builder withAttackPoint(Integer attackPoint) {
@@ -93,7 +99,6 @@ public record Card(
             this.classCoin = classCoin;
             return this;
         }
-
 
         public Card build() {
             return new Card(

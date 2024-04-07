@@ -9,6 +9,7 @@ import org.utours.ace.infra.profile.firebase.FirebaseCardMapper;
 import org.utours.ace.infra.common.firebase.FirebaseDatabaseReferences;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountMapper;
 import org.utours.ace.infra.profile.firebase.FirebasePlayerAccountRepository;
+import org.utours.ace.infra.profile.jikan.JikanInformationCardProvider;
 import org.utours.ace.infra.profile.mal.MalImageCardDownloader;
 import org.utours.ace.infra.profile.sqlite.SQLiteImageInstaller;
 import org.utours.ace.infra.profile.sqlite.SQLiteImageProvider;
@@ -17,6 +18,7 @@ import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.GachaService;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.port.ImageCardDownloader;
+import org.utours.ace.profile.port.InformationCardProvider;
 import org.utours.ace.profile.port.PlayerAccountRepository;
 
 public enum PlayerAccountContainer {
@@ -26,6 +28,7 @@ public enum PlayerAccountContainer {
     private final PlayerAccountRepository playerAccountRepository;
     private final PlayerAccountService playerAccountService;
     private final ImageCardDownloader imageCardDownloader;
+    private final InformationCardProvider informationCardProvider;
 
     PlayerAccountContainer() {
 
@@ -38,6 +41,11 @@ public enum PlayerAccountContainer {
         this.playerAccountRepository = new FirebasePlayerAccountRepository(refs.playerAccountsReference(), playerAccountMapper);
         this.imageCardDownloader = new MalImageCardDownloader(new HttpImageDownloader());
         this.playerAccountService = new PlayerAccountService(playerAccountRepository);
+        this.informationCardProvider = new JikanInformationCardProvider();
+    }
+
+    public InformationCardProvider getInformationCardProvider() {
+        return informationCardProvider;
     }
 
     public PlayerAccountRepository getPlayerAccountRepository() {

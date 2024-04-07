@@ -71,5 +71,6 @@
     <string name="no_description">No description</string>
     <string name="complete_the_deck">Complete the deck</string>
     <string name="your_deck_is_not_complete">Your deck is not complete</string>
+    <string name="loading_dots">Loading...</string>
 
 </resources>

@@ -1,5 +1,6 @@
 package org.utours.ace.profile.deck;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -21,7 +22,9 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import org.utours.ace.R;
+import org.utours.ace.infra.profile.PlayerAccountContainer;
 import org.utours.ace.profile.NavigationActivity;
+import org.utours.ace.profile.dialog.InformationCardDialog;
 import org.utours.ace.profile.dialog.SelectClassCoinDialog;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.ImageCardReference;
@@ -53,12 +56,14 @@ public class DeckFragment extends Fragment {
     private Button classButton;
     private Button informationButton;
     private Context context;
+    private NavigationActivity navigationActivity;
 
     public static DeckFragment newInstance(CardService cardService,
                                            PlayerAccountService playerAccountService,
                                            NavigationActivity navigationActivity) {
         DeckFragment deckFragment = new DeckFragment();
         deckFragment.context = navigationActivity;
+        deckFragment.navigationActivity = navigationActivity;
         deckFragment.cardService = cardService;
         deckFragment.playerAccountService = playerAccountService;
         deckFragment.setDefaultCardViewBackground = (cardView) -> {
@@ -108,11 +113,21 @@ public class DeckFragment extends Fragment {
         classButton.setEnabled(false);
         informationButton.setEnabled(false);
         classButton.setOnClickListener(v -> onClickClassButton());
+        informationButton.setOnClickListener(v -> onClickInfoButton());
 
         setup().thenRun(() -> {
             gridView.setAdapter(cardGridAdapter);
             setupCardDetailsOnSelect(null);
         });
+    }
+
+    private void onClickInfoButton() {
+        Dialog dialog = new InformationCardDialog(
+                navigationActivity,
+                cardSelected,
+                imageCardReference.get(cardSelected),
+                PlayerAccountContainer.INSTANCE.getInformationCardProvider());
+        dialog.show();
     }
 
     private void onToggleDeck(CompoundButton compoundButton, boolean isActive) {

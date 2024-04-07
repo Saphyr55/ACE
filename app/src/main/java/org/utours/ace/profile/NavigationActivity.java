@@ -60,7 +60,7 @@ public class NavigationActivity extends AppCompatActivity {
         GachaService gachaService = PlayerAccountContainer.INSTANCE.getGachaService(this);
 
         mainFragment = MainFragment.newInstance(this);
-        profileFragment = ProfileFragment.newInstance(cardService, playerAccountService);
+        profileFragment = ProfileFragment.newInstance(this, cardService, playerAccountService);
         deckFragment = DeckFragment.newInstance(cardService, playerAccountService);
         gachaFragment = new GachaFragment(cardService, gachaService, this);
         shopFragment = new ShopFragment();

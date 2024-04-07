@@ -65,6 +65,8 @@
     <string name="Username">Username</string>
     <string name="level">Level</string>
     <string name="UID">UID</string>
-    <string name="choose_your_card">Choose your card</string>
     <string name="change_your_description">Change your description :</string>
+    <string name="change_your_picture">Change your picture</string>
+    <string name="upload_image">Upload image</string>
+    <string name="take_a_photo">Take a photo</string>
 </resources>

@@ -2,7 +2,9 @@ package org.utours.ace.profile.dialog;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.BaseAdapter;
 import android.widget.Button;
@@ -15,6 +17,7 @@ import androidx.cardview.widget.CardView;
 import org.utours.ace.R;
 import org.utours.ace.common.Refreshable;
 import org.utours.ace.profile.CardGridAdapter;
+import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
 import org.utours.ace.profile.model.Card;
@@ -25,6 +28,7 @@ import org.utours.ace.profile.model.PlayerAccount;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public final class CustomizeProfileDialog extends Dialog {
@@ -37,13 +41,13 @@ public final class CustomizeProfileDialog extends Dialog {
     private Card cardSelected;
     private CardView cardViewSelected;
 
-    public CustomizeProfileDialog(@NonNull Context context,
+    public CustomizeProfileDialog(@NonNull NavigationActivity navigationActivity,
                                   PlayerAccountService playerAccountService,
-                                  Refreshable refreshable,
                                   CardService cardService,
-                                  Map<String, ImageCard> cardImages) {
+                                  Map<String, ImageCard> cardImages,
+                                  BiConsumer<CardView,Card> refreshable) {
 
-        super(context);
+        super(navigationActivity);
         this.cardImages = cardImages;
         pAccountService = playerAccountService;
 
@@ -52,11 +56,14 @@ public final class CustomizeProfileDialog extends Dialog {
         Optional.ofNullable(getWindow())
                 .ifPresent(window -> window.setWindowAnimations(R.style.DialogAnimations));
 
+        Button uploadButton = findViewById(R.id.btn_uploadImage);
+        Button photoButton = findViewById(R.id.btn_takePhoto);
         Button cancelButton = findViewById(R.id.btn_cancel);
         Button saveButton = findViewById(R.id.btn_save);
         EditText descriptionEditText = findViewById(R.id.edittext_description);
         GridView gridView = findViewById(R.id.grid_cards);
 
+        descriptionEditText.setText(pAccountService.currentPlayerAccount().description());
 
         cardGridAdapter = new CardGridAdapter(
                 getContext(),
@@ -76,6 +83,16 @@ public final class CustomizeProfileDialog extends Dialog {
             cardView.setBackgroundColor(color);
         };
 
+        uploadButton.setOnClickListener(v -> {
+            Intent iGallery = new Intent(Intent.ACTION_PICK);
+            iGallery.setData(MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+            navigationActivity.startActivity(iGallery);
+        });
+
+        photoButton.setOnClickListener(v -> {
+
+        });
+
         saveButton.setOnClickListener(v -> {
             String description = descriptionEditText.getText().toString();
             playerAccountService.setCurrentPlayerAccount(playerAccount -> {
@@ -83,7 +100,7 @@ public final class CustomizeProfileDialog extends Dialog {
                         .withDescription(description)
                         .build();
             });
-            refreshable.refresh();
+            refreshable.accept(cardViewSelected, cardSelected);
             dismiss();
         });
 

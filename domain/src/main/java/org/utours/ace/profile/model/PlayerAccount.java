@@ -77,6 +77,7 @@ public record PlayerAccount(
         private Deck deck = new Deck(Set.of());
         private Set<Card> cards = Set.of();
 
+
         private Builder(String uid, String email) {
             this.uid = uid;
             this.email = email;

@@ -1,22 +1,28 @@
 package org.utours.ace.profile.profile;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import org.utours.ace.R;
+import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.dialog.CustomizeProfileDialog;
 import org.utours.ace.profile.feature.CardService;
 import org.utours.ace.profile.feature.PlayerAccountService;
+import org.utours.ace.profile.model.Card;
 import org.utours.ace.profile.model.ImageCard;
 
 import java.util.List;
@@ -26,18 +32,21 @@ import java.util.concurrent.CompletableFuture;
 
 public class ProfileFragment extends Fragment {
 
+    private NavigationActivity navigationActivity;
     private PlayerAccountService accountService;
     private CardService cardService;
     private Map<String, ImageCard> cardImages;
+    private View viewFragment;
 
     public ProfileFragment(){
 
     }
 
-    public static ProfileFragment newInstance(CardService cardService, PlayerAccountService accountService) {
+    public static ProfileFragment newInstance(NavigationActivity navigationActivity, CardService cardService, PlayerAccountService accountService) {
         ProfileFragment fragment = new ProfileFragment();
         fragment.accountService = accountService;
         fragment.cardService = cardService;
+        fragment.navigationActivity = navigationActivity;
 
         return fragment;
     }
@@ -52,7 +61,7 @@ public class ProfileFragment extends Fragment {
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-
+        viewFragment = view;
         Context context = view.getContext();
         TextView levelNumberText = view.findViewById(R.id.text_level);
         TextView uuidNumberText = view.findViewById(R.id.text_uuid);
@@ -70,22 +79,33 @@ public class ProfileFragment extends Fragment {
         descriptionText.setText(description);
         usernameText.setText(username);
 
-        customizeButton.setOnClickListener(v -> onCustomizeButton(context,descriptionText) );
+        customizeButton.setOnClickListener(v -> onCustomizeButton(navigationActivity,descriptionText) );
 
     }
 
-    private void onCustomizeButton(Context context, TextView descriptionText) {
+    private void onCustomizeButton(NavigationActivity navigationActivity, TextView descriptionText) {
 
-        CustomizeProfileDialog customizeProfileDialog = new CustomizeProfileDialog(context,accountService,() -> refresh(descriptionText), cardService, cardImages);
+        CustomizeProfileDialog customizeProfileDialog = new CustomizeProfileDialog(navigationActivity,accountService, cardService, cardImages, (cardView, card) -> {
+            refresh(descriptionText, cardView, card);
+        });
         customizeProfileDialog.show();
 
     }
 
-    public void refresh(TextView descriptionText) {
+    public void refresh(TextView descriptionText, CardView cardView, Card card) {
 
         String description = String.valueOf(accountService.currentPlayerAccount().description());
-
         descriptionText.setText(description);
+        if(cardView == null)
+            return;
+        CardView userPictureCardView = viewFragment.findViewById(R.id.profile_user_picture);
+        ImageView userPictureImageview = userPictureCardView.findViewById(R.id.image_card);
+
+        ImageCard imageCard = cardImages.get(card.pictureId());
+        assert imageCard != null;
+        byte[] content = imageCard.content();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(content, 0, content.length);
+        userPictureImageview.setImageBitmap(bitmap);
 
     }
 

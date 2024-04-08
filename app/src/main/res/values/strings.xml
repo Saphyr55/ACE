@@ -81,5 +81,6 @@
     <string name="change_your_picture">Change your picture</string>
     <string name="upload_image">Upload image</string>
     <string name="take_a_photo">Take a photo</string>
+    <string name="no_internet_connection">No internet connection, please reload the game</string>
 
 </resources>

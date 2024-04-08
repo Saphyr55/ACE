@@ -58,7 +58,6 @@ public final class CustomizeProfileDialog extends Dialog {
                 .ifPresent(window -> window.setWindowAnimations(R.style.DialogAnimations));
 
         Button uploadButton = findViewById(R.id.btn_uploadImage);
-        Button photoButton = findViewById(R.id.btn_takePhoto);
         Button cancelButton = findViewById(R.id.btn_cancel);
         Button saveButton = findViewById(R.id.btn_save);
         EditText descriptionEditText = findViewById(R.id.edittext_description);
@@ -90,9 +89,7 @@ public final class CustomizeProfileDialog extends Dialog {
             navigationActivity.startActivityForResult(iGallery, REQUEST_CODE);
         });
 
-        photoButton.setOnClickListener(v -> {
 
-        });
 
         saveButton.setOnClickListener(v -> {
             String description = descriptionEditText.getText().toString();

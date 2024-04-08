@@ -1,8 +1,10 @@
 package org.utours.ace.profile;
 
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -15,6 +17,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import org.utours.ace.R;
+import org.utours.ace.common.WifiReceiver;
 import org.utours.ace.databinding.ActivityNavigationBinding;
 import org.utours.ace.infra.profile.PlayerAccountContainer;
 import org.utours.ace.main.ErrorFragment;
@@ -38,6 +41,8 @@ public class NavigationActivity extends AppCompatActivity {
     private DeckFragment deckFragment;
     private GachaFragment gachaFragment;
     private ShopFragment shopFragment;
+    WifiReceiver wifiReceiver;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +68,8 @@ public class NavigationActivity extends AppCompatActivity {
         gachaFragment = new GachaFragment(cardService, gachaService, this);
         shopFragment = new ShopFragment();
 
+        wifiReceiver = new WifiReceiver();
+
         cardService
                 .downloadAndInstallAllImages()
                 .thenCompose(unused -> deckFragment.setup())
@@ -70,6 +77,7 @@ public class NavigationActivity extends AppCompatActivity {
                 .thenCompose(unused -> profileFragment.setup())
                 .thenRun(this::startNavigationMain)
                 .exceptionally(this::messagingErrorFragment);
+
     }
 
     private void startNavigationMain() {
@@ -155,7 +163,16 @@ public class NavigationActivity extends AppCompatActivity {
         }
     }
 
-
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(wifiReceiver,filter);
+    }
+    protected void onStop(){
+        super.onStop();
+        unregisterReceiver(wifiReceiver);
+    }
 
 
 }

@@ -9,6 +9,6 @@ public record ProfilePicture(
 ) implements ImageContent {
     public enum Type {
         Card,
-        External
+        Storage
     }
 }

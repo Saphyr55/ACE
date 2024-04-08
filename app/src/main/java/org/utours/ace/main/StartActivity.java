@@ -3,6 +3,8 @@ package org.utours.ace.main;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.TextView;
@@ -13,9 +15,11 @@ import org.utours.ace.auth.model.AuthAccount;
 import org.utours.ace.infra.profile.PlayerAccountContainer;
 import org.utours.ace.profile.NavigationActivity;
 import org.utours.ace.profile.model.PlayerAccount;
+import org.utours.ace.common.WifiReceiver;
 
 public class StartActivity extends AppCompatActivity {
 
+    WifiReceiver wifiReceiver;
     private TextView startACETextView;
     private Button parameterStartButton;
 
@@ -36,6 +40,8 @@ public class StartActivity extends AppCompatActivity {
                 .getPlayerAccountRepository()
                 .getByUID(authAccount.uid())
                 .thenAccept(opt -> initPlayerAccount(opt.orElseThrow(RuntimeException::new)));
+
+        wifiReceiver = new WifiReceiver();
     }
 
     private void initPlayerAccount(PlayerAccount playerAccount) {
@@ -49,6 +55,7 @@ public class StartActivity extends AppCompatActivity {
 
     private void redirectToNavigationActivity() {
         Intent intent = new Intent(this, NavigationActivity.class);
+        sendBroadcast(intent);
         startActivity(intent);
         finish();
     }
@@ -57,5 +64,15 @@ public class StartActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter(WifiManager.NETWORK_STATE_CHANGED_ACTION);
+        registerReceiver(wifiReceiver,filter);
+    }
+    protected void onStop(){
+        super.onStop();
+        unregisterReceiver(wifiReceiver);
+    }
 
 }
